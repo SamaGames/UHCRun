@@ -1,0 +1,15 @@
+name: SurvivalGames
+main: net.zyuiop.survivalgames.SurvivalGames
+version: 1
+depend: [MasterBundle, SamaPermissionsBukkit]
+load: STARTUP
+commands:
+   start:
+      description: Démarre la partie
+      usage: /<command> now
+      permission: sg.op
+      permission-message: Permission non accordée
+permissions:
+   sg.op:
+      description: Commandes OP PPVP
+      default: op
