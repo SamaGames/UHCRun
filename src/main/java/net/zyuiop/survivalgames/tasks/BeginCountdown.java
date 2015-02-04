@@ -4,7 +4,7 @@ import net.samagames.gameapi.GameUtils;
 import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.themachine.messages.StaticMessages;
 import net.samagames.utils.Titles;
-import net.zyuiop.survivalgames.game.Game;
+import net.zyuiop.survivalgames.game.BasicGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -15,13 +15,13 @@ import org.bukkit.entity.Player;
  */
 public class BeginCountdown implements Runnable {
 
-    protected Game parent;
+    protected BasicGame parent;
     protected int maxPlayers = 0;
     protected int minPlayers = 0;
     protected boolean ready = false;
     protected int time = 121; // 2 minutes
 
-    public BeginCountdown(Game parentArena, int maxPlayers, int minPlayers) {
+    public BeginCountdown(BasicGame parentArena, int maxPlayers, int minPlayers) {
         this.parent = parentArena;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;

@@ -1,23 +1,20 @@
 package net.zyuiop.survivalgames.listeners;
 
+import net.samagames.gameapi.GameUtils;
 import net.samagames.gameapi.json.Status;
 import net.zyuiop.survivalgames.SurvivalGames;
-import net.zyuiop.survivalgames.game.Game;
+import net.zyuiop.survivalgames.game.BasicGame;
 import net.zyuiop.survivalgames.utils.Metadatas;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -40,9 +37,9 @@ import java.util.Random;
  */
 public class PlayerListener implements Listener {
 
-    protected Game game;
+    protected BasicGame game;
 
-    public PlayerListener(Game game) {
+    public PlayerListener(BasicGame game) {
         this.game = game;
     }
 
@@ -58,6 +55,13 @@ public class PlayerListener implements Listener {
         if (event.getItem().getType() == Material.GOLDEN_APPLE) {
             event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10*20, 1));
         }
+    }
+
+    @EventHandler
+    public void brewevent(BrewEvent event)
+    {
+        if(event.getContents().getIngredient().getType() == Material.GLOWSTONE_DUST)
+            event.setCancelled(true);
     }
 
     @EventHandler
@@ -142,13 +146,19 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         if (event.getRecipe().getResult().getType() == Material.GOLDEN_APPLE && event.getInventory().getItem(0).getType() == Material.GOLD_BLOCK)
-            event.setCancelled(true);
+            event.getInventory().setResult(null);
         else if (event.getRecipe().getResult().getType() == Material.WOOD_PICKAXE)
             event.getInventory().setResult(new ItemStack(Material.STONE_PICKAXE));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_AXE)
             event.getInventory().setResult(new ItemStack(Material.STONE_AXE));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_SWORD)
             event.getInventory().setResult(new ItemStack(Material.STONE_SWORD));
+    }
+
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        if (event.getEntityType() == EntityType.WITCH)
+            event.setCancelled(true);
     }
 
     @EventHandler
@@ -163,36 +173,31 @@ public class PlayerListener implements Listener {
             event.getInventory().setResult(new ItemStack(Material.STONE_SWORD));
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
             Player damaged = (Player) event.getEntity();
             Entity damager = event.getDamager();
-            EntityType type = event.getEntityType();
 
-            if (damager instanceof Projectile) {
-                if (((Entity) ((Projectile) damager).getShooter()).getType() == EntityType.SKELETON)
-                    return;
-            }
-
-            if (type == EntityType.ARROW || type == EntityType.PRIMED_TNT || type == EntityType.PLAYER || damager instanceof Projectile) {
+            if (damager instanceof Projectile || damager instanceof Player) {
                 if (!game.isPvpenabled()) {
+                    Bukkit.getLogger().info("=> Cancelling damage from "+damager.getType()+"("+damager.getName()+") to "+damaged.getDisplayName());
                     event.setCancelled(true);
-                } else {
-                    Player playerdamager = null;
-                    if (damager instanceof Player) {
-                        playerdamager = (Player) damager;
-                    } else if (damager instanceof Arrow) {
-                        Arrow arrow = (Arrow) damager;
-                        Entity shooter = (Entity) arrow.getShooter();
-                        if (shooter instanceof Player)
-                            playerdamager = (Player) shooter;
-                    }
-
-                    if (playerdamager != null) {
-                        Metadatas.setMetadata(damaged, "lastDamager", playerdamager);
-                    }
+                    return;
                 }
+
+                Player playerdamager;
+                if (damager instanceof Player) {
+                    playerdamager = (Player) damager;
+                } else {
+                    Projectile  arrow = (Projectile) damager;
+                    Entity shooter = (Entity) arrow.getShooter();
+                    if (shooter instanceof Player)
+                        playerdamager = (Player) shooter;
+                    else
+                        return;
+                }
+                Metadatas.setMetadata(damaged, "lastDamager", playerdamager);
             }
         }
     }
@@ -220,8 +225,9 @@ public class PlayerListener implements Listener {
             event.getDrops().add(new ItemStack(Material.GOLDEN_APPLE));
             if (event.getEntity().getKiller() != null)
                 event.getEntity().getKiller().addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*20, 1));
+            GameUtils.broadcastSound(Sound.WITHER_DEATH);
         }
-        event.setDeathMessage("");
+        event.setDeathMessage(game.getCoherenceMachine().getGameTag()+event.getDeathMessage());
     }
 
     @EventHandler

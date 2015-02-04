@@ -1,37 +1,30 @@
 package net.zyuiop.survivalgames.listeners;
 
 import net.samagames.gameapi.json.Status;
-import net.zyuiop.survivalgames.game.Game;
-import org.bukkit.ChatColor;
+import net.zyuiop.survivalgames.game.BasicGame;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by zyuiop on 13/09/14.
  */
 public class SpectatorListener implements Listener {
 
-    protected Game arena;
+    protected BasicGame arena;
     public ArrayList<Material> whitelist = new ArrayList<>();
 
-    public SpectatorListener(Game parent) {
+    public SpectatorListener(BasicGame parent) {
         this.arena = parent;
     }
 

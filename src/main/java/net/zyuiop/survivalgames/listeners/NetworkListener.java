@@ -2,25 +2,22 @@ package net.zyuiop.survivalgames.listeners;
 
 import net.samagames.gameapi.events.FinishJoinPlayerEvent;
 import net.samagames.gameapi.events.PreJoinPlayerEvent;
-import net.samagames.gameapi.json.Status;
 import net.zyuiop.survivalgames.SurvivalGames;
-import net.zyuiop.survivalgames.game.Game;
+import net.zyuiop.survivalgames.game.BasicGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
 
 /**
  * Created by vialarl on 16/01/2015.
  */
 public class NetworkListener implements Listener {
 
-    private Game game;
+    private BasicGame game;
 
-    public NetworkListener(Game game) {
+    public NetworkListener(BasicGame game) {
         this.game = game;
     }
 

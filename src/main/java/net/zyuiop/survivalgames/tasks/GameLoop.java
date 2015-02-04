@@ -2,7 +2,7 @@ package net.zyuiop.survivalgames.tasks;
 
 import net.samagames.utils.ObjectiveSign;
 import net.zyuiop.survivalgames.SurvivalGames;
-import net.zyuiop.survivalgames.game.Game;
+import net.zyuiop.survivalgames.game.BasicGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -11,14 +11,14 @@ import org.bukkit.ChatColor;
  */
 public class GameLoop implements Runnable {
 
-    protected Game parent;
+    protected BasicGame parent;
     protected int minutes = 0;
     protected int seconds = 0;
     protected TimedEvent nextEvent = null;
 
     protected ObjectiveSign objective;
 
-    public GameLoop(Game parentArena, ObjectiveSign obj) {
+    public GameLoop(BasicGame parentArena, ObjectiveSign obj) {
         this.parent = parentArena;
         objective = obj;
         nextEvent = new TimedEvent(1, 0, ChatColor.GOLD + "Dégats actifs", ChatColor.GOLD) {
@@ -34,7 +34,7 @@ public class GameLoop implements Runnable {
     }
 
     protected void createReductionEvent() {
-        nextEvent = new TimedEvent(19, 0, ChatColor.RED + "Réduction", ChatColor.RED) {
+        nextEvent = new TimedEvent(19, 0, ChatColor.RED + "Téléportation", ChatColor.RED) {
             @Override
             public void run() {
                 parent.disableDamages();
@@ -97,7 +97,6 @@ public class GameLoop implements Runnable {
         this.objective.setLine(- 2, timeString(minutes, seconds));
         this.objective.setLine(- 3, "Joueurs : " + ChatColor.AQUA + parent.countGamePlayers());
 
-        int indice = -3;
 
         if (nextEvent != null) {
             this.objective.setLine(- 4, ChatColor.GRAY + "");
@@ -110,13 +109,6 @@ public class GameLoop implements Runnable {
             if (nextEvent.seconds == 0 && 0 == nextEvent.minutes)
                 Bukkit.broadcastMessage(parent.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + nextEvent.string + ChatColor.GOLD + " maintenant !");
             nextEvent.decrement();
-            indice = -6;
-        }
-
-        if (parent.getFeast() != null) {
-            this.objective.setLine(indice-1, ChatColor.GOLD + "");
-            this.objective.setLine(indice-2, ChatColor.GOLD + "Feast en :");
-            this.objective.setLine(indice-3, ChatColor.GOLD + ""+ parent.getFeast().getBlockX()+";"+parent.getFeast().getBlockZ());
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(SurvivalGames.instance, new Runnable() {

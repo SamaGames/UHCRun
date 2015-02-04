@@ -33,32 +33,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Created by vialarl on 16/01/2015.
  */
-public class Game implements GameArena {
-    protected CopyOnWriteArraySet<UUID> players = new CopyOnWriteArraySet<>();
-    protected int maxPlayers = 20;
-    protected int minPlayers = 7;
-    protected int vipPlayers = 4;
-    protected Status status;
-    protected String mapName;
-    protected SurvivalGames plugin;
-    protected Location feast = null;
-    protected boolean pvpenabled = false;
-    protected MessageManager messageManager;
-    private CoherenceMachine coherenceMachine;
-    private BukkitTask beginCountdown;
-    private BukkitTask mainLoop;
-    private ObjectiveSign objectiveSign;
-    private Objective life;
-    private Scoreboard scoreboard;
-    private boolean damages;
-    private ArrayList<SpawnLocation> spawns = new ArrayList<>();
+public class SoloGame extends BasicGame {
 
-    public Game(String mapname) {
-        this.mapName = mapname;
-        this.status = Status.Idle;
-        this.coherenceMachine = new CoherenceMachine("UHCRun");
-        this.messageManager = new MessageManager(coherenceMachine);
-        beginCountdown = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new BeginCountdown(this, maxPlayers, minPlayers), 20L, 20L);
+    public SoloGame() {
+        super("Solo", 10, 20, 4);
         spawns.add(new SpawnLocation(0, 200));
         spawns.add(new SpawnLocation(0, 400));
         spawns.add(new SpawnLocation(200, 0));
@@ -67,12 +45,12 @@ public class Game implements GameArena {
         spawns.add(new SpawnLocation(200, 400));
         spawns.add(new SpawnLocation(400, 400));
         spawns.add(new SpawnLocation(200, 200));
-        spawns.add(new SpawnLocation(0, -200));
+        spawns.add(new SpawnLocation(0, - 200));
         spawns.add(new SpawnLocation(0, -400));
         spawns.add(new SpawnLocation(-200, 0));
         spawns.add(new SpawnLocation(-400, 0));
         spawns.add(new SpawnLocation(-400, -200));
-        spawns.add(new SpawnLocation(-200, -400));
+        spawns.add(new SpawnLocation(- 200, - 400));
         spawns.add(new SpawnLocation(-400, -400));
         spawns.add(new SpawnLocation(-200, -200));
         spawns.add(new SpawnLocation(400, -200));
@@ -82,37 +60,15 @@ public class Game implements GameArena {
         spawns.add(new SpawnLocation(-400, 400));
         spawns.add(new SpawnLocation(400, -400));
         spawns.add(new SpawnLocation(200, -200));
-        spawns.add(new SpawnLocation(-200, 200));
+        spawns.add(new SpawnLocation(- 200, 200));
     }
 
-    public void enablePVP() {
-        this.pvpenabled = true;
-    }
-
-    public void disableDamages() {
-        this.damages = false;
-    }
-
-    public void start() {
-        SurvivalGames.instance.removeSpawn();
-        objectiveSign = new ObjectiveSign("sggameloop", ChatColor.AQUA +""+ChatColor.ITALIC + "≡ UHCRun ≡");
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        life = scoreboard.registerNewObjective("vie", "health");
-        Objective lifeb = scoreboard.registerNewObjective("vieb", "health");
-        life.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        lifeb.setDisplayName("HP");
-        life.setDisplayName("HP");
-        lifeb.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-        updateStatus(Status.InGame);
-        if (beginCountdown != null)
-            beginCountdown.cancel();
-
-        mainLoop = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new GameLoop(this, objectiveSign), 20, 20);
-
-        List<Player> list = Lists.newArrayList();
+    @Override
+    public void teleportAtStart() {
         World world = Bukkit.getWorld("world");
         Collections.shuffle(spawns);
         Iterator<SpawnLocation> locationIterator = spawns.iterator();
+
         for (UUID uuid : players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) {
@@ -126,62 +82,11 @@ public class Game implements GameArena {
                 return;
             }
 
-            player.setGameMode(GameMode.SURVIVAL);
-            player.setFoodLevel(20);
-            player.setScoreboard(scoreboard);
-            player.setLevel(0);
             player.teleport(locationIterator.next().getSpawn(world));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60*20*32, 1));
-            objectiveSign.addReceiver(player);
-            list.add(player);
         }
-
-        for (UUID uuid : players) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
-                players.remove(uuid);
-                return;
-            }
-
-            player.setHealth(10.0);
-        }
-
-        for (UUID uuid : players) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
-                players.remove(uuid);
-                return;
-            }
-
-            player.setHealth(20.0);
-        }
-
-
-        Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
     }
 
-    public void stumpPlayer(Player player, boolean logout) {
-        players.remove(player.getUniqueId());
-        if (status != Status.InGame)
-            return;
-
-        Object lastDamager = Metadatas.getMetadata(player, "lastDamager");
-        Player killer = null;
-        if (lastDamager != null && lastDamager instanceof Player) {
-            killer = (Player) lastDamager;
-            if (!killer.isOnline() || !isInGame(killer.getUniqueId()))
-                killer = null;
-            else
-                CoinsManager.creditJoueur(killer.getUniqueId(), 20, true, true, "Un joueur tué !");
-        }
-
-        if (logout)
-            Bukkit.broadcastMessage(coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s'est déconnecté.");
-        else if (killer != null)
-            Bukkit.broadcastMessage(coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par "+ killer.getDisplayName());
-        else
-            Bukkit.broadcastMessage(coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
-
+    public void checkStump(Player player) {
         if (players.size() == 2)
             CoinsManager.creditJoueur(player.getUniqueId(), 20, true, true, "Troisième au classement !");
 
@@ -200,30 +105,6 @@ public class Game implements GameArena {
         } else {
             Bukkit.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + players.size() + ChatColor.YELLOW + " joueur(s) en vie.");
         }
-
-        if (logout)
-            return;
-
-        player.setGameMode(GameMode.SPECTATOR);
-        player.setHealth(1.0); // Le joueur ne voit pas l'écran de mort
-        Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
-    }
-
-    public boolean isDamages() {
-        return damages;
-    }
-
-    public void finish() {
-        mainLoop.cancel();
-        Bukkit.getScheduler().runTaskLater(SurvivalGames.instance, new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers())
-                    GameAPI.kickPlayer(player);
-
-                Bukkit.getServer().shutdown();
-            }
-        }, 20*30);
     }
 
     public void win(final Player player) {
@@ -291,83 +172,6 @@ public class Game implements GameArena {
         }, 5L, 5L);
 
         finish();
-    }
-
-    public void join(Player player) {
-        players.add(player.getUniqueId());
-        messageManager.writeWelcomeInGameMessage(player);
-        messageManager.writePlayerJoinArenaMessage(player, this);
-        player.setGameMode(GameMode.ADVENTURE);
-        player.teleport(new Location(Bukkit.getWorld("world"), 0, 162, 0));
-    }
-
-    public boolean isPvpenabled() {
-        return pvpenabled;
-    }
-
-    public boolean isInGame(UUID player) {
-        return players.contains(player);
-    }
-
-    public MessageManager getMessageManager() {
-        return messageManager;
-    }
-
-    @Override
-    public int countGamePlayers() {
-        return players.size();
-    }
-
-    public Location getFeast() {
-        return feast;
-    }
-
-    @Override
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    @Override
-    public int getTotalMaxPlayers() {
-        return getMaxPlayers() + getVIPSlots();
-    }
-
-    @Override
-    public int getVIPSlots() {
-        return vipPlayers;
-    }
-
-    @Override
-    public Status getStatus() {
-        return status;
-    }
-
-    @Override
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void updateStatus(Status status) {
-        setStatus(status);
-        GameAPI.getManager().sendArena();
-    }
-
-    @Override
-    public String getMapName() {
-        return mapName;
-    }
-
-    @Override
-    public boolean hasPlayer(UUID player) {
-        return players.contains(player);
-    }
-
-    public CoherenceMachine getCoherenceMachine() {
-        return coherenceMachine;
-    }
-
-    public void enableDamage() {
-        this.damages = true;
     }
 
     public void teleportDeathmatch() {

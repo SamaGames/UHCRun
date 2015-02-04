@@ -1,6 +1,6 @@
 package net.zyuiop.survivalgames.commands;
 
-import net.zyuiop.survivalgames.game.Game;
+import net.zyuiop.survivalgames.game.BasicGame;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,9 +10,9 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandStart implements CommandExecutor {
 
-    private Game game;
+    private BasicGame game;
 
-    public CommandStart(Game game) {
+    public CommandStart(BasicGame game) {
         this.game = game;
     }
 

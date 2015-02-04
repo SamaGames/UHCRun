@@ -4,7 +4,8 @@ import net.minecraft.server.v1_8_R1.*;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
 import net.zyuiop.survivalgames.commands.CommandStart;
-import net.zyuiop.survivalgames.game.Game;
+import net.zyuiop.survivalgames.game.BasicGame;
+import net.zyuiop.survivalgames.game.SoloGame;
 import net.zyuiop.survivalgames.listeners.CompassTargetter;
 import net.zyuiop.survivalgames.listeners.NetworkListener;
 import net.zyuiop.survivalgames.generator.BlocksRule;
@@ -39,7 +40,7 @@ public class SurvivalGames extends JavaPlugin implements Listener {
     private FileConfiguration config;
     private YamlConfiguration arenaConfig;
     public static SurvivalGames instance;
-    public Game game;
+    public BasicGame game;
     public SurvivalGamesPopulator populator;
     private BukkitTask startTimer;
     private SpawnBlock spawnBlock;
@@ -90,7 +91,7 @@ public class SurvivalGames extends JavaPlugin implements Listener {
         populator = new SurvivalGamesPopulator();
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile);
 
-        populator.registerRule(new BlocksRule(Material.DIAMOND_ORE, 0, 2, 0, 64, 8));
+        populator.registerRule(new BlocksRule(Material.DIAMOND_ORE, 0, 4, 0, 64, 5));
         populator.registerRule(new BlocksRule(Material.IRON_ORE, 0, 2, 0, 64, 15));
         populator.registerRule(new BlocksRule(Material.GOLD_ORE, 0, 2, 0, 64, 8));
         populator.registerRule(new BlocksRule(Material.LAPIS_ORE, 0, 2, 0, 64, 4));
@@ -172,7 +173,7 @@ public class SurvivalGames extends JavaPlugin implements Listener {
     public void finishEnabling() {
         this.startTimer.cancel();
 
-        game = new Game(arenaConfig.getString("name", "Surprise !"));
+        game = new SoloGame();
         game.setStatus(Status.Generating);
 
         Bukkit.getServer().getPluginManager().registerEvents(new NetworkListener(game), this);

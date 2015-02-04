@@ -1,22 +1,25 @@
 package net.zyuiop.survivalgames.generator;
 
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
+import net.minecraft.server.v1_8_R1.ChunkSnapshot;
 import net.zyuiop.survivalgames.SurvivalGames;
 import org.bukkit.*;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.Vector;
 
 /**
  * Created by charles on 14/08/2014.
@@ -129,6 +132,13 @@ public class SurvivalGamesPopulator extends BlockPopulator {
                 z++;
             }
             x++;
+        }
+
+        CraftWorld handle = (CraftWorld) world;
+        if (random.nextInt(1000) <= 750) {
+            new WorldGenCaves().a(handle.getHandle().chunkProviderServer, handle.getHandle(), chunk.getX(), chunk.getZ(), new ChunkSnapshot());
+        } else if (random.nextInt(1000) <= 750) {
+            new WorldGenCanyon().a(handle.getHandle().chunkProviderServer, handle.getHandle(), chunk.getX(), chunk.getZ(), new ChunkSnapshot());
         }
 
         for (BlocksRule bloc : blocks) {

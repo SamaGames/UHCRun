@@ -1,5 +1,6 @@
 package net.zyuiop.survivalgames.generator;
 
+import net.minecraft.server.v1_8_R1.WorldGenCaves;
 import net.samagames.gameapi.GameAPI;
 import net.zyuiop.survivalgames.SurvivalGames;
 import org.bukkit.Bukkit;
@@ -14,14 +15,14 @@ public class WorldGenerator {
     public static void begin(final World world)
     {
         task = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new Runnable() {
-            private int todo = (1200*1200)/(16*16);
-            private int x = -600;
-            private int z = -600;
+            private int todo = (1100*1100)/(16*16);
+            private int x = -550;
+            private int z = -550;
 
             @Override
             public void run() {
                 int i = 0;
-                while (i < 4) {
+                while (i < 7) {
                     world.getChunkAt(world.getBlockAt(x, 64, z)).load(true);
                     int percentage = (numberChunk * 100 / todo);
                     if (percentage > lastShow) {
@@ -30,12 +31,12 @@ public class WorldGenerator {
                     }
 
                     z+=16;
-                    if (z >= 600) {
-                        z = - 600;
+                    if (z >= 550) {
+                        z = - 550;
                         x += 16;
                     }
 
-                    if (x >= 600)  {
+                    if (x >= 550)  {
                         WorldGenerator.finish();
                         return;
                     }
