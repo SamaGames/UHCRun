@@ -24,36 +24,45 @@ public class GameLoop implements Runnable {
         nextEvent = new TimedEvent(1, 0, ChatColor.GOLD + "Dégats actifs", ChatColor.GOLD) {
             @Override
             public void run() {
+
+                Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats sont désormais actifs.");
+                Bukkit.broadcastMessage(ChatColor.GOLD + "La map sera réduite dans 19 minutes. Le PVP sera activé à ce moment là.");
                 parent.enableDamage();
-                nextEvent = new TimedEvent(3, 0, ChatColor.GOLD + "PVP Actif", ChatColor.GOLD) {
-                    @Override
-                    public void run() {
-                        parent.enablePVP();
-                        createReductionEvent();
-                    }
-                };
+                createReductionEvent();
             }
         };
     }
 
     protected void createReductionEvent() {
-        nextEvent = new TimedEvent(16, 0, ChatColor.RED + "Réduction", ChatColor.RED) {
+        nextEvent = new TimedEvent(19, 0, ChatColor.RED + "Réduction", ChatColor.RED) {
             @Override
             public void run() {
-                Bukkit.getWorld("world").getWorldBorder().setSize(80, 420);
-                Bukkit.broadcastMessage(ChatColor.GOLD + "La réduction de la map commence !");
-                Bukkit.broadcastMessage(ChatColor.GOLD + "La map se réduit en "+ChatColor.RED + "80*80");
-                Bukkit.broadcastMessage(ChatColor.GOLD + "La réduction sera terminée dans 6 minutes.");
-                Bukkit.broadcastMessage(ChatColor.GOLD + "Les bordures seront alors en coordonnées "+ChatColor.RED + "-40 +40");
-                nextEvent = new TimedEvent(7, 0, "Fin de réduction", ChatColor.WHITE) {
+                parent.disableDamages();
+                parent.teleportDeathmatch();
+                Bukkit.getWorld("world").getWorldBorder().setSize(250, 0);
+                Bukkit.getWorld("world").getWorldBorder().setSize(10, 600);
+                Bukkit.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite en 250*250");
+                Bukkit.broadcastMessage(ChatColor.GOLD + "Les bordures sont en coordonnées "+ChatColor.RED + "-125 +125");
+                Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP seront activés dans 30 secondes !");
+
+                nextEvent = new TimedEvent(0, 30, ChatColor.RED + "PVP Activé", ChatColor.RED) {
                     @Override
                     public void run() {
-                        Bukkit.broadcastMessage(ChatColor.GOLD + "La réduction de la map est a présent terminée.");
-                        nextEvent = new TimedEvent(4, 0, ChatColor.RED + "Fin de partie", ChatColor.RED) {
+                        parent.enablePVP();
+                        parent.enableDamage();
+                        Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP sont maintenant activés. Bonne chance !");
+                        Bukkit.broadcastMessage(ChatColor.GOLD + "La map est maintenant en réduction constante pendant les 10 prochaines minutes.");
+                        nextEvent = new TimedEvent(9, 30, "Fin de réduction", ChatColor.WHITE) {
                             @Override
                             public void run() {
-                                Bukkit.broadcastMessage(ChatColor.GOLD + "La partie se termine.");
-                                Bukkit.getServer().shutdown();
+                                Bukkit.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite. Fin de partie forcée dans 2 minutes.");
+                                nextEvent = new TimedEvent(2, 0, ChatColor.RED + "Fin de partie", ChatColor.RED) {
+                                    @Override
+                                    public void run() {
+                                        Bukkit.broadcastMessage(ChatColor.GOLD + "La partie se termine.");
+                                        Bukkit.getServer().shutdown();
+                                    }
+                                };
                             }
                         };
                     }
@@ -95,8 +104,11 @@ public class GameLoop implements Runnable {
             this.objective.setLine(- 5, nextEvent.string);
             this.objective.setLine(- 6, nextEvent.color+"dans "+ time(nextEvent.minutes, nextEvent.seconds));
 
-            if ((nextEvent.seconds == 0 && nextEvent.minutes <= 3) || (nextEvent.minutes == 0 && (nextEvent.seconds < 6 || nextEvent.seconds == 10 || nextEvent.seconds == 30)))
+            if ((nextEvent.seconds == 0 && nextEvent.minutes <= 3 && nextEvent.minutes > 0)|| (nextEvent.minutes == 0 && (nextEvent.seconds < 6 || nextEvent.seconds == 10 || nextEvent.seconds == 30)))
                 Bukkit.broadcastMessage(parent.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + nextEvent.string + ChatColor.GOLD + " dans "+ ((nextEvent.minutes != 0) ? nextEvent.minutes + "min" : nextEvent.seconds + " sec"));
+
+            if (nextEvent.seconds == 0 && 0 == nextEvent.minutes)
+                Bukkit.broadcastMessage(parent.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + nextEvent.string + ChatColor.GOLD + " maintenant !");
             nextEvent.decrement();
             indice = -6;
         }
@@ -120,6 +132,7 @@ public class GameLoop implements Runnable {
         public int seconds;
         public String string;
         public ChatColor color;
+        public boolean wasRun = false;
 
         public TimedEvent(int minutes, int seconds, String string, ChatColor color) {
             this.minutes = minutes;
@@ -137,7 +150,8 @@ public class GameLoop implements Runnable {
                 seconds = 59;
             }
 
-            if (minutes < 0) {
+            if ((minutes < 0 || (seconds == 0 && minutes == 0)) && !wasRun) {
+                wasRun = true;
                 run();
             }
         }

@@ -22,6 +22,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.inventory.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -42,12 +44,18 @@ public class SurvivalGames extends JavaPlugin implements Listener {
     private BukkitTask startTimer;
     private SpawnBlock spawnBlock;
     public static boolean ready;
+    public static boolean isWorldLoaded = false;
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onWorldInit(final WorldInitEvent event) {
         if (event.getWorld().getEnvironment() == World.Environment.NORMAL) {
             event.getWorld().getPopulators().add(populator);
         }
+    }
+
+    public void onDisable() {
+        GameAPI.getArena().setStatus(Status.Stopping);
+        GameAPI.getManager().sendArena();
     }
 
     public void removeSpawn() {
@@ -82,37 +90,15 @@ public class SurvivalGames extends JavaPlugin implements Listener {
         populator = new SurvivalGamesPopulator();
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile);
 
-        for (Object rule : arenaConfig.getList("rules")) {
-            if (rule instanceof String) {
-                if (rule.equals("nodiamond")) {
-                    populator.replaceBlock(Material.DIAMOND_ORE, Material.STONE);
-                }
-                if (rule.equals("morediamond")) {
-                    populator.registerRule(new BlocksRule(Material.DIAMOND_ORE, 0, 0.02, 2, 0, 16, 8));
-                }
-
-                if (rule.equals("moreiron")) {
-                    populator.registerRule(new BlocksRule(Material.IRON_ORE, 0, 0.15, 2, 0, 45, 15));
-                }
-
-                if (rule.equals("moregold")) {
-                    populator.registerRule(new BlocksRule(Material.GOLD_ORE, 0, 0.09, 2, 0, 35, 10));
-                }
-
-                if (rule.equals("morelapis")) {
-                    populator.registerRule(new BlocksRule(Material.LAPIS_ORE, 0, 0.09, 2, 0, 30, 4));
-                }
-
-                if (rule.equals("cheat")) {
-                    populator.replaceBlock(Material.LEAVES, Material.SLIME_BLOCK);
-                    populator.replaceBlock(Material.GRAVEL, Material.DIAMOND_ORE);
-                    populator.replaceBlock(Material.DIRT, Material.IRON_ORE);
-                }
-            }
-        }
+        populator.registerRule(new BlocksRule(Material.DIAMOND_ORE, 0, 2, 0, 64, 8));
+        populator.registerRule(new BlocksRule(Material.IRON_ORE, 0, 2, 0, 64, 15));
+        populator.registerRule(new BlocksRule(Material.GOLD_ORE, 0, 2, 0, 64, 8));
+        populator.registerRule(new BlocksRule(Material.LAPIS_ORE, 0, 2, 0, 64, 4));
+        populator.registerRule(new BlocksRule(Material.OBSIDIAN, 0, 4, 0, 32, 6));
 
         Bukkit.getPluginManager().registerEvents(this, this);
         this.saveResource("lobby.schematic", false);
+        this.saveResource("nether.schematic", false);
 
         BiomeBase[] a = BiomeBase.getBiomes();
         BiomeForest nb1 = new BiomeForest(0, 0);
@@ -148,12 +134,12 @@ public class SurvivalGames extends JavaPlugin implements Listener {
             ff.set(nb2, mobs);
 
             m1.invoke(nb1, 353825);
-            m2.invoke(nb1, "Oceane");
+            m2.invoke(nb1, "Forest");
             m3.invoke(nb1, 5159473);
             m4.invoke(nb1, 0.7F, 0.8F);
 
             m1.invoke(nb2, 353825);
-            m2.invoke(nb2, "Deep Oceane");
+            m2.invoke(nb2, "Forest");
             m3.invoke(nb2, 5159473);
             m4.invoke(nb2, 0.7F, 0.8F);
 
@@ -174,6 +160,7 @@ public class SurvivalGames extends JavaPlugin implements Listener {
             @Override
             public void run() {
                 if (Bukkit.getPluginManager().isPluginEnabled("MasterBundle")) {
+                    isWorldLoaded = true;
                     finishEnabling();
                 }
             }
@@ -194,13 +181,46 @@ public class SurvivalGames extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new SpectatorListener(game), this);
         getCommand("start").setExecutor(new CommandStart(game));
 
-        GameAPI.registerGame(this.config.getString("gameName", "survivalgames"), game);
+        GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
         World world = Bukkit.getWorlds().get(0);
         world.getWorldBorder().setCenter(0D, 0D);
-        world.getWorldBorder().setSize(500);
+        world.getWorldBorder().setSize(1000);
         world.getWorldBorder().setWarningDistance(20);
         world.getWorldBorder().setDamageBuffer(3D);
         world.getWorldBorder().setDamageAmount(2D);
+        world.setGameRuleValue("naturalRegeneration", "false");
+        world.setGameRuleValue("doDaylightCycle", "false");
+        world.setGameRuleValue("randomTickSpeed", "45");
+
+        final ShapedRecipe cobblePickaxe = new ShapedRecipe(new ItemStack(Material.STONE_PICKAXE));
+        cobblePickaxe.shape("WWW", "ASA", "ASA");
+        cobblePickaxe.setIngredient('W', Material.WOOD);
+        cobblePickaxe.setIngredient('S', Material.STICK);
+        cobblePickaxe.setIngredient('A', Material.AIR);
+
+        final ShapedRecipe cobbleAxe = new ShapedRecipe(new ItemStack(Material.STONE_AXE));
+        cobbleAxe.shape("WWA", "WSA", "ASA");
+        cobbleAxe.setIngredient('W', Material.WOOD);
+        cobbleAxe.setIngredient('S', Material.STICK);
+        cobbleAxe.setIngredient('A', Material.AIR);
+
+        final ShapedRecipe cobbleAxeB = new ShapedRecipe(new ItemStack(Material.STONE_AXE));
+        cobbleAxeB.shape("AWW", "ASW", "ASA");
+        cobbleAxeB.setIngredient('W', Material.WOOD);
+        cobbleAxeB.setIngredient('S', Material.STICK);
+        cobbleAxeB.setIngredient('A', Material.AIR);
+
+        final ShapedRecipe cobbleSword = new ShapedRecipe(new ItemStack(Material.STONE_SWORD));
+        cobbleSword.shape("AWA", "AWA", "ASA");
+        cobbleSword.setIngredient('W', Material.WOOD);
+        cobbleSword.setIngredient('S', Material.STICK);
+        cobbleSword.setIngredient('A', Material.AIR);
+
+        getServer().addRecipe(cobbleAxe);
+        getServer().addRecipe(cobblePickaxe);
+        getServer().addRecipe(cobbleSword);
+        getServer().addRecipe(cobbleAxeB);
+
         WorldGenerator.begin(world);
     }
 

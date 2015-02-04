@@ -74,11 +74,6 @@ public class SpectatorListener implements Listener {
     }
 
     @EventHandler
-    public void onExplode(EntityExplodeEvent ev) {
-        ev.blockList().clear();
-    }
-
-    @EventHandler
     public void onInteract(PlayerInteractEntityEvent e) {
         e.setCancelled(cancel(e.getPlayer()));
     }

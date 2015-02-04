@@ -14,9 +14,9 @@ public class WorldGenerator {
     public static void begin(final World world)
     {
         task = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new Runnable() {
-            private int todo = (516*516)/(16*16);
-            private int x = -250;
-            private int z = -250;
+            private int todo = (1200*1200)/(16*16);
+            private int x = -600;
+            private int z = -600;
 
             @Override
             public void run() {
@@ -30,12 +30,12 @@ public class WorldGenerator {
                     }
 
                     z+=16;
-                    if (z >= 250) {
-                        z = - 250;
+                    if (z >= 600) {
+                        z = - 600;
                         x += 16;
                     }
 
-                    if (x >= 250)  {
+                    if (x >= 600)  {
                         WorldGenerator.finish();
                         return;
                     }

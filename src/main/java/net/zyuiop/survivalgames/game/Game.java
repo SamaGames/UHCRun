@@ -20,11 +20,14 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -32,9 +35,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class Game implements GameArena {
     protected CopyOnWriteArraySet<UUID> players = new CopyOnWriteArraySet<>();
-    protected int maxPlayers = 45;
-    protected int minPlayers = 15;
-    protected int vipPlayers = 5;
+    protected int maxPlayers = 20;
+    protected int minPlayers = 7;
+    protected int vipPlayers = 4;
     protected Status status;
     protected String mapName;
     protected SurvivalGames plugin;
@@ -45,23 +48,61 @@ public class Game implements GameArena {
     private BukkitTask beginCountdown;
     private BukkitTask mainLoop;
     private ObjectiveSign objectiveSign;
+    private Objective life;
+    private Scoreboard scoreboard;
     private boolean damages;
+    private ArrayList<SpawnLocation> spawns = new ArrayList<>();
 
     public Game(String mapname) {
         this.mapName = mapname;
         this.status = Status.Idle;
-        this.coherenceMachine = new CoherenceMachine("SurvivalGames");
+        this.coherenceMachine = new CoherenceMachine("UHCRun");
         this.messageManager = new MessageManager(coherenceMachine);
         beginCountdown = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new BeginCountdown(this, maxPlayers, minPlayers), 20L, 20L);
+        spawns.add(new SpawnLocation(0, 200));
+        spawns.add(new SpawnLocation(0, 400));
+        spawns.add(new SpawnLocation(200, 0));
+        spawns.add(new SpawnLocation(400, 0));
+        spawns.add(new SpawnLocation(400, 200));
+        spawns.add(new SpawnLocation(200, 400));
+        spawns.add(new SpawnLocation(400, 400));
+        spawns.add(new SpawnLocation(200, 200));
+        spawns.add(new SpawnLocation(0, -200));
+        spawns.add(new SpawnLocation(0, -400));
+        spawns.add(new SpawnLocation(-200, 0));
+        spawns.add(new SpawnLocation(-400, 0));
+        spawns.add(new SpawnLocation(-400, -200));
+        spawns.add(new SpawnLocation(-200, -400));
+        spawns.add(new SpawnLocation(-400, -400));
+        spawns.add(new SpawnLocation(-200, -200));
+        spawns.add(new SpawnLocation(400, -200));
+        spawns.add(new SpawnLocation(-400, 200));
+        spawns.add(new SpawnLocation(200, -400));
+        spawns.add(new SpawnLocation(-200, 400));
+        spawns.add(new SpawnLocation(-400, 400));
+        spawns.add(new SpawnLocation(400, -400));
+        spawns.add(new SpawnLocation(200, -200));
+        spawns.add(new SpawnLocation(-200, 200));
     }
 
     public void enablePVP() {
         this.pvpenabled = true;
     }
 
+    public void disableDamages() {
+        this.damages = false;
+    }
+
     public void start() {
         SurvivalGames.instance.removeSpawn();
-        objectiveSign = new ObjectiveSign("sggameloop", ChatColor.DARK_RED + "Survival Games");
+        objectiveSign = new ObjectiveSign("sggameloop", ChatColor.AQUA +""+ChatColor.ITALIC + "≡ UHCRun ≡");
+        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        life = scoreboard.registerNewObjective("vie", "health");
+        Objective lifeb = scoreboard.registerNewObjective("vieb", "health");
+        life.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        lifeb.setDisplayName("HP");
+        life.setDisplayName("HP");
+        lifeb.setDisplaySlot(DisplaySlot.PLAYER_LIST);
         updateStatus(Status.InGame);
         if (beginCountdown != null)
             beginCountdown.cancel();
@@ -69,6 +110,9 @@ public class Game implements GameArena {
         mainLoop = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new GameLoop(this, objectiveSign), 20, 20);
 
         List<Player> list = Lists.newArrayList();
+        World world = Bukkit.getWorld("world");
+        Collections.shuffle(spawns);
+        Iterator<SpawnLocation> locationIterator = spawns.iterator();
         for (UUID uuid : players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) {
@@ -76,143 +120,51 @@ public class Game implements GameArena {
                 return;
             }
 
+            if (!locationIterator.hasNext()) {
+                player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
+                players.remove(uuid);
+                return;
+            }
+
             player.setGameMode(GameMode.SURVIVAL);
-            player.setHealth(20.0);
             player.setFoodLevel(20);
+            player.setScoreboard(scoreboard);
+            player.setLevel(0);
+            player.teleport(locationIterator.next().getSpawn(world));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60*20*32, 1));
             objectiveSign.addReceiver(player);
             list.add(player);
         }
 
-        World world = Bukkit.getWorld("world");
-        final double xRangeMin = -25;
-        final double zRangeMin = -25;
-        final double xRangeMax = +25;
-        final double zRangeMax = +25;
-        final Location[] locations = getSpreadLocations(world, players.size(), xRangeMin, zRangeMin, xRangeMax, zRangeMax);
-        range(world, 1, xRangeMin, zRangeMin, xRangeMax, zRangeMax, locations);
-        spread(world, list, locations);
+        for (UUID uuid : players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) {
+                players.remove(uuid);
+                return;
+            }
+
+            player.setHealth(10.0);
+        }
+
+        for (UUID uuid : players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) {
+                players.remove(uuid);
+                return;
+            }
+
+            player.setHealth(20.0);
+        }
+
 
         Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
     }
 
-
-    private int range(World world, double distance, double xRangeMin, double zRangeMin, double xRangeMax, double zRangeMax, Location[] locations) {
-        Random random = new Random();
-        boolean flag = true;
-        double max;
-        int i;
-        for (i = 0; i < 10000 && flag; ++i) {
-            flag = false;
-            max = Float.MAX_VALUE;
-            Location loc1;
-            int j;
-            for (int k = 0; k < locations.length; ++k) {
-                Location loc2 = locations[k];
-                j = 0;
-                loc1 = new Location(world, 0, 0, 0);
-                for (int l = 0; l < locations.length; ++l) {
-                    if (k != l) {
-                        Location loc3 = locations[l];
-                        double dis = loc2.distanceSquared(loc3);
-                        max = Math.min(dis, max);
-                        if (dis < distance) {
-                            ++j;
-                            loc1.add(loc3.getX() - loc2.getX(), 0, 0);
-                            loc1.add(loc3.getZ() - loc2.getZ(), 0, 0);
-                        }
-                    }
-                }
-                if (j > 0) {
-                    loc2.setX(loc2.getX() / j);
-                    loc2.setZ(loc2.getZ() / j);
-                    double d7 = Math.sqrt(loc1.getX() * loc1.getX() + loc1.getZ() * loc1.getZ());
-                    if (d7 > 0.0D) {
-                        loc1.setX(loc1.getX() / d7);
-                        loc2.add(-loc1.getX(), 0, -loc1.getZ());
-                    } else {
-                        double x = xRangeMin >= xRangeMax ? xRangeMin : random.nextDouble() * (xRangeMax - xRangeMin) + xRangeMin;
-                        double z = zRangeMin >= zRangeMax ? zRangeMin : random.nextDouble() * (zRangeMax - zRangeMin) + zRangeMin;
-                        loc2.setX(x);
-                        loc2.setZ(z);
-                    }
-                    flag = true;
-                }
-                boolean swap = false;
-                if (loc2.getX() < xRangeMin) {
-                    loc2.setX(xRangeMin);
-                    swap = true;
-                } else if (loc2.getX() > xRangeMax) {
-                    loc2.setX(xRangeMax);
-                    swap = true;
-                }
-                if (loc2.getZ() < zRangeMin) {
-                    loc2.setZ(zRangeMin);
-                    swap = true;
-                } else if (loc2.getZ() > zRangeMax) {
-                    loc2.setZ(zRangeMax);
-                    swap = true;
-                }
-                if (swap) {
-                    flag = true;
-                }
-            }
-            if (!flag) {
-                Location[] locs = locations;
-                int i1 = locations.length;
-                for (j = 0; j < i1; ++j) {
-                    loc1 = locs[j];
-                    if (world.getHighestBlockYAt(loc1) == 0) {
-                        double x = xRangeMin >= xRangeMax ? xRangeMin : random.nextDouble() * (xRangeMax - xRangeMin) + xRangeMin;
-                        double z = zRangeMin >= zRangeMax ? zRangeMin : random.nextDouble() * (zRangeMax - zRangeMin) + zRangeMin;
-                        locations[i] = (new Location(world, x, 0, z));
-                        loc1.setX(x);
-                        loc1.setZ(z);
-                        flag = true;
-                    }
-                }
-            }
-        }
-        if (i >= 10000) {
-            return -1;
-        } else {
-            return i;
-        }
-    }
-
-    private double spread(World world, List<Player> list, Location[] locations) {
-        double distance = 0.0D;
-        int i = 0;
-        for (int j = 0; j < list.size(); ++j) {
-            Player player = list.get(j);
-            Location location = locations[i++];
-
-            player.teleport(new Location(world, Math.floor(location.getX()) + 0.5D, world.getHighestBlockYAt((int) location.getX(), (int) location.getZ()), Math.floor(location.getZ()) + 0.5D));
-            double value = Double.MAX_VALUE;
-            for (int k = 0; k < locations.length; ++k) {
-                if (location != locations[k]) {
-                    double d = location.distanceSquared(locations[k]);
-                    value = Math.min(d, value);
-                }
-            }
-            distance += value;
-        }
-        distance /= list.size();
-        return distance;
-    }
-
-    private Location[] getSpreadLocations(World world, int size, double xRangeMin, double zRangeMin, double xRangeMax, double zRangeMax) {
-        Random random = new Random();
-        Location[] locations = new Location[size];
-        for (int i = 0; i < size; ++i) {
-            double x = xRangeMin >= xRangeMax ? xRangeMin : random.nextDouble() * (xRangeMax - xRangeMin) + xRangeMin;
-            double z = zRangeMin >= zRangeMax ? zRangeMin : random.nextDouble() * (zRangeMax - zRangeMin) + zRangeMin;
-            locations[i] = (new Location(world, x, 0, z));
-        }
-        return locations;
-    }
-
     public void stumpPlayer(Player player, boolean logout) {
         players.remove(player.getUniqueId());
+        if (status != Status.InGame)
+            return;
+
         Object lastDamager = Metadatas.getMetadata(player, "lastDamager");
         Player killer = null;
         if (lastDamager != null && lastDamager instanceof Player) {
@@ -416,5 +368,26 @@ public class Game implements GameArena {
 
     public void enableDamage() {
         this.damages = true;
+    }
+
+    public void teleportDeathmatch() {
+        World world = Bukkit.getWorld("world");
+        Collections.shuffle(spawns);
+        Iterator<SpawnLocation> locationIterator = spawns.iterator();
+        for (UUID uuid : players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) {
+                players.remove(uuid);
+                return;
+            }
+
+            if (!locationIterator.hasNext()) {
+                player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
+                players.remove(uuid);
+                return;
+            }
+
+            player.teleport(locationIterator.next().getDeathmatchSpawn(world));
+        }
     }
 }
