@@ -3,6 +3,7 @@ package net.zyuiop.survivalgames;
 import net.minecraft.server.v1_8_R1.*;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
+import net.zyuiop.survivalgames.commands.CommandNextEvent;
 import net.zyuiop.survivalgames.commands.CommandStart;
 import net.zyuiop.survivalgames.game.BasicGame;
 import net.zyuiop.survivalgames.game.SoloGame;
@@ -54,6 +55,7 @@ public class SurvivalGames extends JavaPlugin implements Listener {
         }
     }
 
+    @Override
     public void onDisable() {
         GameAPI.getArena().setStatus(Status.Stopping);
         GameAPI.getManager().sendArena();
@@ -181,6 +183,7 @@ public class SurvivalGames extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new CompassTargetter(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new SpectatorListener(game), this);
         getCommand("start").setExecutor(new CommandStart(game));
+        getCommand("nextevent").setExecutor(new CommandNextEvent(game));
 
         GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
         World world = Bukkit.getWorlds().get(0);

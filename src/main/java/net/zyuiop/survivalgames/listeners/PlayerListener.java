@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -131,7 +132,7 @@ public class PlayerListener implements Listener {
                 }.runTaskTimer(SurvivalGames.instance, 1, 1);
                 break;
         }
-        event.getPlayer().giveExp(event.getExpToDrop()*2);
+        event.getPlayer().giveExp(event.getExpToDrop() * 2);
     }
 
     private void dropItem(final Location location, final ItemStack drop) {
@@ -146,7 +147,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         if (event.getRecipe().getResult().getType() == Material.GOLDEN_APPLE && event.getInventory().getItem(0).getType() == Material.GOLD_BLOCK)
-            event.getInventory().setResult(null);
+            event.getInventory().setResult(new ItemStack(Material.AIR));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_PICKAXE)
             event.getInventory().setResult(new ItemStack(Material.STONE_PICKAXE));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_AXE)
@@ -164,7 +165,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onCraft(PrepareItemCraftEvent event) {
         if (event.getRecipe().getResult().getType() == Material.GOLDEN_APPLE && event.getInventory().getItem(0).getType() == Material.GOLD_BLOCK)
-            event.getInventory().setResult(null);
+            event.getInventory().setResult(new ItemStack(Material.AIR));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_PICKAXE)
             event.getInventory().setResult(new ItemStack(Material.STONE_PICKAXE));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_AXE)
@@ -179,25 +180,22 @@ public class PlayerListener implements Listener {
             Player damaged = (Player) event.getEntity();
             Entity damager = event.getDamager();
 
-            if (damager instanceof Projectile || damager instanceof Player) {
+            if (damager instanceof Player) {
                 if (!game.isPvpenabled()) {
-                    Bukkit.getLogger().info("=> Cancelling damage from "+damager.getType()+"("+damager.getName()+") to "+damaged.getDisplayName());
                     event.setCancelled(true);
                     return;
                 }
-
-                Player playerdamager;
-                if (damager instanceof Player) {
-                    playerdamager = (Player) damager;
-                } else {
-                    Projectile  arrow = (Projectile) damager;
-                    Entity shooter = (Entity) arrow.getShooter();
-                    if (shooter instanceof Player)
-                        playerdamager = (Player) shooter;
-                    else
+                Metadatas.setMetadata(damaged, "lastDamager", (Player) damager);
+            } else if (damager instanceof Projectile) {
+                Projectile  arrow = (Projectile) damager;
+                Entity shooter = (Entity) arrow.getShooter();
+                if (shooter instanceof Player) {
+                    if (!game.isPvpenabled()) {
+                        event.setCancelled(true);
                         return;
+                    }
+                    Metadatas.setMetadata(damaged, "lastDamager", (Player) shooter);
                 }
-                Metadatas.setMetadata(damaged, "lastDamager", playerdamager);
             }
         }
     }
@@ -251,7 +249,9 @@ public class PlayerListener implements Listener {
                     newDrops.add(new ItemStack(Material.COOKED_MUTTON, stack.getAmount()*2));
             }
             if (random.nextInt(32) >= 16)
-                newDrops.add(new ItemStack(Material.LEATHER, random.nextInt(5)));
+                newDrops.add(new ItemStack(Material.LEATHER, random.nextInt(5)+1));
+            if (random.nextInt(32) >= 16)
+                newDrops.add(new ItemStack(Material.STRING, random.nextInt(2)+1));
             event.getDrops().clear();
             event.getDrops().addAll(newDrops);
         } else if (entity instanceof Pig) {
@@ -261,7 +261,15 @@ public class PlayerListener implements Listener {
                     newDrops.add(new ItemStack(Material.GRILLED_PORK, stack.getAmount()*2));
             }
             if (random.nextInt(32) >= 16)
-                newDrops.add(new ItemStack(Material.LEATHER, random.nextInt(5)));
+                newDrops.add(new ItemStack(Material.LEATHER, random.nextInt(5)+1));
+            event.getDrops().clear();
+            event.getDrops().addAll(newDrops);
+        } else if (entity instanceof Rabbit) {
+            List<ItemStack> newDrops = new ArrayList<>();
+            for (ItemStack stack : event.getDrops()) {
+                if (stack.getType() == Material.RABBIT)
+                    newDrops.add(new ItemStack(Material.COOKED_RABBIT, stack.getAmount()*2));
+            }
             event.getDrops().clear();
             event.getDrops().addAll(newDrops);
         } else if (entity instanceof Chicken) {

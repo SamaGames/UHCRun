@@ -50,8 +50,9 @@ public abstract class BasicGame implements GameArena {
     protected ObjectiveSign objectiveSign;
     protected Objective life;
     protected Scoreboard scoreboard;
-    private boolean damages;
+    private boolean damages = false;
     protected ArrayList<SpawnLocation> spawns = new ArrayList<>();
+    private GameLoop gameLoop;
 
     public BasicGame(String map, int min, int max, int vip) {
         maxPlayers = max;
@@ -87,7 +88,8 @@ public abstract class BasicGame implements GameArena {
         if (beginCountdown != null)
             beginCountdown.cancel();
 
-        mainLoop = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, new GameLoop(this, objectiveSign), 20, 20);
+        gameLoop = new GameLoop(this, objectiveSign);
+        mainLoop = Bukkit.getScheduler().runTaskTimer(SurvivalGames.instance, gameLoop, 20, 20);
 
         teleportAtStart();
 
@@ -244,5 +246,9 @@ public abstract class BasicGame implements GameArena {
 
     public CoherenceMachine getCoherenceMachine() {
         return coherenceMachine;
+    }
+
+    public GameLoop getGameLoop() {
+        return gameLoop;
     }
 }

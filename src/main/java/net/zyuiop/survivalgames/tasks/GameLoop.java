@@ -33,14 +33,30 @@ public class GameLoop implements Runnable {
         };
     }
 
+    public void forceNextEvent() {
+        if (nextEvent != null)
+            nextEvent.run();
+    }
+
     protected void createReductionEvent() {
         nextEvent = new TimedEvent(19, 0, ChatColor.RED + "Téléportation", ChatColor.RED) {
             @Override
             public void run() {
                 parent.disableDamages();
                 parent.teleportDeathmatch();
-                Bukkit.getWorld("world").getWorldBorder().setSize(250, 0);
-                Bukkit.getWorld("world").getWorldBorder().setSize(10, 600);
+
+                try {
+                    Bukkit.getWorld("world").getWorldBorder().setSize(250, 0);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                try {
+                    Bukkit.getWorld("world").getWorldBorder().setSize(10, 600);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
                 Bukkit.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite en 250*250");
                 Bukkit.broadcastMessage(ChatColor.GOLD + "Les bordures sont en coordonnées "+ChatColor.RED + "-125 +125");
                 Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP seront activés dans 30 secondes !");
