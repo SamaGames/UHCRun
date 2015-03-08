@@ -1,5 +1,5 @@
 name: SurvivalGames
-main: net.zyuiop.survivalgames.SurvivalGames
+main: net.zyuiop.uhcrun.UHCRun
 version: 1
 depend: [MasterBundle, SamaPermissionsBukkit]
 load: STARTUP
@@ -14,7 +14,15 @@ commands:
       usage: /<command>
       permission: sg.op
       permission-message: Permission non accordée
+   uhcrun:
+      aliases: [uhc]
+      description: COmmandes UHCRUN
+      usage: /<command>
+      permission: sgpub
+      permission-message: Permission non accordée
 permissions:
    sg.op:
       description: Commandes OP PPVP
       default: op
+   sgpub:
+      default: true
