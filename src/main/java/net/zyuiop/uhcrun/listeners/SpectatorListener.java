@@ -1,7 +1,11 @@
 package net.zyuiop.uhcrun.listeners;
 
+import net.md_5.bungee.api.ChatColor;
 import net.samagames.gameapi.json.Status;
+import net.zyuiop.uhcrun.UHCRun;
 import net.zyuiop.uhcrun.game.BasicGame;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,6 +73,15 @@ public class SpectatorListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent e) {
         e.setCancelled(cancel(e.getPlayer()));
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        if ((arena.getStatus() == Status.Starting || arena.getStatus() == Status.Available || arena.getStatus() == Status.Generating) && event.getTo().getY() < 125) {
+            event.setCancelled(true);
+            event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 162, 0));
+            event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Mais où vous allez comme ça ?!");
+        }
     }
 
     @EventHandler

@@ -50,6 +50,5 @@ public class WorldGenerator {
     private static void finish() {
         task.cancel();
         UHCRun.instance.finishGeneration();
-
     }
 }

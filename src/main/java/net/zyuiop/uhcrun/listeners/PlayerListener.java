@@ -18,9 +18,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
@@ -130,6 +128,121 @@ public class PlayerListener implements Listener {
         }
     }
 
+    private void breakLeaf(World world, int x, int y, int z) {
+        Block block = world.getBlockAt(x, y, z);
+        byte data = block.getData();
+
+        if((data & 4) == 4)
+        {
+            return; // player placed leaf, ignore
+        }
+
+        byte range = 4;
+        byte max = 32;
+        int[] blocks = new int[max * max * max];
+        int off = range + 1;
+        int mul = max * max;
+        int div = max / 2;
+
+        if(validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off))
+        {
+            int offX;
+            int offY;
+            int offZ;
+            int type;
+
+            for(offX = -range; offX <= range; offX++)
+            {
+                for(offY = -range; offY <= range; offY++)
+                {
+                    for(offZ = -range; offZ <= range; offZ++)
+                    {
+                        Material mat = world.getBlockAt(x + offX, y + offY, z + offZ).getType();
+                        if ((mat == Material.LEAVES || mat == Material.LEAVES_2))
+                            type = Material.LEAVES.getId();
+                        else if ((mat == Material.LOG || mat == Material.LOG_2))
+                            type = Material.LOG.getId();
+                        blocks[(offX + div) * mul + (offY + div) * max + offZ + div] = ((mat == Material.LOG || mat == Material.LOG_2) ? 0 : ((mat == Material.LEAVES || mat == Material.LEAVES_2) ? -2 : -1));
+                    }
+                }
+            }
+
+            for(offX = 1; offX <= 4; offX++)
+            {
+                for(offY = -range; offY <= range; offY++)
+                {
+                    for(offZ = -range; offZ <= range; offZ++)
+                    {
+                        for(type = -range; type <= range; type++)
+                        {
+                            if(blocks[(offY + div) * mul + (offZ + div) * max + type + div] == offX - 1)
+                            {
+                                if(blocks[(offY + div - 1) * mul + (offZ + div) * max + type + div] == -2)
+                                    blocks[(offY + div - 1) * mul + (offZ + div) * max + type + div] = offX;
+
+                                if(blocks[(offY + div + 1) * mul + (offZ + div) * max + type + div] == -2)
+                                    blocks[(offY + div + 1) * mul + (offZ + div) * max + type + div] = offX;
+
+                                if(blocks[(offY + div) * mul + (offZ + div - 1) * max + type + div] == -2)
+                                    blocks[(offY + div) * mul + (offZ + div - 1) * max + type + div] = offX;
+
+                                if(blocks[(offY + div) * mul + (offZ + div + 1) * max + type + div] == -2)
+                                    blocks[(offY + div) * mul + (offZ + div + 1) * max + type + div] = offX;
+
+                                if(blocks[(offY + div) * mul + (offZ + div) * max + (type + div - 1)] == -2)
+                                    blocks[(offY + div) * mul + (offZ + div) * max + (type + div - 1)] = offX;
+
+                                if(blocks[(offY + div) * mul + (offZ + div) * max + type + div + 1] == -2)
+                                    blocks[(offY + div) * mul + (offZ + div) * max + type + div + 1] = offX;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(blocks[div * mul + div * max + div] < 0) {
+            LeavesDecayEvent event = new LeavesDecayEvent(block);
+            Bukkit.getServer().getPluginManager().callEvent(event);
+
+            if(event.isCancelled()) {
+                return;
+            }
+
+            block.breakNaturally();
+
+            if(10 > new Random().nextInt(100))
+            {
+                world.playEffect(block.getLocation(), Effect.STEP_SOUND, Material.LEAVES.getId());
+            }
+        }
+    }
+
+    public boolean validChunk(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        if(maxY >= 0 && minY < world.getMaxHeight())
+        {
+            minX >>= 4;
+            minZ >>= 4;
+            maxX >>= 4;
+            maxZ >>= 4;
+
+            for(int x = minX; x <= maxX; x++)
+            {
+                for(int z = minZ; z <= maxZ; z++)
+                {
+                    if(!world.isChunkLoaded(x, z))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         BasicGame bgame = UHCRun.instance.game;
@@ -228,11 +341,15 @@ public class PlayerListener implements Listener {
                 event.getBlock().setType(Material.AIR);
                 dropItem(loc, new ItemStack(Material.DIAMOND, 2));
                 break;
+			case CACTUS:
+				event.setCancelled(true);
+				event.getBlock().setType(Material.AIR);
+				dropItem(loc, new ItemStack(Material.LOG, 2));
             case LOG: case LOG_2:
                 final List<Block> bList = new ArrayList<Block>();
+                checkLeaves(event.getBlock());
                 bList.add(event.getBlock());
                 new BukkitRunnable() {
-
                     @Override
                     public void run() {
                         for (int i = 0; i < bList.size(); i++) {
@@ -241,7 +358,9 @@ public class PlayerListener implements Listener {
                                 for (ItemStack item : block.getDrops()) {
                                     block.getWorld().dropItemNaturally(block.getLocation(), item);
                                 }
+
                                 block.setType(Material.AIR);
+                                checkLeaves(block);
                             }
                             for (BlockFace face : BlockFace.values()) {
                                 if (block.getRelative(face).getType() == Material.LOG || block.getRelative(face).getType() == Material.LOG_2) {
@@ -257,6 +376,36 @@ public class PlayerListener implements Listener {
                 break;
         }
         event.getPlayer().giveExp(event.getExpToDrop() * 2);
+    }
+
+    private void checkLeaves(Block block) {
+        Location loc = block.getLocation();
+        final World world = loc.getWorld();
+        final int x = loc.getBlockX();
+        final int y = loc.getBlockY();
+        final int z = loc.getBlockZ();
+        final int range = 4;
+        final int off = range + 1;
+
+        if(!validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off))
+        {
+            return;
+        }
+
+        Bukkit.getServer().getScheduler().runTask(UHCRun.instance, new Runnable() {
+            @Override
+            public void run() {
+                for (int offX = - range; offX <= range; offX++) {
+                    for (int offY = - range; offY <= range; offY++) {
+                        for (int offZ = - range; offZ <= range; offZ++) {
+                            if ((world.getBlockAt(x +offX, y + offY, z + offZ).getType() == Material.LEAVES || world.getBlockAt(x +offX, y + offY, z + offZ).getType() == Material.LEAVES_2)) {
+                                breakLeaf(world, x + offX, y + offY, z + offZ);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void dropItem(final Location location, final ItemStack drop) {
@@ -366,6 +515,24 @@ public class PlayerListener implements Listener {
         event.setDeathMessage(game.getCoherenceMachine().getGameTag()+event.getDeathMessage());
     }
 
+	@EventHandler
+	public void onBreak(BlockSpreadEvent event) {
+		event.setCancelled(true);
+		if (event.getBlock().getType() == Material.CACTUS) {
+			event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(Material.LOG, 2));
+			event.getBlock().setType(Material.AIR);
+		}
+	}
+
+	@EventHandler
+	public void onBreak(BlockFadeEvent event) {
+		event.setCancelled(true);
+		if (event.getBlock().getType() == Material.CACTUS) {
+			event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(Material.LOG, 2));
+			event.getBlock().setType(Material.AIR);
+		}
+	}
+
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
         Random random = new Random();
@@ -418,6 +585,12 @@ public class PlayerListener implements Listener {
                 if (stack.getType() == Material.FEATHER)
                     newDrops.add(new ItemStack(Material.ARROW, stack.getAmount()*2));
             }
+            event.getDrops().clear();
+            event.getDrops().addAll(newDrops);
+        } else if (entity instanceof Squid) {
+            List<ItemStack> newDrops = new ArrayList<>();
+			if (random.nextInt(32) >= 8)
+				newDrops.add(new ItemStack(Material.COOKED_FISH, random.nextInt(5)+1));
             event.getDrops().clear();
             event.getDrops().addAll(newDrops);
         } else if (entity instanceof Skeleton) {

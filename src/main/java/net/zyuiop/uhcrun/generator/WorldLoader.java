@@ -11,8 +11,7 @@ public class WorldLoader {
     public static int lastShow = -1;
     public static int numberChunk = 0;
 
-    public static void begin(final World world)
-    {
+    public static void begin(final World world) {
         task = Bukkit.getScheduler().runTaskTimer(UHCRun.instance, new Runnable() {
             private int todo = (1200*1200)/(16*16);
             private int x = -600;
@@ -21,10 +20,10 @@ public class WorldLoader {
             @Override
             public void run() {
                 int i = 0;
-                while (i < 3) {
+                while (i < 50) {
                     world.getChunkAt(world.getBlockAt(x, 64, z)).load(true);
                     int percentage = (numberChunk * 100 / todo);
-                    if (percentage > lastShow) {
+                    if (percentage > lastShow && percentage % 10 == 0) {
                         lastShow = percentage;
                         GameAPI.getManager().sendArena(GameAPI.getManager().buildJson(GameAPI.getArena(), percentage));
                     }

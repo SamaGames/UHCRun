@@ -10,9 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-/**
- * Created by vialarl on 16/01/2015.
- */
 public class NetworkListener implements Listener {
 
     private BasicGame game;

@@ -23,6 +23,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -41,11 +42,11 @@ public abstract class BasicGame implements GameArena {
     protected CoherenceMachine coherenceMachine;
     protected BukkitTask beginCountdown;
     protected BukkitTask mainLoop;
-    protected ObjectiveSign objectiveSign;
     protected Objective life;
     public Scoreboard scoreboard;
     private boolean damages = false;
     protected ArrayList<SpawnLocation> spawns = new ArrayList<>();
+	protected ConcurrentHashMap<UUID, Integer> kills = new ConcurrentHashMap<>();
     private GameLoop gameLoop;
 
     public BasicGame(String map, int min, int max, int vip) {
@@ -60,6 +61,18 @@ public abstract class BasicGame implements GameArena {
         this.messageManager = new MessageManager(coherenceMachine);
         beginCountdown = Bukkit.getScheduler().runTaskTimer(UHCRun.instance, new BeginCountdown(this, maxPlayers, minPlayers), 20L, 20L);
     }
+
+	public void addKill(UUID player) {
+		Integer val = kills.get(player);
+		if (val == null)
+			val = 0;
+		kills.put(player, val+1);
+	}
+
+	public int countKills(UUID player) {
+		Integer val = kills.get(player);
+		return (val == null) ? 0 : val;
+	}
 
     public void enablePVP() {
         this.pvpenabled = true;
@@ -76,7 +89,6 @@ public abstract class BasicGame implements GameArena {
     public void start() {
 		updateStatus(Status.InGame);
         UHCRun.instance.removeSpawn();
-        objectiveSign = new ObjectiveSign("sggameloop", ChatColor.AQUA +""+ChatColor.ITALIC + "≡ UHCRun ≡");
         life = scoreboard.registerNewObjective("vie", "health");
         Objective lifeb = scoreboard.registerNewObjective("vieb", "health");
         life.setDisplaySlot(DisplaySlot.BELOW_NAME);
@@ -86,7 +98,7 @@ public abstract class BasicGame implements GameArena {
         if (beginCountdown != null)
             beginCountdown.cancel();
 
-        gameLoop = new GameLoop(this, objectiveSign);
+        gameLoop = new GameLoop(this);
         mainLoop = Bukkit.getScheduler().runTaskTimer(UHCRun.instance, gameLoop, 20, 20);
 
         teleportAtStart();
@@ -110,7 +122,9 @@ public abstract class BasicGame implements GameArena {
             player.setLevel(0);
             player.getInventory().clear();
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60 * 20 * 20, 0));
-            objectiveSign.addReceiver(player);
+			ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD +""+ChatColor.ITALIC + ChatColor.BOLD + "≡ UHCRun ≡");
+			sign.addReceiver(player);
+			gameLoop.addPlayer(player.getUniqueId(), sign);
 		}
 
         Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
@@ -133,6 +147,7 @@ public abstract class BasicGame implements GameArena {
                 creditKillCoins(killer);
                 try {
                     StatsApi.increaseStat(killer, "uhcrun", "kills", 1);
+					addKill(killer.getUniqueId());
                 } catch (Exception ignored) {}
             }
         }
@@ -167,7 +182,12 @@ public abstract class BasicGame implements GameArena {
     }
 
     public void finish() {
-        mainLoop.cancel();
+        Bukkit.getScheduler().runTaskLater(UHCRun.instance, new Runnable() {
+			@Override
+			public void run() {
+				mainLoop.cancel();
+			}
+		}, 30L);
         setStatus(Status.Stopping);
         GameAPI.getManager().sendArena();
         Bukkit.getScheduler().runTaskLater(UHCRun.instance, new Runnable() {

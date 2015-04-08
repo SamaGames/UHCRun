@@ -14,6 +14,7 @@ import net.zyuiop.uhcrun.listeners.NetworkListener;
 import net.zyuiop.uhcrun.generator.BlocksRule;
 import net.zyuiop.uhcrun.generator.SurvivalGamesPopulator;
 import net.zyuiop.uhcrun.generator.WorldGenerator;
+import net.zyuiop.uhcrun.generator.WorldLoader;
 import net.zyuiop.uhcrun.listeners.PlayerListener;
 import net.zyuiop.uhcrun.listeners.SpectatorListener;
 import net.zyuiop.uhcrun.utils.Gui;
@@ -27,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.ItemStack;
@@ -54,6 +56,13 @@ public class UHCRun extends JavaPlugin implements Listener {
     public static boolean ready;
     public static boolean isWorldLoaded = false;
     private HashMap<UUID, Gui> playersGui = new HashMap<>();
+    public static boolean gen = false;
+
+    @EventHandler
+    public void onChunkUnload(final ChunkUnloadEvent event) {
+        if (game == null || !game.isDamages())
+            event.setCancelled(true);
+    }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onWorldInit(final WorldInitEvent event) {
@@ -204,6 +213,15 @@ public class UHCRun extends JavaPlugin implements Listener {
         }
         catch (Exception e) {}
 
+        File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
+        getLogger().info("Checking wether world exists at : " + conf.getAbsolutePath());
+        if (!conf.exists()) {
+            gen = true;
+            getLogger().info("No world exists. Will be generated.");
+        } else {
+            getLogger().info("World found ! ");
+        }
+
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
             @Override
             public void run() {
@@ -244,7 +262,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         world.getWorldBorder().setDamageAmount(2D);
         world.setGameRuleValue("naturalRegeneration", "false");
         world.setGameRuleValue("doDaylightCycle", "false");
-        world.setGameRuleValue("randomTickSpeed", "45");
+        world.setGameRuleValue("randomTickSpeed", "3");
 
         final ShapedRecipe cobblePickaxe = new ShapedRecipe(new ItemStack(Material.STONE_PICKAXE));
         cobblePickaxe.shape("WWW", "ASA", "ASA");
@@ -282,7 +300,10 @@ public class UHCRun extends JavaPlugin implements Listener {
         getServer().addRecipe(cobbleAxeB);
 		getServer().addRecipe(cobbleSword);
 
-        WorldGenerator.begin(world);
+        if (gen)
+            WorldGenerator.begin(world);
+        else
+            WorldLoader.begin(world);
     }
 
     public void finishGeneration() {
