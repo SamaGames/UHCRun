@@ -1,5 +1,6 @@
 package net.zyuiop.uhcrun.listeners;
 
+import net.minecraft.server.v1_8_R1.*;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.GameUtils;
 import net.samagames.gameapi.json.Status;
@@ -8,13 +9,20 @@ import net.zyuiop.uhcrun.game.BasicGame;
 import net.zyuiop.uhcrun.game.SoloGame;
 import net.zyuiop.uhcrun.game.Team;
 import net.zyuiop.uhcrun.game.TeamGame;
+import net.zyuiop.uhcrun.generator.WorldLoader;
 import net.zyuiop.uhcrun.utils.Gui;
 import net.zyuiop.uhcrun.utils.GuiSelectTeam;
 import net.zyuiop.uhcrun.utils.Metadatas;
 import org.bukkit.*;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,11 +30,18 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -57,7 +72,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onItemConsume(PlayerItemConsumeEvent event) {
         if (event.getItem().getType() == Material.GOLDEN_APPLE) {
-            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10*20, 1));
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10 * 20, 1));
         }
     }
 
@@ -261,7 +276,7 @@ public class PlayerListener implements Listener {
                 event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag()+ChatColor.GREEN + "Le nom de votre équipe est désormais : "+team.getChatColor()+team.getTeamName());
                 UHCRun.instance.openGui(event.getPlayer(), new GuiSelectTeam());
             } else {
-                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag()+ChatColor.RED + "Le nom de l'équipe ne peut être vide.");
+                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Le nom de l'équipe ne peut être vide.");
                 UHCRun.instance.openGui(event.getPlayer(), new GuiSelectTeam());
             }
         }
@@ -303,50 +318,110 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent event) {
-        Material mat = event.getBlock().getType();
-        Location loc = event.getBlock().getLocation();
+    public void onDrop(PlayerDropItemEvent event) {
+        Metadatas.setMetadata(event.getItemDrop(), "playerDrop", true);
+    }
+
+    @EventHandler
+    public void itemSpawn(ItemSpawnEvent event) {
+        if (Metadatas.getMetadata(event.getEntity(), "playerDrop") != null)
+            return;
+
+        String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+
+        ArrayList<String> customLore = new ArrayList<>();
+        Material mat = event.getEntity().getItemStack().getType();
+        ItemMeta me = event.getEntity().getItemStack().getItemMeta();
+        if (me != null && me.getLore() != null && me.getLore().contains(CHECK_LINE))
+            return;
 
         switch (mat) {
             case IRON_ORE:
-                event.getBlock().setType(Material.AIR);
-                dropItem(loc, new ItemStack(Material.IRON_INGOT, 2));
-                event.setCancelled(true);
+                event.getEntity().setItemStack(new ItemStack(Material.IRON_INGOT, 2));
                 break;
             case SAND:
-                event.getBlock().setType(Material.AIR);
-                dropItem(loc, new ItemStack(Material.GLASS, 1));
-                event.setCancelled(true);
+                event.getEntity().setItemStack(new ItemStack(Material.GLASS, 1));
                 break;
             case GRAVEL:
-                event.getBlock().setType(Material.AIR);
-                if (new Random().nextDouble() < 0.75)
-                    dropItem(loc, new ItemStack(Material.ARROW, 3));
-                else
-                    dropItem(loc, new ItemStack(Material.GRAVEL, 1));
-                event.setCancelled(true);
+            case FLINT:
+                if (new Random().nextDouble() < 0.75) {
+                    ItemStack loot = new ItemStack(Material.ARROW, 3);
+                    ItemMeta meta = loot.getItemMeta();
+                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Arrow");
+                    customLore.add(CHECK_LINE);
+                    meta.setLore(customLore);
+                    loot.setItemMeta(meta);
+                    event.getEntity().setItemStack(loot);
+                }
                 break;
             case GOLD_ORE:
-                event.setCancelled(true);
-                event.getBlock().setType(Material.AIR);
-                dropItem(loc, new ItemStack(Material.GOLD_INGOT, 2));
+                event.getEntity().setItemStack(new ItemStack(Material.GOLD_INGOT, 2));
                 break;
-            case COAL_ORE:
-                event.setCancelled(true);
-                event.getBlock().setType(Material.AIR);
-                dropItem(loc, new ItemStack(Material.TORCH, 3));
+            case COAL:
+                event.getEntity().setItemStack(new ItemStack(Material.TORCH, 3));
                 break;
-            case DIAMOND_ORE:
-                event.setCancelled(true);
-                event.getBlock().setType(Material.AIR);
-                dropItem(loc, new ItemStack(Material.DIAMOND, 2));
+            case DIAMOND:
+                ItemStack loot = new ItemStack(Material.DIAMOND, event.getEntity().getItemStack().getAmount() * 2);
+                ItemMeta meta = loot.getItemMeta();
+                customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
+                customLore.add(CHECK_LINE);
+                meta.setLore(customLore);
+                loot.setItemMeta(meta);
+                event.getEntity().setItemStack(loot);
                 break;
-			case CACTUS:
-				event.setCancelled(true);
-				event.getBlock().setType(Material.AIR);
-				dropItem(loc, new ItemStack(Material.LOG, 2));
+            case CACTUS:
+                event.getEntity().setItemStack(new ItemStack(Material.LOG, 2));
+        }
+    }
+
+
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onChestOpen(PlayerInteractEvent event) {
+        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.CHEST)) {
+            Chest chest = (Chest) event.getClickedBlock().getState();
+            int slot = 0;
+            while (slot < chest.getInventory().getSize()) {
+                ItemStack stack = chest.getInventory().getItem(slot);
+                if (stack == null) {
+                    slot ++;
+                    continue;
+                }
+
+                if (stack.getType() == Material.DIAMOND) {
+                    String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+                    ItemMeta meta = stack.getItemMeta();
+                    ArrayList<String> customLore = new ArrayList<>();
+                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
+                    customLore.add(CHECK_LINE);
+                    meta.setLore(customLore);
+                    stack.setItemMeta(meta);
+
+                    chest.getInventory().setItem(slot, stack);
+                }
+                slot ++;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBeginBreak(BlockDamageEvent event) {
+        event.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
+        if (event.getBlock().getType() == Material.OBSIDIAN)
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 20000, 2, true, true));
+        else
+            event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        Material mat = event.getBlock().getType();
+        Location loc = event.getBlock().getLocation();
+        event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
+
+        switch (mat) {
             case LOG: case LOG_2:
-                final List<Block> bList = new ArrayList<Block>();
+                final List<Block> bList = new ArrayList<>();
                 checkLeaves(event.getBlock());
                 bList.add(event.getBlock());
                 new BukkitRunnable() {
@@ -374,6 +449,15 @@ public class PlayerListener implements Listener {
                     }
                 }.runTaskTimer(UHCRun.instance, 1, 1);
                 break;
+            case DIAMOND_ORE:
+            case LAPIS_ORE:
+            case GOLD_ORE:
+            case OBSIDIAN:
+            case IRON_ORE:
+            case REDSTONE_ORE:
+            case QUARTZ_ORE:
+                event.setCancelled(true);
+                event.getBlock().breakNaturally(new ItemStack(Material.DIAMOND_PICKAXE));
         }
         event.getPlayer().giveExp(event.getExpToDrop() * 2);
     }
@@ -398,7 +482,7 @@ public class PlayerListener implements Listener {
                 for (int offX = - range; offX <= range; offX++) {
                     for (int offY = - range; offY <= range; offY++) {
                         for (int offZ = - range; offZ <= range; offZ++) {
-                            if ((world.getBlockAt(x +offX, y + offY, z + offZ).getType() == Material.LEAVES || world.getBlockAt(x +offX, y + offY, z + offZ).getType() == Material.LEAVES_2)) {
+                            if ((world.getBlockAt(x + offX, y + offY, z + offZ).getType() == Material.LEAVES || world.getBlockAt(x + offX, y + offY, z + offZ).getType() == Material.LEAVES_2)) {
                                 breakLeaf(world, x + offX, y + offY, z + offZ);
                             }
                         }
@@ -406,15 +490,6 @@ public class PlayerListener implements Listener {
                 }
             }
         });
-    }
-
-    private void dropItem(final Location location, final ItemStack drop) {
-        Bukkit.getScheduler().runTaskLater(UHCRun.instance, new Runnable() {
-            @Override
-            public void run() {
-                location.getWorld().dropItemNaturally(location, drop);
-            }
-        }, 4);
     }
 
     @EventHandler
@@ -429,6 +504,35 @@ public class PlayerListener implements Listener {
             event.getInventory().setResult(new ItemStack(Material.STONE_SWORD));
         else if (event.getRecipe().getResult().getType() == Material.WOOD_SPADE)
             event.getInventory().setResult(new ItemStack(Material.STONE_SPADE));
+        else if (event.getRecipe().getResult().getType() == Material.DIAMOND) {
+            String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+            ArrayList<String> customLore = new ArrayList<>();
+            customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
+            customLore.add(CHECK_LINE);
+
+            ItemStack res = event.getInventory().getResult();
+            ItemMeta meta = res.getItemMeta();
+            meta.setLore(customLore);
+            res.setItemMeta(meta);
+            event.getInventory().setResult(res);
+        }
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!game.isPvpenabled() && (event.getBlockPlaced().getType() == Material.LAVA || event.getBlockPlaced().getType() == Material.STATIONARY_LAVA)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
+        }
+
+        int x = event.getBlockPlaced().getX();
+        int y = event.getBlockPlaced().getY();
+        int z = event.getBlockPlaced().getZ();
+
+        if (x > -50 && x < 50 && z > -50 && z < 50 && y > WorldLoader.getHighestNaturalBlockAt(x, z) + 17) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + "Towers" + ChatColor.DARK_RED + "] " + ChatColor.RED + "Les Towers sont interdites en UHCRun.");
+        }
     }
 
     @EventHandler
@@ -459,6 +563,18 @@ public class PlayerListener implements Listener {
             event.getInventory().setResult(new ItemStack(Material.STONE_AXE));
 		else if (event.getRecipe().getResult().getType() == Material.WOOD_SPADE)
 			event.getInventory().setResult(new ItemStack(Material.STONE_SPADE));
+        else if (event.getRecipe().getResult().getType() == Material.DIAMOND) {
+            String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+            ArrayList<String> customLore = new ArrayList<>();
+            customLore.add(ChatColor.GRAY + "Aperture™ Uncrafted Companion Diamond");
+            customLore.add(CHECK_LINE);
+
+            ItemStack res = event.getInventory().getResult();
+            ItemMeta meta = res.getItemMeta();
+            meta.setLore(customLore);
+            res.setItemMeta(meta);
+            event.getInventory().setResult(res);
+        }
     }
 
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -473,6 +589,10 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 Metadatas.setMetadata(damaged, "lastDamager", (Player) damager);
+
+                if (((Player) damager).hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
+                    event.setDamage(EntityDamageEvent.DamageModifier.MAGIC, event.getDamage(EntityDamageEvent.DamageModifier.MAGIC) / 2);
+                }
             } else if (damager instanceof Projectile) {
                 Projectile  arrow = (Projectile) damager;
                 Entity shooter = (Entity) arrow.getShooter();
@@ -482,6 +602,10 @@ public class PlayerListener implements Listener {
                         return;
                     }
                     Metadatas.setMetadata(damaged, "lastDamager", (Player) shooter);
+
+                    if (((Player) shooter).hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
+                        event.setDamage(EntityDamageEvent.DamageModifier.MAGIC, event.getDamage(EntityDamageEvent.DamageModifier.MAGIC)/2);
+                    }
                 }
             }
         }
@@ -534,6 +658,13 @@ public class PlayerListener implements Listener {
 	}
 
     @EventHandler
+    public void entitySpawn(EntitySpawnEvent event) {
+        EntityType entity = event.getEntityType();
+        if (entity == EntityType.GUARDIAN)
+            event.setCancelled(true);
+    }
+
+    @EventHandler
     public void onDeath(EntityDeathEvent event) {
         Random random = new Random();
         LivingEntity entity = event.getEntity();
@@ -582,8 +713,17 @@ public class PlayerListener implements Listener {
             for (ItemStack stack : event.getDrops()) {
                 if (stack.getType() == Material.RAW_CHICKEN)
                     newDrops.add(new ItemStack(Material.COOKED_CHICKEN, stack.getAmount()*2));
-                if (stack.getType() == Material.FEATHER)
-                    newDrops.add(new ItemStack(Material.ARROW, stack.getAmount()*2));
+                if (stack.getType() == Material.FEATHER) {
+                    ItemStack loot = new ItemStack(Material.ARROW, stack.getAmount());
+                    ItemMeta meta = loot.getItemMeta();
+                    String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+                    ArrayList<String> customLore = new ArrayList<>();
+                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Arrow");
+                    customLore.add(CHECK_LINE);
+                    meta.setLore(customLore);
+                    loot.setItemMeta(meta);
+                    newDrops.add(loot);
+                }
             }
             event.getDrops().clear();
             event.getDrops().addAll(newDrops);

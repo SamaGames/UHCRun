@@ -142,14 +142,13 @@ public class GameLoop implements Runnable {
 				lastLine -= 3;
 			}
 
-			if (parent.hasPlayer(player)) {
-				int kills = parent.countKills(player);
-				if (kills > 0) {
+			int kills = parent.countKills(player);
+            if (kills > 0) {
 					objective.setLine(lastLine - 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
                     objective.setLine(lastLine - 2, ChatColor.AQUA + "      ");
 					lastLine -= 2;
-				}
-			}
+            }
+
 
 			objective.setLine(lastLine - 1, ChatColor.GRAY + "Bordure :");
 			objective.setLine(lastLine - 2, ChatColor.WHITE + "-" + String.valueOf(((int) Bukkit.getWorld("world").getWorldBorder().getSize()) / 2) + " +" + String.valueOf(((int) Bukkit.getWorld("world").getWorldBorder().getSize()) / 2));

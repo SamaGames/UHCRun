@@ -24,6 +24,14 @@ public class CommandJoin
                         if (t.getChatColor() == teamColor)
                             team = t;
 
+                    try {
+                        if (game.getPlayerTeam(aPlayer) != null)
+                            game.getPlayerTeam(aPlayer).remove(aPlayer);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
                     if (team == null) {
                         cs.sendMessage(ChatColor.RED + "Cette équipe n'existe pas.");
                         return true;

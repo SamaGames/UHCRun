@@ -37,6 +37,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -57,6 +58,44 @@ public class UHCRun extends JavaPlugin implements Listener {
     public static boolean isWorldLoaded = false;
     private HashMap<UUID, Gui> playersGui = new HashMap<>();
     public static boolean gen = false;
+
+   /* public void onLoad() {
+        try {
+            BlockObsidian obsi = new BlockObsidian();
+            Method c = Block.class.getDeclaredMethod("c", float.class);
+            c.setAccessible(true);
+            Method b = Block.class.getDeclaredMethod("b", float.class);
+            b.setAccessible(true);
+            Method a = Block.class.getDeclaredMethod("a", StepSound.class);
+            a.setAccessible(true);
+            Method cname = Block.class.getDeclaredMethod("c", String.class);
+            cname.setAccessible(true);
+
+            obsi = (BlockObsidian) c.invoke(obsi, 0F);
+            obsi = (BlockObsidian) b.invoke(obsi, 0F);
+            obsi = (BlockObsidian) a.invoke(obsi, new StepSound("stone", 1.0F, 1.0F));
+            obsi = (BlockObsidian) cname.invoke(obsi, "obsidian");
+            Method register = Block.class.getDeclaredMethod("a", int.class, String.class, Block.class);
+            register.setAccessible(true);
+            register.invoke(null, 49, "obsidian", obsi);
+
+            Field strenght = Block.class.getDeclaredField("strength");
+            Field dur = Block.class.getDeclaredField("durability");
+            strenght.setAccessible(true);
+            dur.setAccessible(true);
+            getLogger().info("Patched NMS obsidian !");
+            getLogger().info("Properties of OBSIDIAN : " + strenght.getFloat(Block.getById(49)));
+            getLogger().info("Properties of OBSIDIAN : " + dur.getFloat(Block.getById(49)));
+            getLogger().info("Checking registered obsidian :");
+            Object o = Block.REGISTRY.get(new MinecraftKey("obsidian"));
+            getLogger().info("Object : " + o.toString());
+            getLogger().info("Properties of OBSIDIAN : " + strenght.getFloat(o));
+            getLogger().info("Properties of OBSIDIAN : " + dur.getFloat(o));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
 
     @EventHandler
     public void onChunkUnload(final ChunkUnloadEvent event) {
@@ -157,61 +196,8 @@ public class UHCRun extends JavaPlugin implements Listener {
         this.saveResource("lobby.schematic", false);
         this.saveResource("nether.schematic", false);
 
-        BiomeBase[] a = BiomeBase.getBiomes();
-        BiomeForest nb1 = new BiomeForest(0, 0);
-        BiomeForest nb2 = new BiomeForest(24, 0);
+        getLogger().info("Patching NMS classes...");
 
-        try
-        {
-            Method m1 = BiomeBase.class.getMethod("b", int.class);
-            m1.setAccessible(true);
-
-            Method m2 = BiomeBase.class.getMethod("a", String.class);
-            m2.setAccessible(true);
-
-            Method m3 = BiomeBase.class.getMethod("a", int.class);
-            m3.setAccessible(true);
-
-            Method m4 = BiomeBase.class.getMethod("a", float.class, float.class);
-            m4.setAccessible(true);
-
-            Field ff = BiomeBase.class.getDeclaredField("au");
-            ff.setAccessible(true);
-
-            List<BiomeMeta> mobs = new ArrayList<>();
-
-            mobs.add(new BiomeMeta(EntitySheep.class, 12, 4, 4));
-            mobs.add(new BiomeMeta(EntityRabbit.class, 10, 3, 3));
-            mobs.add(new BiomeMeta(EntityPig.class, 10, 4, 4));
-            mobs.add(new BiomeMeta(EntityChicken.class, 10, 4, 4));
-            mobs.add(new BiomeMeta(EntityCow.class, 8, 4, 4));
-            mobs.add(new BiomeMeta(EntityWolf.class, 5, 4, 4));
-
-            ff.set(nb1, mobs);
-            ff.set(nb2, mobs);
-
-            m1.invoke(nb1, 353825);
-            m2.invoke(nb1, "Forest");
-            m3.invoke(nb1, 5159473);
-            m4.invoke(nb1, 0.7F, 0.8F);
-
-            m1.invoke(nb2, 353825);
-            m2.invoke(nb2, "Forest");
-            m3.invoke(nb2, 5159473);
-            m4.invoke(nb2, 0.7F, 0.8F);
-
-            Field f1 = BiomeBase.class.getDeclaredField("OCEAN");
-            Field f2 = BiomeBase.class.getDeclaredField("DEEP_OCEAN");
-            this.setFinalStatic(f1, nb1);
-            this.setFinalStatic(f2, nb2);
-
-            a[0] = nb1;
-            a[24] = nb2;
-
-            Field f3 = BiomeBase.class.getDeclaredField("biomes");
-            this.setFinalStatic(f3, a);
-        }
-        catch (Exception e) {}
 
         File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
         getLogger().info("Checking wether world exists at : " + conf.getAbsolutePath());
@@ -233,6 +219,27 @@ public class UHCRun extends JavaPlugin implements Listener {
         }, 20L, 20L);
 
 
+    }
+
+    protected Block getBlock(Block block, float first, float second, StepSound i) {
+        Method method = null;
+        try {
+            method = Block.class.getDeclaredMethod("c", float.class);
+            method.setAccessible(true);
+            block = (Block) method.invoke(block, first);
+
+            method = Block.class.getDeclaredMethod("b", float.class);
+            method.setAccessible(true);
+            block = (Block) method.invoke(block, second);
+
+            method = Block.class.getDeclaredMethod("a", StepSound.class);
+            method.setAccessible(true);
+            block = (Block) method.invoke(block, i);
+            return block;
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return block;
     }
 
     public void finishEnabling() {
