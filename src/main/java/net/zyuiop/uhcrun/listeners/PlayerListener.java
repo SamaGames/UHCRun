@@ -1,10 +1,13 @@
 package net.zyuiop.uhcrun.listeners;
 
-import net.minecraft.server.v1_8_R1.*;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.GameUtils;
 import net.samagames.gameapi.json.Status;
 import net.zyuiop.uhcrun.UHCRun;
+import net.zyuiop.uhcrun.datasaver.DamageDone;
+import net.zyuiop.uhcrun.datasaver.DamageReceived;
+import net.zyuiop.uhcrun.datasaver.HealingSource;
+import net.zyuiop.uhcrun.datasaver.SavedPlayer;
 import net.zyuiop.uhcrun.game.BasicGame;
 import net.zyuiop.uhcrun.game.SoloGame;
 import net.zyuiop.uhcrun.game.Team;
@@ -19,8 +22,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
-import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -30,18 +31,12 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -67,6 +62,117 @@ public class PlayerListener implements Listener {
         if (event.getEntity() instanceof Player)
             if (!game.isDamages())
                 event.setCancelled(true);
+    }
+
+    public static String getDisplayName(EntityType entityType) {
+        switch (entityType) {
+            case ENDER_PEARL:
+                return "EnderPearl";
+            case PRIMED_TNT:
+            case MINECART_TNT:
+                return "TNT";
+            case FALLING_BLOCK:
+                return "Bloc";
+            case CREEPER:
+                return "Creeper";
+            case SKELETON:
+                return "Squelette";
+            case SPIDER:
+                return "Araignée";
+            case ZOMBIE:
+                return "Zombie";
+            case SLIME:
+                return "Slime";
+            case GHAST:
+                return "Ghast";
+            case ENDERMAN:
+                return "Enderman";
+            case CAVE_SPIDER:
+                return "Araignée des Cavernes";
+            case SILVERFISH:
+                return "Silverfish";
+            case BLAZE:
+            case FIREBALL:
+            case SMALL_FIREBALL:
+                return "Blaze";
+            case IRON_GOLEM:
+                return "Golem de Fer";
+            case WOLF:
+                return "Loup";
+            case LIGHTNING:
+                return "Foudre";
+            default:
+                return entityType.name();
+        }
+    }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void saveDamages(EntityDamageEvent event) {
+        if (event.getFinalDamage() == 0)
+            return;
+
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (game.isInGame(player.getUniqueId())) {
+                SavedPlayer pl = game.getStoredGame().getPlayer(player.getUniqueId(), player.getName());
+                DamageReceived received;
+
+                if (event instanceof EntityDamageByEntityEvent) {
+                    Entity source = ((EntityDamageByEntityEvent) event).getDamager();
+                    if (source instanceof Player) {
+                        ItemStack inHand = ((Player) source).getItemInHand();
+                        received = new DamageReceived(((inHand == null) ? Material.AIR : inHand.getType()), ((Player) source).getName(), ((Player) source).getDisplayName(), event.getFinalDamage());
+                        SavedPlayer sh = game.getStoredGame().getPlayer(source.getUniqueId(), ((Player) source).getName());
+                        sh.doDamage(new DamageDone(((inHand == null) ? Material.AIR : inHand.getType()), player.getName(), player.getDisplayName(), event.getFinalDamage()));
+
+                    } else if (source instanceof Projectile) {
+                        Projectile arrow = (Projectile) source;
+                        Entity shooter = (Entity) arrow.getShooter();
+                        if (shooter instanceof Player) {
+                            received = new DamageReceived(Material.ARROW, ((Player) shooter).getName(), ((Player) shooter).getDisplayName(), event.getFinalDamage());
+                            SavedPlayer sh = game.getStoredGame().getPlayer(shooter.getUniqueId(), ((Player) shooter).getName());
+                            sh.doDamage(new DamageDone(Material.ARROW, player.getName(), player.getDisplayName(), event.getFinalDamage()));
+                        } else {
+                            received = new DamageReceived(Material.ARROW, shooter.getType().toString(), getDisplayName(shooter.getType()), event.getFinalDamage());
+                        }
+                    } else {
+                        Material mat = Material.AIR;
+                        if (source instanceof LivingEntity) {
+                            try {
+                                mat = ((LivingEntity) source).getEquipment().getItemInHand().getType();
+                            } catch (Exception ignored) {}
+                        }
+                        received = new DamageReceived(mat, source.getType().toString(), getDisplayName(source.getType()), event.getFinalDamage());
+                    }
+                } else {
+                    received = new DamageReceived(Material.AIR, BasicGame.getDamageCause(event.getCause()), BasicGame.getDamageCause(event.getCause()), event.getFinalDamage());
+                }
+
+                pl.takeDamage(received);
+            }
+        }
+    }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void regainHealth(EntityRegainHealthEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            String reason;
+            switch (event.getRegainReason()) {
+                case REGEN:
+                case MAGIC_REGEN:
+                    reason = "Régénération";
+                    break;
+                case MAGIC:
+                    reason = "Potion";
+                    break;
+                default:
+                    reason = "Inconnue";
+            }
+
+            SavedPlayer pl = game.getStoredGame().getPlayer(player.getUniqueId(), player.getName());
+            pl.heal(new HealingSource(reason, event.getAmount()));
+        }
     }
 
     @EventHandler

@@ -8,19 +8,26 @@ import net.samagames.gameapi.themachine.messages.MessageManager;
 import net.samagames.gameapi.types.GameArena;
 import net.samagames.utils.ObjectiveSign;
 import net.samagames.utils.Titles;
+import net.zyuiop.MasterBundle.MasterBundle;
+import net.zyuiop.coinsManager.CoinsManager;
 import net.zyuiop.statsapi.StatsApi;
 import net.zyuiop.uhcrun.UHCRun;
+import net.zyuiop.uhcrun.datasaver.SavedPlayer;
+import net.zyuiop.uhcrun.datasaver.StoredGame;
 import net.zyuiop.uhcrun.tasks.BeginCountdown;
 import net.zyuiop.uhcrun.tasks.GameLoop;
 import net.zyuiop.uhcrun.utils.Metadatas;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import redis.clients.jedis.ShardedJedis;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +55,7 @@ public abstract class BasicGame implements GameArena {
     protected ArrayList<SpawnLocation> spawns = new ArrayList<>();
 	protected ConcurrentHashMap<UUID, Integer> kills = new ConcurrentHashMap<>();
     private GameLoop gameLoop;
+    private StoredGame storedGame;
 
     public BasicGame(String map, int min, int max, int vip) {
         maxPlayers = max;
@@ -87,6 +95,9 @@ public abstract class BasicGame implements GameArena {
     }
 
     public void start() {
+        // Init stored game //
+        storedGame = new StoredGame(MasterBundle.getServerName(), System.currentTimeMillis(), mapName);
+
 		updateStatus(Status.InGame);
         UHCRun.instance.removeSpawn();
         life = scoreboard.registerNewObjective("vie", "health");
@@ -148,6 +159,9 @@ public abstract class BasicGame implements GameArena {
                 try {
                     StatsApi.increaseStat(killer, "uhcrun", "kills", 1);
 					addKill(killer.getUniqueId());
+
+                    SavedPlayer savedPlayer = storedGame.getPlayer(killer.getUniqueId(), killer.getName());
+                    savedPlayer.kill(player);
                 } catch (Exception ignored) {}
             }
         }
@@ -161,6 +175,23 @@ public abstract class BasicGame implements GameArena {
 
         checkStump(player);
 
+        try {
+            // Sauvegarde
+            SavedPlayer savedPlayer = storedGame.getPlayer(player.getUniqueId(), player.getName());
+            String killedBy;
+            if (logout)
+                killedBy = "Déconnexion";
+            else if (killer != null)
+                killedBy = killer.getDisplayName();
+            else {
+                EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
+                killedBy = getDamageCause(cause);
+            }
+            savedPlayer.die(players.size(), killedBy, System.currentTimeMillis() - storedGame.getStartTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (logout)
             return;
 
@@ -173,6 +204,39 @@ public abstract class BasicGame implements GameArena {
         Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
     }
 
+    public StoredGame getStoredGame() {
+        return storedGame;
+    }
+
+    public static String getDamageCause(EntityDamageEvent.DamageCause cause) {
+        switch (cause) {
+            case SUFFOCATION:
+                return "Suffocation";
+            case FALL:
+                return "Chute";
+            case FIRE:
+            case FIRE_TICK:
+                return "Feu";
+            case LAVA:
+                return "Lave";
+            case DROWNING:
+                return "Noyade";
+            case BLOCK_EXPLOSION:
+            case ENTITY_EXPLOSION:
+                return "Explosion";
+            case LIGHTNING:
+                return "Foudre";
+            case POISON:
+                return "Poison";
+            case MAGIC:
+                return "Potion";
+            case FALLING_BLOCK:
+                return "Chute de blocs";
+            default:
+                return "Autre";
+        }
+    }
+
     public abstract void creditKillCoins(Player player);
 
     public abstract void checkStump(Player player);
@@ -182,12 +246,56 @@ public abstract class BasicGame implements GameArena {
     }
 
     public void finish() {
+        Bukkit.getScheduler().runTaskAsynchronously(UHCRun.instance, new Runnable() {
+            @Override
+            public void run() {
+                storedGame.setEndTime(System.currentTimeMillis());
+                String json = new Gson().toJson(storedGame);
+                ShardedJedis jedis = MasterBundle.jedis();
+                String gameId = MasterBundle.getServerName() + System.currentTimeMillis();
+                jedis.hset("uhcrungames", gameId, json);
+
+                TreeMap<UUID, Integer> ranks = new TreeMap<>(new Comparator<UUID>() {
+                    public int compare(UUID a, UUID b) {
+                        Integer ka = kills.get(a);
+                        Integer kb = kills.get(b);
+                        ka = (ka == null) ? 0 : ka;
+                        kb = (kb == null) ? 0 : kb;
+                        if (ka >= kb) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                });
+                ranks.putAll(kills);
+                Iterator<Map.Entry<UUID, Integer>> ids = ranks.entrySet().iterator();
+                String[] top = new String[] {"", "", ""};
+                int i = 0;
+                while (i < 3 && ids.hasNext()) {
+                    Map.Entry<UUID, Integer> val = ids.next();
+                    top[i] = Bukkit.getOfflinePlayer(val.getKey()).getName() + "" + ChatColor.AQUA + " (" + val.getValue() + ")";
+                    CoinsManager.creditJoueur(val.getKey(), (3 - i) * 10, true, true, "Rang " + (i+1) + " au classement de kills !");
+                    i++;
+                }
+
+                Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
+                Bukkit.broadcastMessage(ChatColor.GOLD + "                        Classement Kills      ");
+                Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
+                Bukkit.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
+                Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
+                Bukkit.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
+                Bukkit.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
+                Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
+            }
+        });
+
         Bukkit.getScheduler().runTaskLater(UHCRun.instance, new Runnable() {
-			@Override
-			public void run() {
-				mainLoop.cancel();
-			}
-		}, 30L);
+            @Override
+            public void run() {
+                mainLoop.cancel();
+            }
+        }, 30L);
         setStatus(Status.Stopping);
         GameAPI.getManager().sendArena();
         Bukkit.getScheduler().runTaskLater(UHCRun.instance, new Runnable() {

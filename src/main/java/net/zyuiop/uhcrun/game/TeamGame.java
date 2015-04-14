@@ -204,7 +204,7 @@ public class TeamGame extends BasicGame {
         if (team != null) {
             for (UUID id : team.getPlayers()) {
                 if (!id.equals(player.getUniqueId()))
-                    CoinsManager.creditJoueur(player.getUniqueId(), 10, true, true, "Votre équipe fait un kill !");
+                    CoinsManager.creditJoueur(id, 10, true, true, "Votre équipe fait un kill !");
             }
         }
     }
