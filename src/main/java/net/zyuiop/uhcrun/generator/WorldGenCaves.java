@@ -7,16 +7,15 @@ package net.zyuiop.uhcrun.generator;
 
 import com.google.common.base.Objects;
 import java.util.Random;
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.BlockSand;
-import net.minecraft.server.v1_8_R1.Blocks;
-import net.minecraft.server.v1_8_R1.ChunkSnapshot;
-import net.minecraft.server.v1_8_R1.EnumSandVariant;
-import net.minecraft.server.v1_8_R1.IBlockData;
-import net.minecraft.server.v1_8_R1.Material;
-import net.minecraft.server.v1_8_R1.MathHelper;
-import net.minecraft.server.v1_8_R1.World;
-import net.minecraft.server.v1_8_R1.WorldGenBase;
+import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockSand;
+import net.minecraft.server.v1_8_R2.Blocks;
+import net.minecraft.server.v1_8_R2.ChunkSnapshot;
+import net.minecraft.server.v1_8_R2.IBlockData;
+import net.minecraft.server.v1_8_R2.Material;
+import net.minecraft.server.v1_8_R2.MathHelper;
+import net.minecraft.server.v1_8_R2.World;
+import net.minecraft.server.v1_8_R2.WorldGenBase;
 
 public class WorldGenCaves extends WorldGenBase {
     public WorldGenCaves() {
@@ -154,7 +153,7 @@ public class WorldGenCaves extends WorldGenBase {
                                                 } else {
                                                     var5.a(var50, var59, var65, Blocks.AIR.getBlockData());
                                                     if(var63.getBlock() == Blocks.SAND) {
-                                                        var5.a(var50, var59 + 1, var65, var63.get(BlockSand.VARIANT) == EnumSandVariant.RED_SAND?Blocks.RED_SANDSTONE.getBlockData():Blocks.SANDSTONE.getBlockData());
+                                                        var5.a(var50, var59 + 1, var65, var63.get(BlockSand.VARIANT) == BlockSand.EnumSandVariant.RED_SAND?Blocks.RED_SANDSTONE.getBlockData():Blocks.SANDSTONE.getBlockData());
                                                     }
 
                                                     if(var58 && var5.a(var50, var59 - 1, var65).getBlock() == Blocks.DIRT) {

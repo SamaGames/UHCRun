@@ -4,7 +4,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
-import net.minecraft.server.v1_8_R1.ChunkSnapshot;
+import net.minecraft.server.v1_8_R2.ChunkSnapshot;
 import net.zyuiop.uhcrun.UHCRun;
 import org.bukkit.*;
 import org.bukkit.Chunk;
@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
 

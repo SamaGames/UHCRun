@@ -1,6 +1,6 @@
 package net.zyuiop.uhcrun;
 
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.*;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
 import net.zyuiop.uhcrun.commands.CommandNextEvent;
@@ -221,7 +221,7 @@ public class UHCRun extends JavaPlugin implements Listener {
 
     }
 
-    protected Block getBlock(Block block, float first, float second, StepSound i) {
+    protected Block getBlock(Block block, float first, float second, Block.StepSound i) {
         Method method = null;
         try {
             method = Block.class.getDeclaredMethod("c", float.class);
@@ -232,7 +232,7 @@ public class UHCRun extends JavaPlugin implements Listener {
             method.setAccessible(true);
             block = (Block) method.invoke(block, second);
 
-            method = Block.class.getDeclaredMethod("a", StepSound.class);
+            method = Block.class.getDeclaredMethod("a", Block.StepSound.class);
             method.setAccessible(true);
             block = (Block) method.invoke(block, i);
             return block;

@@ -18,7 +18,7 @@ import net.zyuiop.uhcrun.tasks.BeginCountdown;
 import net.zyuiop.uhcrun.tasks.GameLoop;
 import net.zyuiop.uhcrun.utils.Metadatas;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
+import com.google.gson.Gson;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
