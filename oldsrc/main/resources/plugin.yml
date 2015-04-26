@@ -1,0 +1,28 @@
+name: SurvivalGames
+main: UHCRun
+version: 1
+depend: [MasterBundle, SamaPermissionsBukkit]
+load: STARTUP
+commands:
+   start:
+      description: Démarre la partie
+      usage: /<command> now
+      permission: sg.op
+      permission-message: Permission non accordée
+   nextevent:
+      description: Execute le prochain evenement de force
+      usage: /<command>
+      permission: sg.op
+      permission-message: Permission non accordée
+   uhcrun:
+      aliases: [uhc]
+      description: COmmandes UHCRUN
+      usage: /<command>
+      permission: sgpub
+      permission-message: Permission non accordée
+permissions:
+   sg.op:
+      description: Commandes OP PPVP
+      default: op
+   sgpub:
+      default: true
