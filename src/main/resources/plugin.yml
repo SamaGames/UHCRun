@@ -1,5 +1,5 @@
 name: SurvivalGames
-main: net.zyuiop.uhcrun.UHCRun
+main: UHCRun
 version: 1
 depend: [MasterBundle, SamaPermissionsBukkit]
 load: STARTUP
