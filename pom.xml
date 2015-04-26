@@ -20,7 +20,7 @@
             <url>http://repo.md-5.net/content/groups/public/</url>
         </repository>
         <repository>
-            <id>zyuiop-repo</id>
+            <id>samagames-repo</id>
             <url>http://maven.samagames.net/</url>
         </repository>
         <repository>
