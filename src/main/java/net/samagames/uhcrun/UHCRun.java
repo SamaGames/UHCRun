@@ -1,5 +1,6 @@
 package net.samagames.uhcrun;
 
+import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -32,6 +33,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private boolean needGen;
     private BukkitTask startTimer;
     private OrePopulator populator;
+    private boolean worldLoaded;
 
     @Override
     public void onEnable()
@@ -61,6 +63,7 @@ public class UHCRun extends JavaPlugin implements Listener
         if (event.getWorld().getEnvironment() == World.Environment.NORMAL) {
             this.setupWorlds();
             event.getWorld().getPopulators().add(populator);
+            event.getWorld().getPopulators().add(new FortressPopulator(this));
         }
     }
 
@@ -74,6 +77,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private void postInit()
     {
         this.startTimer.cancel();
+        this.worldLoaded = true;
         System.out.println("POST INIT");
     }
 
@@ -106,5 +110,10 @@ public class UHCRun extends JavaPlugin implements Listener
         world.setGameRuleValue("randomTickSpeed", "3");
 
         System.out.println("WORLD INIT");
+    }
+
+    public boolean isWorldLoaded()
+    {
+        return worldLoaded;
     }
 }

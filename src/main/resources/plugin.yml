@@ -1,7 +1,7 @@
 name: SurvivalGames
 main: net.samagames.uhcrun.UHCRun
 version: 1.0
-depend: [SamaGamesAPI, SamaPermissionsBukkit]
+depend: [SamaGamesAPI, SamaPermissionsBukkit, WorldEdit]
 load: STARTUP
 commands:
    start:
