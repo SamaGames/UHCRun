@@ -44,18 +44,18 @@ public class SurvivalGamesPopulator extends BlockPopulator {
     }
 
     public void generateBlazeFortress(int x, int z) {
-        if (! UHCRun.getInstance().isWorldLoaded())
+        if (! UHCRun.isWorldLoaded)
             return;
 
 
         Bukkit.getLogger().info("Generating fortress at "+x+ "; "+z);
-        File file = new File(UHCRun.getInstance().getDataFolder(), "/nether.schematic");
+        File file = new File(UHCRun.instance.getDataFolder(), "/nether.schematic");
         EditSession es;
         if (file.exists()) {
             try {
                 com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(x, 40, z);
                 World worldf = Bukkit.getWorld("world");
-                Chunk chunk = worldf.getChunkAt(new Location(worldf, x, 40, z));
+                Chunk chunk = worldf.getChunkAt(new org.bukkit.Location(worldf, x, 40, z));
                 chunk.load(true);
                 int cx = chunk.getX() - 3;
                 int cz = chunk.getZ() - 3;
@@ -89,7 +89,7 @@ public class SurvivalGamesPopulator extends BlockPopulator {
                     while (bz < z+35) {
                         int by = 40;
                         while (by > 0) {
-                            Location block = new Location(worldf, bx, by, bz);
+                            Location block = new org.bukkit.Location(worldf, bx, by, bz);
                             if (block.getBlock().getType() == Material.MOB_SPAWNER) {
                                 block.getBlock().setType(Material.STONE);
                                 block.getBlock().setType(Material.MOB_SPAWNER);

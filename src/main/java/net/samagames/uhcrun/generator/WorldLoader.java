@@ -1,5 +1,6 @@
 package net.samagames.uhcrun.generator;
 
+import net.samagames.api.SamaGamesAPI;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -37,7 +38,7 @@ public class WorldLoader {
             x++;
         }
 
-        task = Bukkit.getScheduler().runTaskTimer(UHCRun.getInstance(), new Runnable() {
+        task = Bukkit.getScheduler().runTaskTimer(UHCRun.instance, new Runnable() {
             private int todo = (1200*1200)/(16*16);
             private int x = -600;
             private int z = -600;
@@ -50,7 +51,7 @@ public class WorldLoader {
                     int percentage = (numberChunk * 100 / todo);
                     if (percentage > lastShow && percentage % 10 == 0) {
                         lastShow = percentage;
-                        //GameAPI.getManager().sendArena(GameAPI.getManager().buildJson(GameAPI.getArena(), percentage));
+                        SamaGamesAPI.get().getGameManager().refreshArena();
                     }
 
                     z+=16;
@@ -73,7 +74,7 @@ public class WorldLoader {
 
     private static void finish() {
         task.cancel();
-        UHCRun.getInstance().finishGeneration();
+        UHCRun.instance.finishGeneration();
     }
 
     public static class PartialLocation {

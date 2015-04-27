@@ -1,7 +1,7 @@
 name: SurvivalGames
-main: net.samagames.uhcrun.UHCRun
-version: 2.0
-depend: [SamaGamesAPI, SamaPermissionsBukkit]
+main: UHCRun
+version: 1
+depend: [MasterBundle, SamaPermissionsBukkit]
 load: STARTUP
 commands:
    start:

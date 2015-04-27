@@ -4,31 +4,25 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-/**
- * Created by Thog92 on 27/04/2015.
- */
-public class CommandUHC implements CommandExecutor {
-
-    private CommandExecutor help = new CommandHelp();
-    private CommandExecutor invite = new CommandInvite();
-    private CommandExecutor join;
-
+public class CommandUHC implements CommandExecutor
+{
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+    public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings)
+    {
         if(strings.length != 0)
         {
             switch (strings[0])
             {
                 case "help":
-                    help.onCommand(commandSender, command, s, strings);
+                    CommandHelp.onCommand(cs, cmnd, string, strings);
                     break;
-
+                    
                 case "invite":
-                    invite.onCommand(commandSender, command, s, strings);
+                    CommandInvite.onCommand(cs, cmnd, string, strings);
                     break;
-
+                    
                 case "join":
-                    join.onCommand(commandSender, command, s, strings);
+                    CommandJoin.onCommand(cs, cmnd, string, strings);
                     break;
             }
         }
@@ -36,7 +30,7 @@ public class CommandUHC implements CommandExecutor {
         {
             return false;
         }
-
+        
         return true;
     }
 }

@@ -1,27 +1,23 @@
 package net.samagames.uhcrun.commands;
 
 import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.game.Team;
 import net.samagames.uhcrun.game.TeamGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-/**
- * Created by Thog92 on 27/04/2015.
- */
-public class CommandInvite implements CommandExecutor {
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if(commandSender instanceof Player) {
-            if (UHCRun.getInstance().getGame() instanceof TeamGame) {
-                TeamGame game = (TeamGame) UHCRun.getInstance().getGame();
+public class CommandInvite {
+    public static boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings) {
+        if(cs instanceof Player) {
+            if (UHCRun.instance.game instanceof TeamGame) {
+                TeamGame game = (TeamGame) UHCRun.instance.game;
                 if(!game.isGameStarted()) {
-                    String inviter = commandSender.getName();
+                    String inviter = cs.getName();
                     String invited = strings[1];
                     UUID aInviter = ((Player) cs).getUniqueId();
                     UUID aInvited = Bukkit.getPlayer(invited).getUniqueId();
@@ -32,15 +28,16 @@ public class CommandInvite implements CommandExecutor {
                             team.removeInvite(aInvited);
 
                         team.invite(inviter, aInvited);
-                        Bukkit.getPlayer(inviter).sendMessage(ChatColor.GREEN + "Le joueur a bien été invité !");
+                        Bukkit.getPlayer(inviter).sendMessage(ChatColor.GREEN + "Le joueur a bien Ã©tÃ© invitÃ© !");
                     } else {
-                        Bukkit.getPlayer(inviter).sendMessage(ChatColor.RED + "Votre équipe est pleine !");
+                        Bukkit.getPlayer(inviter).sendMessage(ChatColor.RED + "Votre Ã©quipe est pleine !");
                     }
                 }
             } else {
-                commandSender.sendMessage(ChatColor.RED + "Vous n'êtes pas dans la version en équipes de l'UHCRun.");
+                cs.sendMessage(ChatColor.RED + "Vous n'Ãªtes pas dans la version en Ã©quipes de l'UHCRun.");
             }
         }
+                
         return true;
     }
 }
