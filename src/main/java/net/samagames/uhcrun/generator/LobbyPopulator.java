@@ -32,6 +32,7 @@ public class LobbyPopulator
     }
 
     public void generate() {
+        this.plugin.getLogger().info("Generating Looby...");
         File file = new File(this.plugin.getDataFolder(), "/lobby.schematic");
 
         if (file.exists()) {
@@ -49,8 +50,10 @@ public class LobbyPopulator
             }
 
         } else {
-            Bukkit.getLogger().severe(("File does not exist."));
+            this.plugin.getLogger().severe(("File does not exist. Abort..."));
         }
+
+        this.plugin.getLogger().info("Done.");
     }
 
     public void remove() {

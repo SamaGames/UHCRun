@@ -5,6 +5,7 @@ import net.samagames.api.games.IManagedGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
+import net.samagames.uhcrun.listener.CraftListener;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -41,16 +45,18 @@ public class UHCRun extends JavaPlugin implements Listener
     private boolean worldLoaded;
     private SamaGamesAPI api;
     private LobbyPopulator loobyPopulator;
+    private PluginManager pluginManager;
 
     @Override
     public void onEnable()
     {
         instance = this;
         api = SamaGamesAPI.get();
+        pluginManager = Bukkit.getPluginManager();
         config = this.getConfig();
         logger = this.getLogger();
 
-        Bukkit.getPluginManager().registerEvents(this, this);
+        pluginManager.registerEvents(this, this);
         this.saveResource("lobby.schematic", false);
         this.saveResource("nether.schematic", false);
 
@@ -65,6 +71,7 @@ public class UHCRun extends JavaPlugin implements Listener
         {
             logger.info("World found!");
         }
+
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
     }
 
@@ -98,16 +105,16 @@ public class UHCRun extends JavaPlugin implements Listener
     {
         this.startTimer.cancel();
         this.worldLoaded = true;
-        System.out.println("POST INIT");
+
+        // Add the looby
         loobyPopulator = new LobbyPopulator(this);
         loobyPopulator.generate();
+        pluginManager.registerEvents(new CraftListener(), this);
     }
 
 
     public void setupWorlds()
     {
-
-
         // Init custom ore populator
         populator = new OrePopulator();
         populator.addRule(new OrePopulator.Rule(Material.DIAMOND_ORE, 0, 4, 0, 64, 5));
