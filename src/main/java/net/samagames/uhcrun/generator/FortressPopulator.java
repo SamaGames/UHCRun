@@ -96,7 +96,7 @@ public class FortressPopulator extends BlockPopulator
                                 spawner.setSpawnedType(EntityType.BLAZE);
                                 spawner.setDelay(1);
                                 spawner.update();
-                                Bukkit.getLogger().info("Spawner configured at "+bx+" - "+by+" - "+bz);
+                                Bukkit.getLogger().info("Spawner configured at "+bx+" , "+by+" , "+bz);
                                 break;
                             }
                             by--;

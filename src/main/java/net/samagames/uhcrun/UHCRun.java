@@ -1,15 +1,18 @@
 package net.samagames.uhcrun;
 
+import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.IManagedGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
+import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldBorder;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -27,18 +30,23 @@ import java.util.logging.Logger;
 public class UHCRun extends JavaPlugin implements Listener
 {
 
+    private Location spawnLocation;
     private static UHCRun instance;
     private FileConfiguration config;
     private Logger logger;
     private boolean needGen;
     private BukkitTask startTimer;
     private OrePopulator populator;
+    private IManagedGame game;
     private boolean worldLoaded;
+    private SamaGamesAPI api;
+    private LobbyPopulator loobyPopulator;
 
     @Override
     public void onEnable()
     {
         instance = this;
+        api = SamaGamesAPI.get();
         config = this.getConfig();
         logger = this.getLogger();
 
@@ -49,18 +57,29 @@ public class UHCRun extends JavaPlugin implements Listener
 
         File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
         logger.info("Checking wether world exists at : " + conf.getAbsolutePath());
-        if (!conf.exists()) {
+        if (!conf.exists())
+        {
             needGen = true;
             logger.info("No world exists. Will be generated.");
-        } else {
+        } else
+        {
             logger.info("World found!");
         }
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
     }
 
+    @EventHandler
+    public void onChunkUnload(final ChunkUnloadEvent event)
+    {
+        if (game == null)
+            event.setCancelled(true);
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
-    public void onWorldInit(final WorldInitEvent event) {
-        if (event.getWorld().getEnvironment() == World.Environment.NORMAL) {
+    public void onWorldInit(final WorldInitEvent event)
+    {
+        if (event.getWorld().getEnvironment() == World.Environment.NORMAL)
+        {
             this.setupWorlds();
             event.getWorld().getPopulators().add(populator);
             event.getWorld().getPopulators().add(new FortressPopulator(this));
@@ -70,7 +89,8 @@ public class UHCRun extends JavaPlugin implements Listener
     @Override
     public void onDisable()
     {
-
+        if(loobyPopulator != null)
+            loobyPopulator.remove();
     }
 
 
@@ -79,10 +99,13 @@ public class UHCRun extends JavaPlugin implements Listener
         this.startTimer.cancel();
         this.worldLoaded = true;
         System.out.println("POST INIT");
+        loobyPopulator = new LobbyPopulator(this);
+        loobyPopulator.generate();
     }
 
 
-    public void setupWorlds() {
+    public void setupWorlds()
+    {
 
 
         // Init custom ore populator
@@ -94,8 +117,9 @@ public class UHCRun extends JavaPlugin implements Listener
         populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 0, 4, 0, 32, 6));
 
 
-
         World world = Bukkit.getWorlds().get(0);
+        spawnLocation  = new Location(world, 0.6, 152, 0.6);
+        world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
         WorldBorder border = world.getWorldBorder();
 
         // Overworld settings
@@ -115,5 +139,10 @@ public class UHCRun extends JavaPlugin implements Listener
     public boolean isWorldLoaded()
     {
         return worldLoaded;
+    }
+
+    @EventHandler
+    public void onPreJoin(PlayerJoinEvent event) {
+        event.getPlayer().teleport(spawnLocation);
     }
 }
