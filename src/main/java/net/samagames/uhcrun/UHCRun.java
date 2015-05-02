@@ -3,6 +3,7 @@ package net.samagames.uhcrun;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.types.GameArena;
+import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.IGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
@@ -78,6 +79,9 @@ public class UHCRun extends JavaPlugin implements Listener
 
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
+
+        this.game = new Game("solo", (short)10, (short)4, (short)1);
+
         /*if (playersPerTeam <= 1)
             game = new SoloGame();
         else
@@ -92,7 +96,7 @@ public class UHCRun extends JavaPlugin implements Listener
     @EventHandler
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
-        if (game.getStatus() != Status.InGame)
+        if (!game.hasTeleportPlayers())
             event.setCancelled(true);
     }
 
@@ -125,6 +129,8 @@ public class UHCRun extends JavaPlugin implements Listener
         loobyPopulator.generate();
         pluginManager.registerEvents(new CraftListener(), this);
         pluginManager.registerEvents(new BlockListener(), this);
+
+        game.postInit();
         game.updateStatus(Status.Available);
     }
 
@@ -166,7 +172,12 @@ public class UHCRun extends JavaPlugin implements Listener
     @EventHandler
     public void onPreJoin(PlayerJoinEvent event)
     {
-        if(game == null)
+        if(game == null || game.getStatus() == Status.Available)
             event.getPlayer().teleport(spawnLocation);
+    }
+
+    public Location getSpawnLocation()
+    {
+        return spawnLocation;
     }
 }
