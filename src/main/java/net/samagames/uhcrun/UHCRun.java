@@ -87,8 +87,6 @@ public class UHCRun extends JavaPlugin implements Listener
         else
             game = new TeamGame(playersPerTeam);*/
         pluginManager.registerEvents(new LoginListener(game), this);
-        GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
-        game.setStatus(Status.Generating);
 
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
     }
@@ -120,6 +118,8 @@ public class UHCRun extends JavaPlugin implements Listener
 
     private void postInit()
     {
+        GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
+        game.setStatus(Status.Generating);
         this.startTimer.cancel();
 
         this.worldLoaded = true;

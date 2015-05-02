@@ -92,7 +92,7 @@ public class Game implements IGame
 
         if (beginCountdown != null) beginCountdown.cancel();
 
-        //teleportAtStart();
+        //teleportPlayers();
 
         for (UUID uuid : players)
         {
