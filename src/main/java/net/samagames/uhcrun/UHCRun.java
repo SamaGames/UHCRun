@@ -1,22 +1,23 @@
 package net.samagames.uhcrun;
 
-import net.samagames.api.SamaGamesAPI;
-import net.samagames.api.games.IManagedGame;
+import net.samagames.gameapi.GameAPI;
+import net.samagames.gameapi.json.Status;
+import net.samagames.gameapi.types.GameArena;
+import net.samagames.uhcrun.game.IGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
+import net.samagames.uhcrun.listener.BlockListener;
 import net.samagames.uhcrun.listener.CraftListener;
+import net.samagames.uhcrun.listener.LoginListener;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -34,24 +35,27 @@ import java.util.logging.Logger;
 public class UHCRun extends JavaPlugin implements Listener
 {
 
-    private Location spawnLocation;
     private static UHCRun instance;
+    private Location spawnLocation;
     private FileConfiguration config;
     private Logger logger;
     private boolean needGen;
     private BukkitTask startTimer;
     private OrePopulator populator;
-    private IManagedGame game;
+    private IGame game;
     private boolean worldLoaded;
-    private SamaGamesAPI api;
     private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
+
+    public static UHCRun getInstance()
+    {
+        return instance;
+    }
 
     @Override
     public void onEnable()
     {
         instance = this;
-        api = SamaGamesAPI.get();
         pluginManager = Bukkit.getPluginManager();
         config = this.getConfig();
         logger = this.getLogger();
@@ -72,13 +76,23 @@ public class UHCRun extends JavaPlugin implements Listener
             logger.info("World found!");
         }
 
+        int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
+
+        /*if (playersPerTeam <= 1)
+            game = new SoloGame();
+        else
+            game = new TeamGame(playersPerTeam);*/
+        pluginManager.registerEvents(new LoginListener(game), this);
+        GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
+        game.setStatus(Status.Generating);
+
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
     }
 
     @EventHandler
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
-        if (game == null)
+        if (game.getStatus() != Status.InGame)
             event.setCancelled(true);
     }
 
@@ -96,22 +110,23 @@ public class UHCRun extends JavaPlugin implements Listener
     @Override
     public void onDisable()
     {
-        if(loobyPopulator != null)
+        if (loobyPopulator != null)
             loobyPopulator.remove();
     }
-
 
     private void postInit()
     {
         this.startTimer.cancel();
+
         this.worldLoaded = true;
 
         // Add the looby
         loobyPopulator = new LobbyPopulator(this);
         loobyPopulator.generate();
         pluginManager.registerEvents(new CraftListener(), this);
+        pluginManager.registerEvents(new BlockListener(), this);
+        game.updateStatus(Status.Available);
     }
-
 
     public void setupWorlds()
     {
@@ -125,7 +140,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
 
         World world = Bukkit.getWorlds().get(0);
-        spawnLocation  = new Location(world, 0.6, 152, 0.6);
+        spawnLocation = new Location(world, 0.6, 152, 0.6);
         world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
         WorldBorder border = world.getWorldBorder();
 
@@ -149,7 +164,9 @@ public class UHCRun extends JavaPlugin implements Listener
     }
 
     @EventHandler
-    public void onPreJoin(PlayerJoinEvent event) {
-        event.getPlayer().teleport(spawnLocation);
+    public void onPreJoin(PlayerJoinEvent event)
+    {
+        if(game == null)
+            event.getPlayer().teleport(spawnLocation);
     }
 }

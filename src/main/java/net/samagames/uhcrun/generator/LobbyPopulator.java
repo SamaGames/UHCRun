@@ -31,12 +31,15 @@ public class LobbyPopulator
         this.plugin = pl;
     }
 
-    public void generate() {
+    public void generate()
+    {
         this.plugin.getLogger().info("Generating Looby...");
         File file = new File(this.plugin.getDataFolder(), "/lobby.schematic");
 
-        if (file.exists()) {
-            try {
+        if (file.exists())
+        {
+            try
+            {
                 Vector v = new Vector(0, 200, 0);
                 World worldf = Bukkit.getWorld("world");
                 worldf.loadChunk(0, 0);
@@ -45,18 +48,21 @@ public class LobbyPopulator
                 this.es.setFastMode(true);
                 CuboidClipboard c1 = SchematicFormat.MCEDIT.load(file);
                 c1.paste(this.es, v, true);
-            } catch (MaxChangedBlocksException | IOException | DataException ex) {
+            } catch (MaxChangedBlocksException | IOException | DataException ex)
+            {
                 ex.printStackTrace();
             }
 
-        } else {
+        } else
+        {
             this.plugin.getLogger().severe(("File does not exist. Abort..."));
         }
 
         this.plugin.getLogger().info("Done.");
     }
 
-    public void remove() {
+    public void remove()
+    {
         this.es.undo(this.es);
     }
 }

@@ -11,7 +11,6 @@ import org.bukkit.*;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,30 +36,37 @@ public class FortressPopulator extends BlockPopulator
     @Override
     public void populate(World world, Random random, Chunk chunk)
     {
-        if (random.nextInt(1000) <= 10) {
-            int xFortress = chunk.getX()*16 + random.nextInt(15);
-            int zFortress = chunk.getZ()*16 + random.nextInt(15);
+        if (random.nextInt(1000) <= 10)
+        {
+            int xFortress = chunk.getX() * 16 + random.nextInt(15);
+            int zFortress = chunk.getZ() * 16 + random.nextInt(15);
             generateBlazeFortress(xFortress, zFortress);
         }
     }
 
-    public void generateBlazeFortress(int x, int z) {
+    public void generateBlazeFortress(int x, int z)
+    {
         if (!plugin.isWorldLoaded())
             return;
-        Bukkit.getLogger().info("Generating fortress at "+x+ "; "+z);
+        Bukkit.getLogger().info("Generating fortress at " + x + "; " + z);
         File file = new File(plugin.getDataFolder(), "/nether.schematic");
         EditSession es;
-        if (file.exists()) {
-            try {
+        if (file.exists())
+        {
+            try
+            {
                 com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(x, 40, z);
                 World worldf = Bukkit.getWorld("world");
                 Chunk chunk = worldf.getChunkAt(new org.bukkit.Location(worldf, x, 40, z));
                 chunk.load(true);
                 int cx = chunk.getX() - 3;
                 int cz = chunk.getZ() - 3;
-                while (cx < chunk.getX()+3) {
-                    while (cz < chunk.getZ()+3) {
-                        if (cx != chunk.getX() ||cz != chunk.getZ()) {
+                while (cx < chunk.getX() + 3)
+                {
+                    while (cz < chunk.getZ() + 3)
+                    {
+                        if (cx != chunk.getX() || cz != chunk.getZ())
+                        {
                             worldf.getChunkAt(cx, cz).load(true);
                         }
                         cz++;
@@ -83,20 +89,24 @@ public class FortressPopulator extends BlockPopulator
                 c1.paste(es, v, false);
 
                 int bx = x;
-                while (bx < x+35) {
+                while (bx < x + 35)
+                {
                     int bz = z;
-                    while (bz < z+35) {
+                    while (bz < z + 35)
+                    {
                         int by = 40;
-                        while (by > 0) {
+                        while (by > 0)
+                        {
                             Location block = new org.bukkit.Location(worldf, bx, by, bz);
-                            if (block.getBlock().getType() == Material.MOB_SPAWNER) {
+                            if (block.getBlock().getType() == Material.MOB_SPAWNER)
+                            {
                                 block.getBlock().setType(Material.STONE);
                                 block.getBlock().setType(Material.MOB_SPAWNER);
                                 CreatureSpawner spawner = (CreatureSpawner) block.getBlock().getState();
                                 spawner.setSpawnedType(EntityType.BLAZE);
                                 spawner.setDelay(1);
                                 spawner.update();
-                                Bukkit.getLogger().info("Spawner configured at "+bx+" , "+by+" , "+bz);
+                                Bukkit.getLogger().info("Spawner configured at " + bx + " , " + by + " , " + bz);
                                 break;
                             }
                             by--;
@@ -105,10 +115,12 @@ public class FortressPopulator extends BlockPopulator
                     }
                     bx++;
                 }
-            } catch (MaxChangedBlocksException | IOException | DataException ex) {
+            } catch (MaxChangedBlocksException | IOException | DataException ex)
+            {
                 ex.printStackTrace();
             }
-        } else {
+        } else
+        {
             Bukkit.getLogger().severe(("File does not exist."));
         }
     }
