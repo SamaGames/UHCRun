@@ -77,7 +77,7 @@ public class BeginCountdown implements Runnable {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setLevel(time);
             if (time <= 5 || time == 10) {
-                Titles.sendTitle(p, 2, 16, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + time + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
+                Titles.sendTitle(p, 2, 16, 2, ChatColor.GOLD + "Dï¿½but dans " + ChatColor.RED + time + ChatColor.GOLD + " sec", ChatColor.GOLD + "Prï¿½parez vous au combat !");
             }
         }
 

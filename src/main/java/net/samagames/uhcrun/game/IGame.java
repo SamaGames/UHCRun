@@ -2,8 +2,11 @@ package net.samagames.uhcrun.game;
 
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
+import net.samagames.gameapi.themachine.CoherenceMachine;
 import net.samagames.gameapi.types.GameArena;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 /**
  * This file is a part of the SamaGames Project CodeBase
@@ -33,4 +36,21 @@ public interface IGame extends GameArena
 
     boolean hasTeleportPlayers();
 
+    void enableDamages();
+
+    void disableDamages();
+
+    void enablePVP();
+
+    CoherenceMachine getCoherenceMachine();
+
+    int getKills(UUID player);
+
+    int getPreparingTime();
+
+    void teleportDeathMatch();
+
+    int getDeathMatchSize();
+
+    int getReductionTime();
 }

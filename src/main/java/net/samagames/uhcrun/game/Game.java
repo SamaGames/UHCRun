@@ -6,6 +6,7 @@ import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.themachine.CoherenceMachine;
 import net.samagames.gameapi.themachine.messages.MessageManager;
 import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.database.IDatabase;
 import net.samagames.uhcrun.game.data.StoredGame;
 import net.samagames.uhcrun.task.BeginCountdown;
 import net.samagames.utils.ObjectiveSign;
@@ -52,6 +53,7 @@ public class Game implements IGame
     private Objective life;
     private CoherenceMachine coherenceMachine;
     private ObjectiveSign sign;
+    private GameLoop gameLoop;
 
     public Game(String mapName, short normalSlots, short vipSlots, short minPlayers)
     {
@@ -79,7 +81,7 @@ public class Game implements IGame
     public void start()
     {
         storedGame = new StoredGame(MasterBundle.getServerName(), System.currentTimeMillis(), mapName);
-
+        plugin.removeSpawn();
         updateStatus(Status.InGame);
 
         life = scoreboard.registerNewObjective("vie", "health");
@@ -91,6 +93,9 @@ public class Game implements IGame
         sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
 
         if (beginCountdown != null) beginCountdown.cancel();
+
+        gameLoop = new GameLoop(this);
+        mainTask = Bukkit.getScheduler().runTaskTimer(plugin, gameLoop, 20, 20);
 
         //teleportPlayers();
 
@@ -119,8 +124,10 @@ public class Game implements IGame
             player.getInventory().clear();
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60 * 20 * 20, 0));
             sign.addReceiver(player);
-            //gameLoop.addPlayer(player.getUniqueId(), sign);
+            gameLoop.addPlayer(player.getUniqueId(), sign);
         }
+
+        Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
     }
 
     @Override
@@ -129,9 +136,9 @@ public class Game implements IGame
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             storedGame.setEndTime(System.currentTimeMillis());
             String json = new Gson().toJson(storedGame);
-            ShardedJedis jedis = MasterBundle.jedis();
+            IDatabase database = plugin.getDatabse();
             String gameId = MasterBundle.getServerName() + System.currentTimeMillis();
-            jedis.hset("uhcrungames", gameId, json);
+            database.hset("uhcrungames", gameId, json);
 
             TreeMap<UUID, Integer> ranks = new TreeMap<>((a, b) -> {
                 Integer ka = kills.get(a);
@@ -163,7 +170,7 @@ public class Game implements IGame
             Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
             Bukkit.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
             Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
-            Bukkit.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
+            Bukkit.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "dï¿½briefing de partie" + ChatColor.GOLD + " ici : ");
             Bukkit.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
             Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
@@ -197,6 +204,24 @@ public class Game implements IGame
     public boolean hasTeleportPlayers()
     {
         return status != Status.Available && status != Status.Generating;
+    }
+
+    @Override
+    public void enableDamages()
+    {
+
+    }
+
+    @Override
+    public void disableDamages()
+    {
+
+    }
+
+    @Override
+    public void enablePVP()
+    {
+        this.plugin.getServer()
     }
 
     @Override
@@ -250,5 +275,35 @@ public class Game implements IGame
     public CoherenceMachine getCoherenceMachine()
     {
         return coherenceMachine;
+    }
+
+    @Override
+    public int getKills(UUID player)
+    {
+        return kills.get(player);
+    }
+
+    @Override
+    public int getPreparingTime()
+    {
+        return 20;
+    }
+
+    @Override
+    public void teleportDeathMatch()
+    {
+
+    }
+
+    @Override
+    public int getDeathMatchSize()
+    {
+        return 0;
+    }
+
+    @Override
+    public int getReductionTime()
+    {
+        return 10;
     }
 }

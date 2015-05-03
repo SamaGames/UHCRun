@@ -3,6 +3,9 @@ package net.samagames.uhcrun;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.types.GameArena;
+import net.samagames.uhcrun.database.IDatabase;
+import net.samagames.uhcrun.database.NoDatabase;
+import net.samagames.uhcrun.database.RedisDatabase;
 import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.IGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
@@ -11,6 +14,7 @@ import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.listener.BlockListener;
 import net.samagames.uhcrun.listener.CraftListener;
 import net.samagames.uhcrun.listener.LoginListener;
+import net.zyuiop.MasterBundle.MasterBundle;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
@@ -47,6 +51,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private boolean worldLoaded;
     private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
+    private IDatabase database;
 
     public static UHCRun getInstance()
     {
@@ -132,6 +137,12 @@ public class UHCRun extends JavaPlugin implements Listener
 
         game.postInit();
         game.updateStatus(Status.Available);
+
+        if(MasterBundle.pool == null)
+            this.database = new NoDatabase();
+        else
+            this.database = new RedisDatabase(MasterBundle.pool);
+
     }
 
     public void setupWorlds()
@@ -179,5 +190,15 @@ public class UHCRun extends JavaPlugin implements Listener
     public Location getSpawnLocation()
     {
         return spawnLocation;
+    }
+
+    public IDatabase getDatabse()
+    {
+        return database;
+    }
+
+    public void removeSpawn()
+    {
+        loobyPopulator.remove();
     }
 }
