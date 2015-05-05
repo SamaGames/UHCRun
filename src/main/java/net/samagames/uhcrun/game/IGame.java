@@ -53,4 +53,16 @@ public interface IGame extends GameArena
     int getDeathMatchSize();
 
     int getReductionTime();
+
+    boolean isPvpEnabled();
+
+    boolean isInGame(UUID player);
+
+    void stumpPlayer(Player entity, boolean b);
+
+    void addKill(UUID player);
+
+    void creditKillCoins(Player killer);
+
+    void checkStump(Player player);
 }

@@ -7,9 +7,13 @@ import net.samagames.gameapi.themachine.CoherenceMachine;
 import net.samagames.gameapi.themachine.messages.MessageManager;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.database.IDatabase;
+import net.samagames.uhcrun.game.data.SavedPlayer;
 import net.samagames.uhcrun.game.data.StoredGame;
 import net.samagames.uhcrun.task.BeginCountdown;
+import net.samagames.uhcrun.task.GameLoop;
+import net.samagames.uhcrun.utils.Metadatas;
 import net.samagames.utils.ObjectiveSign;
+import net.samagames.utils.Titles;
 import net.zyuiop.MasterBundle.MasterBundle;
 import net.zyuiop.coinsManager.CoinsManager;
 import net.zyuiop.statsapi.StatsApi;
@@ -17,13 +21,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-import redis.clients.jedis.ShardedJedis;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +40,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class Game implements IGame
+public abstract class Game implements IGame
 {
 
     private final String mapName;
@@ -44,8 +48,8 @@ public class Game implements IGame
     protected final UHCRun plugin;
     private final BukkitTask beginCountdown;
     private final MessageManager messageManager;
-    protected AbstractSet<UUID> players;
-    protected AbstractMap<UUID, Integer> kills;
+    protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
+    protected AbstractMap<UUID, Integer> kills = new ConcurrentHashMap<>();
     protected Status status;
     private StoredGame storedGame;
     private BukkitTask mainTask;
@@ -54,21 +58,19 @@ public class Game implements IGame
     private CoherenceMachine coherenceMachine;
     private ObjectiveSign sign;
     private GameLoop gameLoop;
+    private boolean pvpEnabled;
 
     public Game(String mapName, short normalSlots, short vipSlots, short minPlayers)
     {
         this.plugin = UHCRun.getInstance();
         this.status = Status.Idle;
-        this.players = new CopyOnWriteArraySet<>();
-        this.kills = new ConcurrentHashMap<>();
         this.mapName = mapName;
         this.normalSlots = normalSlots;
         this.vipSlots = vipSlots;
-
+        this.pvpEnabled = true;
         this.coherenceMachine = new CoherenceMachine("UHCRun");
-
         this.messageManager = this.coherenceMachine.getMessageManager();
-        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers), 20L, 20L);
+        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 21), 20L, 20L);
     }
 
     @Override
@@ -105,7 +107,7 @@ public class Game implements IGame
             if (player == null)
             {
                 players.remove(uuid);
-                return;
+                continue;
             }
 
             try
@@ -122,9 +124,10 @@ public class Game implements IGame
             lifeb.getScore(player.getName()).setScore(20);
             player.setLevel(0);
             player.getInventory().clear();
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60 * 20 * 20, 0));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 24000, 0));
             sign.addReceiver(player);
             gameLoop.addPlayer(player.getUniqueId(), sign);
+            kills.put(uuid, 0);
         }
 
         Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
@@ -221,7 +224,7 @@ public class Game implements IGame
     @Override
     public void enablePVP()
     {
-        this.plugin.getServer()
+
     }
 
     @Override
@@ -298,12 +301,132 @@ public class Game implements IGame
     @Override
     public int getDeathMatchSize()
     {
-        return 0;
+        return 400;
     }
 
     @Override
     public int getReductionTime()
     {
         return 10;
+    }
+
+    @Override
+    public boolean isPvpEnabled()
+    {
+        return pvpEnabled;
+    }
+
+    @Override
+    public boolean isInGame(UUID player)
+    {
+        return players.contains(player);
+    }
+
+    @Override
+    public void stumpPlayer(Player player, boolean logout)
+    {
+        this.players.remove(player.getUniqueId());
+        if(this.status == Status.InGame) {
+            Object lastDamager = Metadatas.getMetadata(player, "lastDamager");
+            Player killer = null;
+            SavedPlayer e;
+            if(lastDamager != null && lastDamager instanceof Player) {
+                killer = (Player)lastDamager;
+                if(killer.isOnline() && this.isInGame(killer.getUniqueId())) {
+                    this.creditKillCoins(killer);
+
+                    try {
+                        StatsApi.increaseStat(killer, "uhcrun", "kills", 1);
+                        this.addKill(killer.getUniqueId());
+                        e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
+                        e.kill(player);
+                        killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
+                    } catch (Exception var10) {
+                        ;
+                    }
+                } else {
+                    killer = null;
+                }
+            }
+
+            if(logout) {
+                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté.");
+            } else if(killer != null) {
+                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
+            } else {
+                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
+            }
+
+            this.checkStump(player);
+
+            try {
+                e = this.storedGame.getPlayer(player.getUniqueId(), player.getName());
+                String killedBy;
+                if(logout) {
+                    killedBy = "Déconnexion";
+                } else if(killer != null) {
+                    killedBy = killer.getDisplayName();
+                } else {
+                    EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
+                    killedBy = getDamageCause(cause);
+                }
+
+                e.die(this.players.size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
+            } catch (Exception var9) {
+                var9.printStackTrace();
+            }
+
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setHealth(20.0D);
+            if(!logout) {
+                try {
+                    StatsApi.increaseStat(player, "uhcrun", "stumps", 1);
+                } catch (Exception var8) {
+                    ;
+                }
+
+                Titles.sendTitle(player, Integer.valueOf(5), Integer.valueOf(70), Integer.valueOf(5), ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
+            }
+        }
+    }
+
+    @Override
+    public void addKill(UUID player)
+    {
+        Integer val = this.kills.get(player);
+
+        // impossible but check it by security
+        if(val == null) val = 0;
+
+        this.kills.put(player, val + 1);
+    }
+
+    public String getDamageCause(EntityDamageEvent.DamageCause cause) {
+        switch (cause) {
+            case SUFFOCATION:
+                return "Suffocation";
+            case FALL:
+                return "Chute";
+            case FIRE:
+            case FIRE_TICK:
+                return "Feu";
+            case LAVA:
+                return "Lave";
+            case DROWNING:
+                return "Noyade";
+            case BLOCK_EXPLOSION:
+            case ENTITY_EXPLOSION:
+                return "Explosion";
+            case LIGHTNING:
+                return "Foudre";
+            case POISON:
+                return "Poison";
+            case MAGIC:
+                return "Potion";
+            case FALLING_BLOCK:
+                return "Chute de blocs";
+            default:
+                return "Autre";
+        }
     }
 }

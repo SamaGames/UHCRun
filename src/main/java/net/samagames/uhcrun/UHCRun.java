@@ -8,11 +8,13 @@ import net.samagames.uhcrun.database.NoDatabase;
 import net.samagames.uhcrun.database.RedisDatabase;
 import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.listener.BlockListener;
 import net.samagames.uhcrun.listener.CraftListener;
+import net.samagames.uhcrun.listener.GameListener;
 import net.samagames.uhcrun.listener.LoginListener;
 import net.zyuiop.MasterBundle.MasterBundle;
 import org.bukkit.*;
@@ -85,13 +87,14 @@ public class UHCRun extends JavaPlugin implements Listener
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
 
-        this.game = new Game("solo", (short)10, (short)4, (short)1);
+        this.game = new SoloGame((short)10, (short)4, (short)1);
 
         /*if (playersPerTeam <= 1)
             game = new SoloGame();
         else
             game = new TeamGame(playersPerTeam);*/
         pluginManager.registerEvents(new LoginListener(game), this);
+        pluginManager.registerEvents(new GameListener(game), this);
 
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
     }
