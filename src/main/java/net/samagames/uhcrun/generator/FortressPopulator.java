@@ -36,7 +36,8 @@ public class FortressPopulator extends BlockPopulator
     @Override
     public void populate(World world, Random random, Chunk chunk)
     {
-        if (random.nextInt(1000) <= 10)
+        final int i = random.nextInt(1000);
+        if (i > 0 && i <= 10)
         {
             int xFortress = chunk.getX() * 16 + random.nextInt(15);
             int zFortress = chunk.getZ() * 16 + random.nextInt(15);

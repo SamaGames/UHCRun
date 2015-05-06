@@ -85,7 +85,7 @@ public class UHCRun extends JavaPlugin implements Listener
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
 
-        this.game = new SoloGame((short) 10, (short) 4, (short) 1);
+        this.game = new SoloGame((short) 10, (short) 20, (short) 4);
         pluginManager.registerEvents(this, this);
 
         /*if (playersPerTeam <= 1)
@@ -172,6 +172,7 @@ public class UHCRun extends JavaPlugin implements Listener
         world.setGameRuleValue("naturalRegeneration", "false");
         world.setGameRuleValue("doDaylightCycle", "false");
         world.setGameRuleValue("randomTickSpeed", "3");
+        world.setFullTime(6000);
 
         System.out.println("WORLD INIT");
     }

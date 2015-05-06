@@ -71,7 +71,7 @@ public abstract class Game implements IGame
         this.pvpEnabled = true;
         this.coherenceMachine = new CoherenceMachine("UHCRun");
         this.messageManager = this.coherenceMachine.getMessageManager();
-        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 21), 20L, 20L);
+        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
     }
 
     @Override
@@ -180,11 +180,16 @@ public abstract class Game implements IGame
             Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> mainTask.cancel(), 30L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> mainTask.cancel(), 20);
         setStatus(Status.Stopping);
         GameAPI.getManager().sendArena();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            Bukkit.getOnlinePlayers().forEach(GameAPI::kickPlayer);
+            try
+            {
+                Bukkit.getOnlinePlayers().forEach(GameAPI::kickPlayer);
+            } catch (Exception ex)
+            {
+            }
             Bukkit.getServer().shutdown();
         }, 20 * 30);
     }

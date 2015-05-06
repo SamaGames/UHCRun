@@ -45,9 +45,9 @@ public class SoloGame extends Game
         for (int i = 0; i < this.getMaxPlayers(); i++)
         {
             final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
-            for(int y = 0; y < 16; y++)
+            for (int y = 0; y < 16; y++)
             {
-                world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y*16, randomLocation.getBlockZ())).load(true);
+                world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
             }
 
             spawnPoints.add(randomLocation);
@@ -55,7 +55,8 @@ public class SoloGame extends Game
     }
 
     @Override
-    public void creditKillCoins(Player player) {
+    public void creditKillCoins(Player player)
+    {
         CoinsManager.creditJoueur(player.getUniqueId(), 20, true, true, "Un joueur tué !");
     }
 
@@ -111,14 +112,13 @@ public class SoloGame extends Game
             Titles.sendTitle(user, Integer.valueOf(5), Integer.valueOf(70), Integer.valueOf(5), ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
         }
 
-        boolean nb1 = true;
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
         {
-            int compteur = 0;
+            int timer = 0;
 
             public void run()
             {
-                if (this.compteur < 20)
+                if (this.timer < 20)
                 {
                     Firework fw = (Firework) player.getWorld().spawnEntity(player.getPlayer().getLocation(), EntityType.FIREWORK);
                     FireworkMeta fwm = fw.getFireworkMeta();
@@ -159,7 +159,7 @@ public class SoloGame extends Game
                     int rp = r.nextInt(2) + 1;
                     fwm.setPower(rp);
                     fw.setFireworkMeta(fwm);
-                    ++this.compteur;
+                    ++this.timer;
                 }
             }
         }, 5L, 5L);
