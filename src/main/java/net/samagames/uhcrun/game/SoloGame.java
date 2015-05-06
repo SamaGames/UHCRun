@@ -44,7 +44,7 @@ public class SoloGame extends Game
 
         for (int i = 0; i < this.getMaxPlayers(); i++)
         {
-            final Location randomLocation = new Location(world, rand.nextInt(500), 150, rand.nextInt(500));
+            final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
             for(int y = 0; y < 16; y++)
             {
                 world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y*16, randomLocation.getBlockZ())).load(true);
@@ -55,9 +55,8 @@ public class SoloGame extends Game
     }
 
     @Override
-    public void creditKillCoins(Player killer)
-    {
-
+    public void creditKillCoins(Player player) {
+        CoinsManager.creditJoueur(player.getUniqueId(), 20, true, true, "Un joueur tué !");
     }
 
     @Override

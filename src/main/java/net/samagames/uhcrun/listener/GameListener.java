@@ -231,6 +231,7 @@ public class GameListener implements Listener
             event.setCancelled(true);
     }
 
+    @EventHandler
     public void onDamage(EntityDamageEvent event)
     {
         if (event.getEntity() instanceof Player)

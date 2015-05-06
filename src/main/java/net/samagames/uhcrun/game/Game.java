@@ -208,7 +208,7 @@ public abstract class Game implements IGame
     @Override
     public boolean hasTeleportPlayers()
     {
-        return status != Status.Available && status != Status.Generating;
+        return status != Status.InGame;
     }
 
     @Override
