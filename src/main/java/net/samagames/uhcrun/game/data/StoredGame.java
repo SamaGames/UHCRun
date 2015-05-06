@@ -1,7 +1,5 @@
 package net.samagames.uhcrun.game.data;
 
-import net.samagames.uhcrun.game.data.SavedPlayer;
-
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -14,52 +12,62 @@ import java.util.UUID;
  */
 public class StoredGame
 {
-    private HashMap<UUID, SavedPlayer> players = new HashMap<>();
     private final String server;
     private final long startTime;
-    private long endTime;
     private final String gameType;
+    private HashMap<UUID, SavedPlayer> players = new HashMap<>();
+    private long endTime;
 
-    public StoredGame(String server, long startTime, String gameType) {
+    public StoredGame(String server, long startTime, String gameType)
+    {
         this.server = server;
         this.startTime = startTime;
         this.gameType = gameType;
     }
 
-    public void setEndTime(long time) {
-        this.endTime = time;
-    }
-
-    public SavedPlayer getPlayer(UUID player, String name) {
+    public SavedPlayer getPlayer(UUID player, String name)
+    {
         SavedPlayer pl = players.get(player);
-        if (pl == null) {
+        if (pl == null)
+        {
             players.put(player, new SavedPlayer(name, player));
             return players.get(player);
         }
         return pl;
     }
 
-    public SavedPlayer getPlayer(UUID player) {
+    public SavedPlayer getPlayer(UUID player)
+    {
         return players.get(player);
     }
 
-    public HashMap<UUID, SavedPlayer> getPlayers() {
+    public HashMap<UUID, SavedPlayer> getPlayers()
+    {
         return players;
     }
 
-    public String getServer() {
+    public String getServer()
+    {
         return server;
     }
 
-    public long getStartTime() {
+    public long getStartTime()
+    {
         return startTime;
     }
 
-    public long getEndTime() {
+    public long getEndTime()
+    {
         return endTime;
     }
 
-    public String getGameType() {
+    public void setEndTime(long time)
+    {
+        this.endTime = time;
+    }
+
+    public String getGameType()
+    {
         return gameType;
     }
 }

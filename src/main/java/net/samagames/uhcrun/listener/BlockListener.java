@@ -146,8 +146,6 @@ public class BlockListener implements Listener
         int div = max / 2;
 
 
-
-
         // Compute leaf
         if (validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off))
         {

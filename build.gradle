@@ -10,7 +10,8 @@ archivesBaseName = 'uhcrun'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-
+//force UTF-8 to the compileJava task
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
         

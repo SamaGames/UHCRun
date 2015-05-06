@@ -23,23 +23,28 @@ public class GameDamageData extends GameData
         this.damage = damage;
     }
 
-    public Material getWeapon() {
+    public Material getWeapon()
+    {
         return weapon;
     }
 
-    public String getEntity() {
+    public String getEntity()
+    {
         return entityName;
     }
 
-    public double getDamage() {
+    public double getDamage()
+    {
         return damage;
     }
 
-    public void setDamage(double damage) {
+    public void setDamage(double damage)
+    {
         this.damage = damage;
     }
 
-    public String getIdentification() {
+    public String getIdentification()
+    {
         return weapon.toString() + "-" + entityName;
     }
 }

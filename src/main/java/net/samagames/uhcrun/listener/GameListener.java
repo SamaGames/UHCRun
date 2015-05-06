@@ -190,14 +190,19 @@ public class GameListener implements Listener
     }
 
     @EventHandler
-    public void onLogout(PlayerQuitEvent event) {
-        if (game.isInGame(event.getPlayer().getUniqueId())) {
+    public void onLogout(PlayerQuitEvent event)
+    {
+        if (game.isInGame(event.getPlayer().getUniqueId()))
+        {
             game.stumpPlayer(event.getPlayer(), true);
-            if (game.getStatus() == Status.InGame) {
+            if (game.getStatus() == Status.InGame)
+            {
                 Location l = event.getPlayer().getLocation();
                 World w = l.getWorld();
-                for (ItemStack stack : event.getPlayer().getInventory().getContents()) {
-                    if (stack != null) {
+                for (ItemStack stack : event.getPlayer().getInventory().getContents())
+                {
+                    if (stack != null)
+                    {
                         w.dropItemNaturally(l, stack);
                     }
                 }
@@ -206,15 +211,17 @@ public class GameListener implements Listener
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        if (game.isInGame(event.getEntity().getUniqueId())) {
+    public void onDeath(PlayerDeathEvent event)
+    {
+        if (game.isInGame(event.getEntity().getUniqueId()))
+        {
             game.stumpPlayer(event.getEntity(), false);
             event.getDrops().add(new ItemStack(Material.GOLDEN_APPLE));
             if (event.getEntity().getKiller() != null)
-                event.getEntity().getKiller().addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*20, 1));
+                event.getEntity().getKiller().addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20 * 20, 1));
             GameUtils.broadcastSound(Sound.WITHER_DEATH);
         }
-        event.setDeathMessage(game.getCoherenceMachine().getGameTag()+event.getDeathMessage());
+        event.setDeathMessage(game.getCoherenceMachine().getGameTag() + event.getDeathMessage());
     }
 
     @EventHandler
@@ -222,5 +229,12 @@ public class GameListener implements Listener
     {
         if (event.getEntityType() == EntityType.WITCH || event.getEntityType() == EntityType.GUARDIAN)
             event.setCancelled(true);
+    }
+
+    public void onDamage(EntityDamageEvent event)
+    {
+        if (event.getEntity() instanceof Player)
+            if (!game.isDamagesEnabled())
+                event.setCancelled(true);
     }
 }

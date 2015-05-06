@@ -17,7 +17,8 @@ import org.bukkit.entity.Player;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class BeginCountdown implements Runnable {
+public class BeginCountdown implements Runnable
+{
 
     private final int time;
     private final Game game;
@@ -26,7 +27,8 @@ public class BeginCountdown implements Runnable {
     private boolean ready = false;
     private int countdown = 121; // 2 minutes
 
-    public BeginCountdown(Game game, int maxPlayers, int minPlayers, int time) {
+    public BeginCountdown(Game game, int maxPlayers, int minPlayers, int time)
+    {
         this.game = game;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
@@ -35,28 +37,35 @@ public class BeginCountdown implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
         int nPlayers = game.countGamePlayers();
 
-        if (nPlayers >= maxPlayers && countdown > (time / 4)) {
+        if (nPlayers >= maxPlayers && countdown > (time / 4))
+        {
             ready = true;
             countdown = time / 4;
-        } else {
-            if (nPlayers >= minPlayers && !ready) {
+        } else
+        {
+            if (nPlayers >= minPlayers && !ready)
+            {
                 ready = true;
                 game.updateStatus(Status.Starting);
                 countdown = time / 2;
             }
 
-            if (nPlayers >= ((double)maxPlayers/100.0)*65.0 && countdown > (time / 2)) {
+            if (nPlayers >= ((double) maxPlayers / 100.0) * 65.0 && countdown > (time / 2))
+            {
                 countdown = time / 4;
             }
 
-            if (nPlayers >= ((double)maxPlayers/100.0)*85.0 && countdown > (time / 4)) {
+            if (nPlayers >= ((double) maxPlayers / 100.0) * 85.0 && countdown > (time / 4))
+            {
                 countdown = time / 4;
             }
 
-            if (nPlayers < minPlayers && ready) {
+            if (nPlayers < minPlayers && ready)
+            {
                 ready = false;
                 Bukkit.broadcastMessage(StaticMessages.NOTENOUGTHPLAYERS.get(game.getCoherenceMachine()));
                 game.updateStatus(Status.Available);
@@ -64,31 +73,38 @@ public class BeginCountdown implements Runnable {
                     p.setLevel(120);
             }
 
-            if (ready) {
+            if (ready)
+            {
                 countdown--;
                 timeBroadcast();
             }
         }
     }
 
-    public void timeBroadcast() {
-        if (countdown == 0) {
+    private void timeBroadcast()
+    {
+        if (countdown == 0)
+        {
             game.start();
             return;
         }
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers())
+        {
             p.setLevel(countdown);
-            if (countdown <= 5 || countdown == 10) {
+            if (countdown <= 5 || countdown == 10)
+            {
                 Titles.sendTitle(p, 2, 16, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + countdown + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
             }
         }
 
-        if (countdown <= 5 || countdown == 10 || countdown % 30 == 0) {
+        if (countdown <= 5 || countdown == 10 || countdown % 30 == 0)
+        {
             Bukkit.broadcastMessage(StaticMessages.STARTIN.get(this.game.getCoherenceMachine()).replace("${TIME}", countdown + " seconde" + ((countdown > 1) ? "s" : "")));
         }
 
-        if (countdown <= 5 || countdown == 10) {
+        if (countdown <= 5 || countdown == 10)
+        {
             GameUtils.broadcastSound(Sound.NOTE_PIANO);
         }
     }

@@ -27,22 +27,26 @@ public class SavedPlayer
     private double totalDamageMade = 0;
     private double totalHealthRegen = 0;
 
-    public SavedPlayer(String name, UUID uuid) {
+    public SavedPlayer(String name, UUID uuid)
+    {
         this.name = name;
         this.uuid = uuid;
     }
 
-    public void kill(Player player) {
+    public void kill(Player player)
+    {
         hasKilled.put(player.getName(), player.getDisplayName());
     }
 
-    public void die(int ranking, String killer, long timeBeforeDeath) {
+    public void die(int ranking, String killer, long timeBeforeDeath)
+    {
         this.finalRanking = ranking;
         this.killedBy = killer;
         this.deadAfter = timeBeforeDeath;
     }
 
-    public void doDamage(GameDamageData damage) {
+    public void doDamage(GameDamageData damage)
+    {
         GameDamageData stored = damageDone.get(damage.getIdentification());
         if (stored == null)
             stored = damage;
@@ -52,7 +56,8 @@ public class SavedPlayer
         totalDamageMade += damage.getDamage();
     }
 
-    public void takeDamage(GameDamageData received) {
+    public void takeDamage(GameDamageData received)
+    {
         GameDamageData stored = damageTaken.get(received.getIdentification());
         if (stored == null)
             stored = received;
@@ -62,7 +67,8 @@ public class SavedPlayer
         totalDamageTaken += received.getDamage();
     }
 
-    public void heal(HealingSource heal) {
+    public void heal(HealingSource heal)
+    {
         HealingSource stored = healingDone.get(heal.getIdentification());
         if (stored == null)
             stored = heal;
@@ -72,51 +78,63 @@ public class SavedPlayer
         totalHealthRegen += heal.getHealAmount();
     }
 
-    public void setFinalRanking(int finalRanking) {
-        this.finalRanking = finalRanking;
-    }
-
-    public void setKilledBy(String killedBy) {
-        this.killedBy = killedBy;
-    }
-
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
-    public HashMap<String, GameDamageData> getDamageDone() {
+    public HashMap<String, GameDamageData> getDamageDone()
+    {
         return damageDone;
     }
 
-    public HashMap<String, GameDamageData> getDamageTaken() {
+    public HashMap<String, GameDamageData> getDamageTaken()
+    {
         return damageTaken;
     }
 
-    public HashMap<String, HealingSource> getHealingDone() {
+    public HashMap<String, HealingSource> getHealingDone()
+    {
         return healingDone;
     }
 
-    public String getKilledBy() {
+    public String getKilledBy()
+    {
         return killedBy;
     }
 
-    public int getFinalRanking() {
+    public void setKilledBy(String killedBy)
+    {
+        this.killedBy = killedBy;
+    }
+
+    public int getFinalRanking()
+    {
         return finalRanking;
     }
 
-    public double getTotalDamageTaken() {
+    public void setFinalRanking(int finalRanking)
+    {
+        this.finalRanking = finalRanking;
+    }
+
+    public double getTotalDamageTaken()
+    {
         return totalDamageTaken;
     }
 
-    public double getTotalDamageMade() {
+    public double getTotalDamageMade()
+    {
         return totalDamageMade;
     }
 
-    public double getTotalHealthRegen() {
+    public double getTotalHealthRegen()
+    {
         return totalHealthRegen;
     }
 }

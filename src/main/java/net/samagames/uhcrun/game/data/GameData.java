@@ -10,7 +10,8 @@ package net.samagames.uhcrun.game.data;
 public abstract class GameData
 {
 
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (o instanceof GameData)
             return ((GameData) o).getIdentification().equals(this.getIdentification());
         return false;

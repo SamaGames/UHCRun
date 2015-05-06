@@ -24,13 +24,8 @@ public class GameLoop implements Runnable
     protected int minutes = 0;
     protected int seconds = 0;
     protected GameLoop.TimedEvent nextEvent = null;
-    protected ConcurrentHashMap<UUID, ObjectiveSign> objectives = new ConcurrentHashMap();
+    protected ConcurrentHashMap<UUID, ObjectiveSign> objectives = new ConcurrentHashMap<>();
     private UHCRun plugin;
-
-    public int getTime()
-    {
-        return this.minutes * 60 + this.seconds;
-    }
 
     public GameLoop(IGame game)
     {
@@ -41,11 +36,16 @@ public class GameLoop implements Runnable
             public void run()
             {
                 Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats sont désormais actifs.");
-                Bukkit.broadcastMessage(ChatColor.GOLD + "La map sera réduite dans " + (game.getPreparingTime() - 1) + " minutes.Le PVP sera activé à ce moment là.");
+                Bukkit.broadcastMessage(ChatColor.GOLD + "La map sera réduite dans " + (game.getPreparingTime() - 1) + " minutes. Le PVP sera activé à ce moment là.");
                 game.enableDamages();
                 createReductionEvent();
             }
         };
+    }
+
+    public int getTime()
+    {
+        return this.minutes * 60 + this.seconds;
     }
 
     public void forceNextEvent()

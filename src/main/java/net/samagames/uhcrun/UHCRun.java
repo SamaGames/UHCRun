@@ -2,11 +2,9 @@ package net.samagames.uhcrun;
 
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
-import net.samagames.gameapi.types.GameArena;
 import net.samagames.uhcrun.database.IDatabase;
 import net.samagames.uhcrun.database.NoDatabase;
 import net.samagames.uhcrun.database.RedisDatabase;
-import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.IGame;
 import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
@@ -68,7 +66,7 @@ public class UHCRun extends JavaPlugin implements Listener
         config = this.getConfig();
         logger = this.getLogger();
 
-        pluginManager.registerEvents(this, this);
+
         this.saveResource("lobby.schematic", false);
         this.saveResource("nether.schematic", false);
 
@@ -87,7 +85,8 @@ public class UHCRun extends JavaPlugin implements Listener
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
 
-        this.game = new SoloGame((short)10, (short)4, (short)1);
+        this.game = new SoloGame((short) 10, (short) 4, (short) 1);
+        pluginManager.registerEvents(this, this);
 
         /*if (playersPerTeam <= 1)
             game = new SoloGame();
@@ -102,8 +101,7 @@ public class UHCRun extends JavaPlugin implements Listener
     @EventHandler
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
-        if (!game.hasTeleportPlayers())
-            event.setCancelled(true);
+        if (!game.hasTeleportPlayers()) event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -141,14 +139,14 @@ public class UHCRun extends JavaPlugin implements Listener
         game.postInit();
         game.updateStatus(Status.Available);
 
-        if(MasterBundle.pool == null)
+        if (MasterBundle.pool == null)
             this.database = new NoDatabase();
         else
             this.database = new RedisDatabase(MasterBundle.pool);
 
     }
 
-    public void setupWorlds()
+    private void setupWorlds()
     {
         // Init custom ore populator
         populator = new OrePopulator();
@@ -186,7 +184,7 @@ public class UHCRun extends JavaPlugin implements Listener
     @EventHandler
     public void onPreJoin(PlayerJoinEvent event)
     {
-        if(game == null || game.getStatus() == Status.Available)
+        if (game == null || game.getStatus() == Status.Available)
             event.getPlayer().teleport(spawnLocation);
     }
 

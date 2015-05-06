@@ -43,9 +43,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public abstract class Game implements IGame
 {
 
+    protected final UHCRun plugin;
     private final String mapName;
     private final short normalSlots, vipSlots;
-    protected final UHCRun plugin;
     private final BukkitTask beginCountdown;
     private final MessageManager messageManager;
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
@@ -59,6 +59,7 @@ public abstract class Game implements IGame
     private ObjectiveSign sign;
     private GameLoop gameLoop;
     private boolean pvpEnabled;
+    private boolean damages;
 
     public Game(String mapName, short normalSlots, short vipSlots, short minPlayers)
     {
@@ -98,8 +99,7 @@ public abstract class Game implements IGame
 
         gameLoop = new GameLoop(this);
         mainTask = Bukkit.getScheduler().runTaskTimer(plugin, gameLoop, 20, 20);
-
-        //teleportPlayers();
+        teleport();
 
         for (UUID uuid : players)
         {
@@ -132,6 +132,8 @@ public abstract class Game implements IGame
 
         Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
     }
+
+    protected abstract void teleport();
 
     @Override
     public void finish()
@@ -212,19 +214,25 @@ public abstract class Game implements IGame
     @Override
     public void enableDamages()
     {
-
+        this.damages = true;
     }
 
     @Override
     public void disableDamages()
     {
+        this.damages = false;
+    }
 
+    @Override
+    public boolean isDamagesEnabled()
+    {
+        return damages;
     }
 
     @Override
     public void enablePVP()
     {
-
+        this.pvpEnabled = true;
     }
 
     @Override
@@ -326,63 +334,78 @@ public abstract class Game implements IGame
     public void stumpPlayer(Player player, boolean logout)
     {
         this.players.remove(player.getUniqueId());
-        if(this.status == Status.InGame) {
+        if (this.status == Status.InGame)
+        {
             Object lastDamager = Metadatas.getMetadata(player, "lastDamager");
             Player killer = null;
             SavedPlayer e;
-            if(lastDamager != null && lastDamager instanceof Player) {
-                killer = (Player)lastDamager;
-                if(killer.isOnline() && this.isInGame(killer.getUniqueId())) {
+            if (lastDamager != null && lastDamager instanceof Player)
+            {
+                killer = (Player) lastDamager;
+                if (killer.isOnline() && this.isInGame(killer.getUniqueId()))
+                {
                     this.creditKillCoins(killer);
 
-                    try {
+                    try
+                    {
                         StatsApi.increaseStat(killer, "uhcrun", "kills", 1);
                         this.addKill(killer.getUniqueId());
                         e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
                         e.kill(player);
                         killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
-                    } catch (Exception var10) {
-                        ;
+                    } catch (Exception ex)
+                    {
                     }
-                } else {
+                } else
+                {
                     killer = null;
                 }
             }
 
-            if(logout) {
+            if (logout)
+            {
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté.");
-            } else if(killer != null) {
+            } else if (killer != null)
+            {
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
-            } else {
+            } else
+            {
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
             }
 
             this.checkStump(player);
 
-            try {
+            try
+            {
                 e = this.storedGame.getPlayer(player.getUniqueId(), player.getName());
                 String killedBy;
-                if(logout) {
+                if (logout)
+                {
                     killedBy = "Déconnexion";
-                } else if(killer != null) {
+                } else if (killer != null)
+                {
                     killedBy = killer.getDisplayName();
-                } else {
+                } else
+                {
                     EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
                     killedBy = getDamageCause(cause);
                 }
 
                 e.die(this.players.size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
-            } catch (Exception var9) {
+            } catch (Exception var9)
+            {
                 var9.printStackTrace();
             }
 
             player.setGameMode(GameMode.SPECTATOR);
             player.setHealth(20.0D);
-            if(!logout) {
-                try {
+            if (!logout)
+            {
+                try
+                {
                     StatsApi.increaseStat(player, "uhcrun", "stumps", 1);
-                } catch (Exception var8) {
-                    ;
+                } catch (Exception ex)
+                {
                 }
 
                 Titles.sendTitle(player, Integer.valueOf(5), Integer.valueOf(70), Integer.valueOf(5), ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
@@ -396,13 +419,15 @@ public abstract class Game implements IGame
         Integer val = this.kills.get(player);
 
         // impossible but check it by security
-        if(val == null) val = 0;
+        if (val == null) val = 0;
 
         this.kills.put(player, val + 1);
     }
 
-    public String getDamageCause(EntityDamageEvent.DamageCause cause) {
-        switch (cause) {
+    public String getDamageCause(EntityDamageEvent.DamageCause cause)
+    {
+        switch (cause)
+        {
             case SUFFOCATION:
                 return "Suffocation";
             case FALL:

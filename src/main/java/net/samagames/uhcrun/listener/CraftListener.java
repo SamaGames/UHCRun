@@ -12,6 +12,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This file is a part of the SamaGames Project CodeBase
@@ -52,7 +53,7 @@ public class CraftListener implements Listener
         } else if (recipe.getResult().getType() == Material.DIAMOND)
         {
             String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-            ArrayList customLore = new ArrayList();
+            List<String> customLore = new ArrayList<>();
             customLore.add(ChatColor.GRAY + "Aperture™ Uncrafted Companion Diamond");
             customLore.add(CHECK_LINE);
             ItemStack res = inventory.getResult();
