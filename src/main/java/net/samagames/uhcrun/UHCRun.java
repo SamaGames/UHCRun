@@ -2,6 +2,7 @@ package net.samagames.uhcrun;
 
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
+import net.samagames.uhcrun.commands.CommandStart;
 import net.samagames.uhcrun.database.IDatabase;
 import net.samagames.uhcrun.database.NoDatabase;
 import net.samagames.uhcrun.database.RedisDatabase;
@@ -125,6 +126,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private void postInit()
     {
         GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
+        getCommand("start").setExecutor(new CommandStart(game));
         game.setStatus(Status.Generating);
         this.startTimer.cancel();
 
