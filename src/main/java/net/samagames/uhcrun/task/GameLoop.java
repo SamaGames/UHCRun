@@ -23,7 +23,7 @@ public class GameLoop implements Runnable
     protected IGame game;
     protected int minutes = 0;
     protected int seconds = 0;
-    protected GameLoop.TimedEvent nextEvent = null;
+    protected GameLoop.TimedEvent nextEvent;
     protected ConcurrentHashMap<UUID, ObjectiveSign> objectives = new ConcurrentHashMap<>();
     private UHCRun plugin;
 
@@ -150,42 +150,38 @@ public class GameLoop implements Runnable
             UUID player = (UUID) var1.next();
             final ObjectiveSign objective = this.objectives.get(player);
             Player player1 = Bukkit.getPlayer(player);
-            if (player1 == null)
-            {
+            if(player1 == null) {
                 Bukkit.getLogger().info("Player null :  " + player);
                 this.objectives.remove(player);
-            } else
-            {
-                objective.setLine(1, ChatColor.BLUE + " ");
-                objective.setLine(2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + this.game.countGamePlayers());
-                objective.setLine(3, ChatColor.GRAY + "  ");
-                int lastLine = 3;
-                /*if(this.game instanceof TeamGame) {
-                    objective.setLine(-3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame)this.game).getTeams().size());
+            } else {
+                objective.setLine(-1, ChatColor.BLUE + " ");
+                objective.setLine(-2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.countGamePlayers());
+                objective.setLine(-3, ChatColor.GRAY + "  ");
+                int lastLine = -2;
+                /*if(game instanceof TeamGame) {
+                    objective.setLine(-3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame)this.parent).getTeams().size());
                     objective.setLine(-4, ChatColor.RED + "   ");
                     lastLine = -4;
                 }*/
 
-                if (this.nextEvent != null)
-                {
-                    objective.setLine(lastLine + 1, this.nextEvent.string);
-                    objective.setLine(lastLine + 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));
-                    objective.setLine(lastLine + 3, ChatColor.GOLD + "     ");
-                    lastLine += 3;
+                if(this.nextEvent != null) {
+                    objective.setLine(lastLine - 1, this.nextEvent.string);
+                    objective.setLine(lastLine - 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));
+                    objective.setLine(lastLine - 3, ChatColor.GOLD + "     ");
+                    lastLine -= 3;
                 }
 
                 int kills = this.game.getKills(player);
-                if (kills > 0)
-                {
-                    objective.setLine(lastLine + 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
-                    objective.setLine(lastLine + 2, ChatColor.AQUA + "      ");
-                    lastLine += 2;
+                if(kills > 0) {
+                    objective.setLine(lastLine - 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
+                    objective.setLine(lastLine - 2, ChatColor.AQUA + "      ");
+                    lastLine -= 2;
                 }
 
-                objective.setLine(lastLine + 1, ChatColor.GRAY + "Bordure :");
-                objective.setLine(lastLine + 2, ChatColor.WHITE + "-" + (int) Bukkit.getWorld("world").getWorldBorder().getSize() / 2 + " +" + (int) Bukkit.getWorld("world").getWorldBorder().getSize() / 2);
-                objective.setLine(lastLine + 3, ChatColor.RED + "              ");
-                objective.setLine(lastLine + 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.time(this.minutes, this.seconds));
+                objective.setLine(lastLine - 1, ChatColor.GRAY + "Bordure :");
+                objective.setLine(lastLine - 2, ChatColor.WHITE + "-" + (int)Bukkit.getWorld("world").getWorldBorder().getSize() / 2 + " +" + (int)Bukkit.getWorld("world").getWorldBorder().getSize() / 2);
+                objective.setLine(lastLine - 3, ChatColor.RED + "              ");
+                objective.setLine(lastLine - 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.time(this.minutes, this.seconds));
                 objective.updateLines();
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> objective.updateLines());
             }
