@@ -56,7 +56,6 @@ public abstract class Game implements IGame
     private Scoreboard scoreboard;
     private Objective life;
     private CoherenceMachine coherenceMachine;
-    private ObjectiveSign sign;
     private GameLoop gameLoop;
     private boolean pvpEnabled;
     private boolean damages;
@@ -93,7 +92,6 @@ public abstract class Game implements IGame
         lifeb.setDisplayName("HP");
         life.setDisplayName("HP");
         lifeb.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-        sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
 
         if (beginCountdown != null) beginCountdown.cancel();
 
@@ -125,6 +123,7 @@ public abstract class Game implements IGame
             player.setLevel(0);
             player.getInventory().clear();
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 24000, 0));
+            ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "≡ UHCRun ≡");
             sign.addReceiver(player);
             gameLoop.addPlayer(player.getUniqueId(), sign);
             kills.put(uuid, 0);

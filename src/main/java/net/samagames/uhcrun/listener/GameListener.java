@@ -238,4 +238,10 @@ public class GameListener implements Listener
             if (!game.isDamagesEnabled())
                 event.setCancelled(true);
     }
+
+    @EventHandler
+    public void onLoseFood(FoodLevelChangeEvent event)
+    {
+        event.setCancelled(this.game.getStatus() != Status.InGame ? true : !this.game.isInGame(event.getEntity().getUniqueId()));
+    }
 }

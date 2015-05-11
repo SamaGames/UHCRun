@@ -99,20 +99,19 @@ public class UHCRun extends JavaPlugin implements Listener
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
-        if (!game.hasTeleportPlayers()) event.setCancelled(true);
+        event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldInit(final WorldInitEvent event)
     {
-        if (event.getWorld().getEnvironment() == World.Environment.NORMAL)
+        World world = event.getWorld();
+        if (world.getEnvironment() == World.Environment.NORMAL)
         {
-            this.setupWorlds();
-            event.getWorld().getPopulators().add(populator);
-            event.getWorld().getPopulators().add(new FortressPopulator(this));
+            this.setupNormalWorld(world);
         }
     }
 
@@ -132,7 +131,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
         this.worldLoaded = true;
 
-        // Add the looby
+        // Add the lobby
         loobyPopulator = new LobbyPopulator(this);
         loobyPopulator.generate();
         pluginManager.registerEvents(new CraftListener(), this);
@@ -148,7 +147,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
     }
 
-    private void setupWorlds()
+    private void setupNormalWorld(World world)
     {
         // Init custom ore populator
         populator = new OrePopulator();
@@ -158,8 +157,6 @@ public class UHCRun extends JavaPlugin implements Listener
         populator.addRule(new OrePopulator.Rule(Material.LAPIS_ORE, 0, 3, 0, 64, 4));
         populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 0, 4, 0, 32, 6));
 
-
-        World world = Bukkit.getWorlds().get(0);
         spawnLocation = new Location(world, 0.6, 152, 0.6);
         world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
         WorldBorder border = world.getWorldBorder();
@@ -176,7 +173,8 @@ public class UHCRun extends JavaPlugin implements Listener
         world.setGameRuleValue("randomTickSpeed", "3");
         world.setFullTime(6000);
 
-        System.out.println("WORLD INIT");
+        world.getPopulators().add(populator);
+        world.getPopulators().add(new FortressPopulator(this));
     }
 
     public boolean isWorldLoaded()
