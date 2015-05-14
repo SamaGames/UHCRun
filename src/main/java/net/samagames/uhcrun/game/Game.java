@@ -179,7 +179,7 @@ public abstract class Game implements IGame
             Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> mainTask.cancel(), 20);
+        Bukkit.getScheduler().runTaskLater(plugin, mainTask::cancel, 20);
         setStatus(Status.Stopping);
         GameAPI.getManager().sendArena();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -412,7 +412,7 @@ public abstract class Game implements IGame
                 {
                 }
 
-                Titles.sendTitle(player, Integer.valueOf(5), Integer.valueOf(70), Integer.valueOf(5), ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
+                Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
             }
         }
     }

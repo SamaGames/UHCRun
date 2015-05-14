@@ -150,10 +150,12 @@ public class GameLoop implements Runnable
             UUID player = (UUID) var1.next();
             final ObjectiveSign objective = this.objectives.get(player);
             Player player1 = Bukkit.getPlayer(player);
-            if(player1 == null) {
+            if (player1 == null)
+            {
                 Bukkit.getLogger().info("Player null :  " + player);
                 this.objectives.remove(player);
-            } else {
+            } else
+            {
                 objective.setLine(-1, ChatColor.BLUE + " ");
                 objective.setLine(-2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.countGamePlayers());
                 objective.setLine(-3, ChatColor.GRAY + "  ");
@@ -164,7 +166,8 @@ public class GameLoop implements Runnable
                     lastLine = -4;
                 }*/
 
-                if(this.nextEvent != null) {
+                if (this.nextEvent != null)
+                {
                     objective.setLine(lastLine - 1, this.nextEvent.string);
                     objective.setLine(lastLine - 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));
                     objective.setLine(lastLine - 3, ChatColor.GOLD + "     ");
@@ -172,18 +175,19 @@ public class GameLoop implements Runnable
                 }
 
                 int kills = this.game.getKills(player);
-                if(kills > 0) {
+                if (kills > 0)
+                {
                     objective.setLine(lastLine - 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
                     objective.setLine(lastLine - 2, ChatColor.AQUA + "      ");
                     lastLine -= 2;
                 }
 
                 objective.setLine(lastLine - 1, ChatColor.GRAY + "Bordure :");
-                objective.setLine(lastLine - 2, ChatColor.WHITE + "-" + (int)Bukkit.getWorld("world").getWorldBorder().getSize() / 2 + " +" + (int)Bukkit.getWorld("world").getWorldBorder().getSize() / 2);
+                objective.setLine(lastLine - 2, ChatColor.WHITE + "-" + (int) Bukkit.getWorld("world").getWorldBorder().getSize() / 2 + " +" + (int) Bukkit.getWorld("world").getWorldBorder().getSize() / 2);
                 objective.setLine(lastLine - 3, ChatColor.RED + "              ");
                 objective.setLine(lastLine - 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.time(this.minutes, this.seconds));
                 objective.updateLines();
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> objective.updateLines());
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, objective::updateLines);
             }
         }
 

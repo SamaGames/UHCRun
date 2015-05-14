@@ -12,9 +12,7 @@ public abstract class GameData
 
     public boolean equals(Object o)
     {
-        if (o instanceof GameData)
-            return ((GameData) o).getIdentification().equals(this.getIdentification());
-        return false;
+        return o instanceof GameData && ((GameData) o).getIdentification().equals(this.getIdentification());
     }
 
     protected abstract String getIdentification();

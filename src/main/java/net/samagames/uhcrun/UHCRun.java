@@ -18,6 +18,9 @@ import net.samagames.uhcrun.listener.LoginListener;
 import net.zyuiop.MasterBundle.MasterBundle;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -86,7 +89,7 @@ public class UHCRun extends JavaPlugin implements Listener
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
 
-        this.game = new SoloGame((short) 10, (short) 20, (short) 4);
+        this.game = new SoloGame((short) 10, (short) 20, (short) 1);
         pluginManager.registerEvents(this, this);
 
         /*if (playersPerTeam <= 1)
@@ -96,12 +99,18 @@ public class UHCRun extends JavaPlugin implements Listener
         pluginManager.registerEvents(new LoginListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
 
-        this.startTimer = Bukkit.getScheduler().runTaskTimer(this, () -> postInit(), 20L, 20L);
+        this.startTimer = Bukkit.getScheduler().runTaskTimer(this, this::postInit, 20L, 20L);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
+        // Clear entities
+        Entity[] entities = event.getChunk().getEntities();
+        for (Entity entity : entities)
+            if (!(entity instanceof Item || entity instanceof HumanEntity))
+                entity.remove();
+
         event.setCancelled(true);
     }
 

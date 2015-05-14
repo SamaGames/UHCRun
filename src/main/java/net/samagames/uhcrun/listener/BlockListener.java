@@ -41,7 +41,6 @@ public class BlockListener implements Listener
     public void onBreak(BlockBreakEvent event)
     {
         Material mat = event.getBlock().getType();
-        Location loc = event.getBlock().getLocation();
         event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
 
         switch (mat)

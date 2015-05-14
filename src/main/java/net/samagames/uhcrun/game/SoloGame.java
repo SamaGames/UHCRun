@@ -104,12 +104,10 @@ public class SoloGame extends Game
         }
 
         Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
-        Iterator nb = Bukkit.getOnlinePlayers().iterator();
 
-        while (nb.hasNext())
+        for (Player user : Bukkit.getOnlinePlayers())
         {
-            Player user = (Player) nb.next();
-            Titles.sendTitle(user, Integer.valueOf(5), Integer.valueOf(70), Integer.valueOf(5), ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
+            Titles.sendTitle(user, 5, 70, 5, ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
         }
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
@@ -171,11 +169,9 @@ public class SoloGame extends Game
     {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
-        Iterator<UUID> playerIterator = this.players.iterator();
 
-        while (playerIterator.hasNext())
+        for (UUID uuid : this.players)
         {
-            UUID uuid = playerIterator.next();
             Player player = Bukkit.getPlayer(uuid);
             if (player == null)
             {

@@ -24,6 +24,15 @@ import java.util.List;
 public class CraftListener implements Listener
 {
 
+    private List<String> diamondDesc;
+
+    public CraftListener()
+    {
+        diamondDesc = new ArrayList<>();
+        diamondDesc.add(ChatColor.GRAY + "Aperture™ Uncrafted Companion Diamond");
+        diamondDesc.add(ChatColor.GRAY + "© Aperture Science - All rights reserved");
+    }
+
     @EventHandler
     public void onCraft(CraftItemEvent event)
     {
@@ -52,13 +61,9 @@ public class CraftListener implements Listener
             inventory.setResult(new ItemStack(Material.STONE_SPADE));
         } else if (recipe.getResult().getType() == Material.DIAMOND)
         {
-            String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-            List<String> customLore = new ArrayList<>();
-            customLore.add(ChatColor.GRAY + "Aperture™ Uncrafted Companion Diamond");
-            customLore.add(CHECK_LINE);
             ItemStack res = inventory.getResult();
             ItemMeta meta = res.getItemMeta();
-            meta.setLore(customLore);
+            meta.setLore(diamondDesc);
             res.setItemMeta(meta);
             inventory.setResult(res);
         }
