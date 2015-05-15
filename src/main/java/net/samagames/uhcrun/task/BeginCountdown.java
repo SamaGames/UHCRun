@@ -26,6 +26,7 @@ public class BeginCountdown implements Runnable
     private final int minPlayers;
     private boolean ready = false;
     private int countdown = 121; // 2 minutes
+    private String startingMessage;
 
     public BeginCountdown(Game game, int maxPlayers, int minPlayers, int time)
     {
@@ -34,6 +35,7 @@ public class BeginCountdown implements Runnable
         this.minPlayers = minPlayers;
         this.time = time;
         this.countdown = time;
+        startingMessage = StaticMessages.STARTIN.get(this.game.getCoherenceMachine());
     }
 
     @Override
@@ -54,12 +56,7 @@ public class BeginCountdown implements Runnable
                 countdown = time / 2;
             }
 
-            if (nPlayers >= ((double) maxPlayers / 100.0) * 65.0 && countdown > (time / 2))
-            {
-                countdown = time / 4;
-            }
-
-            if (nPlayers >= ((double) maxPlayers / 100.0) * 85.0 && countdown > (time / 4))
+            if (nPlayers >= ((double) maxPlayers / 100.0) * 65.0 && countdown > (time / 2) || (nPlayers >= ((double) maxPlayers / 100.0) * 85.0 && countdown > (time / 4)))
             {
                 countdown = time / 4;
             }
@@ -70,42 +67,36 @@ public class BeginCountdown implements Runnable
                 Bukkit.broadcastMessage(StaticMessages.NOTENOUGTHPLAYERS.get(game.getCoherenceMachine()));
                 game.updateStatus(Status.Available);
                 for (Player p : Bukkit.getOnlinePlayers())
-                    p.setLevel(120);
+                    p.setLevel(countdown - 1);
             }
 
             if (ready)
-            {
-                countdown--;
                 timeBroadcast();
-            }
         }
     }
 
     private void timeBroadcast()
     {
+        countdown--;
         if (countdown == 0)
         {
             game.start();
             return;
         }
 
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player player : Bukkit.getOnlinePlayers())
         {
-            p.setLevel(countdown);
+            player.setLevel(countdown);
             if (countdown <= 5 || countdown == 10)
             {
-                Titles.sendTitle(p, 2, 16, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + countdown + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
+                Titles.sendTitle(player, 2, 16, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + countdown + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
+                player.playSound(player.getPlayer().getPlayer().getLocation(), Sound.NOTE_PIANO, 1.0F, 1.0F);
             }
         }
 
         if (countdown <= 5 || countdown == 10 || countdown % 30 == 0)
         {
-            Bukkit.broadcastMessage(StaticMessages.STARTIN.get(this.game.getCoherenceMachine()).replace("${TIME}", countdown + " seconde" + ((countdown > 1) ? "s" : "")));
-        }
-
-        if (countdown <= 5 || countdown == 10)
-        {
-            GameUtils.broadcastSound(Sound.NOTE_PIANO);
+            Bukkit.broadcastMessage(startingMessage.replace("${TIME}", countdown + " seconde" + ((countdown > 1) ? "s" : "")));
         }
     }
 }

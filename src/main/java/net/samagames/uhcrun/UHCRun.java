@@ -11,6 +11,7 @@ import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
+import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.listener.BlockListener;
 import net.samagames.uhcrun.listener.CraftListener;
 import net.samagames.uhcrun.listener.GameListener;
@@ -56,6 +57,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
     private IDatabase database;
+    private WorldLoader worldLoader;
 
     public static UHCRun getInstance()
     {
@@ -89,7 +91,7 @@ public class UHCRun extends JavaPlugin implements Listener
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
 
-        this.game = new SoloGame((short) 10, (short) 20, (short) 1);
+        this.game = new SoloGame((short) 10, (short) 20, (short) 4);
         pluginManager.registerEvents(this, this);
 
         /*if (playersPerTeam <= 1)
@@ -147,12 +149,16 @@ public class UHCRun extends JavaPlugin implements Listener
         pluginManager.registerEvents(new BlockListener(), this);
 
         game.postInit();
-        game.updateStatus(Status.Available);
+
 
         if (MasterBundle.pool == null)
             this.database = new NoDatabase();
         else
             this.database = new RedisDatabase(MasterBundle.pool);
+
+        worldLoader = new WorldLoader();
+
+        worldLoader.begin(Bukkit.getWorld("world"));
 
     }
 
@@ -184,6 +190,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
         world.getPopulators().add(populator);
         world.getPopulators().add(new FortressPopulator(this));
+        world.setAutoSave(false);
     }
 
     public boolean isWorldLoaded()
@@ -211,5 +218,10 @@ public class UHCRun extends JavaPlugin implements Listener
     public void removeSpawn()
     {
         loobyPopulator.remove();
+    }
+
+    public IGame getGame()
+    {
+        return game;
     }
 }

@@ -136,6 +136,7 @@ public class GameLoop implements Runnable
 
     public void run()
     {
+        long time = System.currentTimeMillis();
         ++this.seconds;
         if (this.seconds >= 60)
         {
@@ -202,6 +203,7 @@ public class GameLoop implements Runnable
         }
 
         this.nextEvent.decrement();
+        plugin.getLogger().info("GameLoop: " + (System.currentTimeMillis() - time));
     }
 
     private abstract class TimedEvent

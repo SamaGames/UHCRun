@@ -3,6 +3,7 @@ package net.samagames.uhcrun.listener;
 import net.samagames.gameapi.GameUtils;
 import net.samagames.gameapi.json.Status;
 import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
@@ -14,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -243,5 +245,22 @@ public class GameListener implements Listener
     public void onLoseFood(FoodLevelChangeEvent event)
     {
         event.setCancelled(this.game.getStatus() != Status.InGame || !this.game.isInGame(event.getEntity().getUniqueId()));
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!game.isPvpEnabled() && (event.getBlockPlaced().getType() == Material.LAVA || event.getBlockPlaced().getType() == Material.STATIONARY_LAVA)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
+        }
+
+        int x = event.getBlockPlaced().getX();
+        int y = event.getBlockPlaced().getY();
+        int z = event.getBlockPlaced().getZ();
+
+        if (x > -50 && x < 50 && z > -50 && z < 50 && y > WorldLoader.getHighestNaturalBlockAt(x, z) + 17) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + "Towers" + ChatColor.DARK_RED + "] " + ChatColor.RED + "Les Towers sont interdites en UHCRun.");
+        }
     }
 }
