@@ -305,10 +305,7 @@ public abstract class Game implements IGame
     }
 
     @Override
-    public void teleportDeathMatch()
-    {
-
-    }
+    public abstract void teleportDeathMatch();
 
     @Override
     public int getDeathMatchSize()

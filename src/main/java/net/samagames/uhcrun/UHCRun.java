@@ -190,7 +190,6 @@ public class UHCRun extends JavaPlugin implements Listener
 
         world.getPopulators().add(populator);
         world.getPopulators().add(new FortressPopulator(this));
-        world.setAutoSave(false);
     }
 
     public boolean isWorldLoaded()

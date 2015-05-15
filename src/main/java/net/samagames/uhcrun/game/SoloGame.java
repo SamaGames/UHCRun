@@ -191,4 +191,31 @@ public class SoloGame extends Game
         }
 
     }
+
+    @Override
+    public void teleportDeathMatch()
+    {
+        Collections.shuffle(this.spawnPoints);
+        Iterator<Location> locationIterator = this.spawnPoints.iterator();
+        Iterator var3 = this.players.iterator();
+
+        while(var3.hasNext()) {
+            UUID uuid = (UUID)var3.next();
+            Player player = Bukkit.getPlayer(uuid);
+            if(player == null) {
+                this.players.remove(uuid);
+                return;
+            }
+
+            if(!locationIterator.hasNext()) {
+                player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
+                this.players.remove(uuid);
+                return;
+            }
+
+            Location location = locationIterator.next();
+
+            player.teleport(new Location(location.getWorld(), ((location.getX() * 4) / 10), 150.0, ((location.getZ() * 4) / 10)));
+        }
+    }
 }
