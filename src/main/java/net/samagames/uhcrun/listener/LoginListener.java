@@ -29,7 +29,7 @@ public class LoginListener implements Listener
     @EventHandler
     public void onPreJoin(PreJoinPlayerEvent event)
     {
-        if (game.getStatus() != Status.Available)
+        if (game.getStatus() == Status.Generating)
             event.refuse(ChatColor.RED + "Map en génération.");
     }
 

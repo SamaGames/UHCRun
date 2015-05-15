@@ -1,5 +1,6 @@
 package net.samagames.uhcrun;
 
+import net.minecraft.server.v1_8_R1.*;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
 import net.samagames.uhcrun.commands.CommandStart;
@@ -18,6 +19,9 @@ import net.samagames.uhcrun.listener.GameListener;
 import net.samagames.uhcrun.listener.LoginListener;
 import net.zyuiop.MasterBundle.MasterBundle;
 import org.bukkit.*;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -33,6 +37,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -222,5 +232,76 @@ public class UHCRun extends JavaPlugin implements Listener
     public IGame getGame()
     {
         return game;
+    }
+
+
+    private void patchBiomes() throws Exception
+    {
+        BiomeBase[] a = BiomeBase.getBiomes();
+        BiomeBase[] tmp = BiomeBase.getBiomes();
+        Map<String, BiomeBase> setBiomes = BiomeBase.o;
+        BiomeForest nb1 = new BiomeForest(0, 0);
+
+
+        ArrayList<BiomeMeta> mobs = new ArrayList<>();
+
+        mobs.add(new BiomeMeta(EntitySheep.class, 15, 4, 4));
+        mobs.add(new BiomeMeta(EntityRabbit.class, 15, 3, 5));
+        mobs.add(new BiomeMeta(EntityPig.class, 20, 10, 15));
+        mobs.add(new BiomeMeta(EntityChicken.class, 21, 10, 15));
+        mobs.add(new BiomeMeta(EntityCow.class, 20, 10, 15));
+        mobs.add(new BiomeMeta(EntityWolf.class, 6, 5, 30));
+
+        Field f3 = BiomeBase.class.getDeclaredField("ad");
+
+        //this.setFinalStatic(f1, nb1);
+        // this.setFinalStatic(f2, nb2);
+        this.setFinalStatic(f3, nb1);
+
+        HashMap<String, BiomeBase> biomes = new HashMap<>();
+
+        setBiomes.remove("Ocean");
+        setBiomes.remove("FrozenOcean");
+        setBiomes.remove("FrozenRiver");
+        setBiomes.remove("Ice Plains");
+        setBiomes.remove("Ice Mountains");
+        setBiomes.remove("MushroomIsland");
+        setBiomes.remove("MushroomIslandShore");
+        setBiomes.remove("TaigaHills");
+        setBiomes.remove("JungleHills");
+        setBiomes.remove("Deep Ocean");
+        setBiomes.remove("Cold Beach");
+        setBiomes.remove("Cold Taiga");
+        setBiomes.remove("Cold Taiga Hills");
+        setBiomes.remove("Mega Taiga");
+        setBiomes.remove("Mega Taiga Hills");
+        setBiomes.remove("Extreme Hills+");
+        setBiomes.remove("Mesa");
+        setBiomes.remove("Mesa Plateau F");
+        setBiomes.remove("Mesa Plateau");
+
+        for (int i = 0; i <= 40; i++)
+        {
+            if (tmp[i] != null && !setBiomes.containsKey(tmp[i].ah))
+            {
+                biomes.put(tmp[i].ah, tmp[i]);
+
+            }
+            tmp[i] = null;
+        }
+
+        Field biomeField = BiomeBase.class.getDeclaredField("biomes");
+        this.setFinalStatic(biomeField, tmp);
+    }
+
+
+        public void setFinalStatic(Field field, Object obj) throws Exception {
+        field.setAccessible(true);
+
+        Field mf = Field.class.getDeclaredField("modifiers");
+        mf.setAccessible(true);
+        mf.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        field.set(null, obj);
     }
 }

@@ -200,6 +200,7 @@ public abstract class Game implements IGame
         messageManager.writeWelcomeInGameMessage(player);
         messageManager.writePlayerJoinArenaMessage(player, this);
         player.setGameMode(GameMode.ADVENTURE);
+        player.sendMessage("Tracker: https://docs.google.com/document/d/1AqPxBYF7QyJ5LE0mVhNDfbOgnOJKH8yBw9aGfliNCx0/edit?usp=sharing");
         player.teleport(plugin.getSpawnLocation());
     }
 
