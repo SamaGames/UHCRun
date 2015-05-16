@@ -136,7 +136,6 @@ public class GameLoop implements Runnable
 
     public void run()
     {
-        long time = System.currentTimeMillis();
         ++this.seconds;
         if (this.seconds >= 60)
         {
@@ -144,11 +143,8 @@ public class GameLoop implements Runnable
             this.seconds = 0;
         }
 
-        Iterator var1 = this.objectives.keySet().iterator();
-
-        while (var1.hasNext())
+        for (UUID player : this.objectives.keySet())
         {
-            UUID player = (UUID) var1.next();
             final ObjectiveSign objective = this.objectives.get(player);
             Player player1 = Bukkit.getPlayer(player);
             if (player1 == null)
@@ -203,7 +199,6 @@ public class GameLoop implements Runnable
         }
 
         this.nextEvent.decrement();
-        plugin.getLogger().info("GameLoop: " + (System.currentTimeMillis() - time));
     }
 
     private abstract class TimedEvent

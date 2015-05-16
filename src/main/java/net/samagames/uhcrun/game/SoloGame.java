@@ -197,17 +197,18 @@ public class SoloGame extends Game
     {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
-        Iterator var3 = this.players.iterator();
 
-        while(var3.hasNext()) {
-            UUID uuid = (UUID)var3.next();
+        for (UUID uuid : this.players)
+        {
             Player player = Bukkit.getPlayer(uuid);
-            if(player == null) {
+            if (player == null)
+            {
                 this.players.remove(uuid);
                 return;
             }
 
-            if(!locationIterator.hasNext()) {
+            if (!locationIterator.hasNext())
+            {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                 this.players.remove(uuid);
                 return;

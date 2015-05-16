@@ -41,10 +41,7 @@ public class FortressPopulator extends BlockPopulator
         try
         {
             this.cuboidClipboard = SchematicFormat.MCEDIT.load(file);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        } catch (DataException e)
+        } catch (IOException | DataException e)
         {
             e.printStackTrace();
         }

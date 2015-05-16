@@ -94,47 +94,6 @@ public class WorldLoader
         }, 1L, 1L);
     }
 
-    public boolean loadChunks(World world, int radius, int sx, int sz)
-    {
-        ArrayList<Chunk> loaded = new ArrayList();
-        Logger log = plugin.getLogger();
-        if (world == null)
-        {
-            log.info("Error world does not exist");
-            return false;
-        }
-        int maxX = sx + 17 + radius;
-        int maxZ = sz + 17 + radius;
-        int minX = sx - 1 - radius;
-        int minZ = sz - 1 - radius;
-        String start = new Date().toString();
-
-        int fail = 0;
-        int total = 0;
-
-        for (int x = minX; x < maxX; x += 16)
-        {
-            log.info("Generating Chunks for X: " + x + " Z: " + minZ + " to " + maxZ);
-            for (int z = minZ; z < maxZ; z += 16)
-            {
-                Chunk c = world.getChunkAt(x, z);
-                if (!c.load(true)) {
-                    fail++;
-                }
-                total++;
-                loaded.add(c);
-
-                c = null;
-            }
-        }
-        log.info("Execution Time:");
-        log.info("Start: " + start);
-        log.info("Finish: " + new Date().toString());
-        log.info("Failed Chunks: " + fail + ", Loaded: " + (total - fail) + " Chunks: " + total);
-        log.info("Finished");
-        return true;
-    }
-
     public static class PartialLocation
     {
         private final int x;
@@ -166,9 +125,7 @@ public class WorldLoader
 
             PartialLocation that = (PartialLocation) o;
 
-            if (x != that.x)
-                return false;
-            return z == that.z;
+            return x == that.x && z == that.z;
 
         }
 

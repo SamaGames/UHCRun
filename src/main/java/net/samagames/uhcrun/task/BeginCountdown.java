@@ -1,6 +1,5 @@
 package net.samagames.uhcrun.task;
 
-import net.samagames.gameapi.GameUtils;
 import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.themachine.messages.StaticMessages;
 import net.samagames.uhcrun.game.Game;
