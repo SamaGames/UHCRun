@@ -456,4 +456,9 @@ public abstract class Game implements IGame
                 return "Autre";
         }
     }
+
+    public GameLoop getGameLoop()
+    {
+        return gameLoop;
+    }
 }

@@ -4,6 +4,7 @@ import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.themachine.CoherenceMachine;
 import net.samagames.gameapi.types.GameArena;
+import net.samagames.uhcrun.task.GameLoop;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -67,4 +68,6 @@ public interface IGame extends GameArena
     void creditKillCoins(Player killer);
 
     void checkStump(Player player);
+
+    GameLoop getGameLoop();
 }

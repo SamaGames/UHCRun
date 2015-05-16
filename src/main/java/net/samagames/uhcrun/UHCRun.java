@@ -4,6 +4,7 @@ import net.minecraft.server.v1_8_R1.BiomeBase;
 import net.minecraft.server.v1_8_R1.BiomeForest;
 import net.samagames.gameapi.GameAPI;
 import net.samagames.gameapi.json.Status;
+import net.samagames.uhcrun.commands.CommandNextEvent;
 import net.samagames.uhcrun.commands.CommandStart;
 import net.samagames.uhcrun.database.IDatabase;
 import net.samagames.uhcrun.database.NoDatabase;
@@ -14,10 +15,7 @@ import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.generator.WorldLoader;
-import net.samagames.uhcrun.listener.BlockListener;
-import net.samagames.uhcrun.listener.CraftListener;
-import net.samagames.uhcrun.listener.GameListener;
-import net.samagames.uhcrun.listener.LoginListener;
+import net.samagames.uhcrun.listener.*;
 import net.zyuiop.MasterBundle.MasterBundle;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -105,6 +103,7 @@ public class UHCRun extends JavaPlugin implements Listener
             game = new TeamGame(playersPerTeam);*/
         pluginManager.registerEvents(new LoginListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
+        pluginManager.registerEvents(new CompassTargeter(this), this);
 
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, this::postInit, 20L, 20L);
     }
@@ -141,6 +140,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private void postInit()
     {
         GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
+        getCommand("nextevent").setExecutor(new CommandNextEvent(game));
         getCommand("start").setExecutor(new CommandStart(game));
         game.setStatus(Status.Generating);
         this.startTimer.cancel();
