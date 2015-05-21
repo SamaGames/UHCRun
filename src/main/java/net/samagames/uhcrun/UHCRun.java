@@ -101,23 +101,12 @@ public class UHCRun extends JavaPlugin implements Listener
             game = new SoloGame();
         else
             game = new TeamGame(playersPerTeam);*/
+        pluginManager.registerEvents(new ChunkListener(), this);
         pluginManager.registerEvents(new LoginListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
         pluginManager.registerEvents(new CompassTargeter(this), this);
 
         this.startTimer = Bukkit.getScheduler().runTaskTimer(this, this::postInit, 20L, 20L);
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onChunkUnload(final ChunkUnloadEvent event)
-    {
-        // Clear entities
-        Entity[] entities = event.getChunk().getEntities();
-        for (Entity entity : entities)
-            if (!(entity instanceof Item || entity instanceof HumanEntity))
-                entity.remove();
-
-        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
