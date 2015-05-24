@@ -49,8 +49,12 @@ public class ChunkListener implements Runnable, Listener
                 continue;
 
             for (Entity entity : chunk.getEntities())
+            {
                 if (!(entity instanceof Item || entity instanceof HumanEntity))
+                {
                     entity.remove();
+                }
+            }
 
             lastChunkCleanUp.replace(chunk, currentTime);
         }

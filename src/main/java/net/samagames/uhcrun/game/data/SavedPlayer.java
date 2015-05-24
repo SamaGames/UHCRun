@@ -3,6 +3,7 @@ package net.samagames.uhcrun.game.data;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -16,10 +17,10 @@ public class SavedPlayer
 {
     private final String name;
     private final UUID uuid;
-    private HashMap<String, GameDamageData> damageDone = new HashMap<>();
-    private HashMap<String, GameDamageData> damageTaken = new HashMap<>();
-    private HashMap<String, HealingSource> healingDone = new HashMap<>();
-    private HashMap<String, String> hasKilled = new HashMap<>();
+    private Map<String, GameDamageData> damageDone = new HashMap<>();
+    private Map<String, GameDamageData> damageTaken = new HashMap<>();
+    private Map<String, HealingSource> healingDone = new HashMap<>();
+    private Map<String, String> hasKilled = new HashMap<>();
     private String killedBy;
     private int finalRanking;
     private long deadAfter;
@@ -88,17 +89,17 @@ public class SavedPlayer
         return uuid;
     }
 
-    public HashMap<String, GameDamageData> getDamageDone()
+    public Map<String, GameDamageData> getDamageDone()
     {
         return damageDone;
     }
 
-    public HashMap<String, GameDamageData> getDamageTaken()
+    public Map<String, GameDamageData> getDamageTaken()
     {
         return damageTaken;
     }
 
-    public HashMap<String, HealingSource> getHealingDone()
+    public Map<String, HealingSource> getHealingDone()
     {
         return healingDone;
     }

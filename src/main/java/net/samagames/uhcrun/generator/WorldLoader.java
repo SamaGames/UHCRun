@@ -11,10 +11,11 @@ import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class WorldLoader
 {
-    private static HashMap<PartialLocation, Integer> highestBlocks = new HashMap<>();
+    private static Map<PartialLocation, Integer> highestBlocks = new HashMap<>();
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;

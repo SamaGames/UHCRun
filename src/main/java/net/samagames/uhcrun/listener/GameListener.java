@@ -40,10 +40,12 @@ public class GameListener implements Listener
 {
 
     private IGame game;
+    private Random random;
 
     public GameListener(IGame game)
     {
         this.game = game;
+        this.random = new Random();
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -126,7 +128,7 @@ public class GameListener implements Listener
                 break;
             case GRAVEL:
             case FLINT:
-                if (new Random().nextDouble() < 0.75)
+                if (random.nextDouble() < 0.75)
                 {
                     ItemStack loot = new ItemStack(Material.ARROW, 3);
                     ItemMeta meta = loot.getItemMeta();

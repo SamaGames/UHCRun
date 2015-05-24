@@ -1,6 +1,7 @@
 package net.samagames.uhcrun.game.data;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -15,7 +16,7 @@ public class StoredGame
     private final String server;
     private final long startTime;
     private final String gameType;
-    private HashMap<UUID, SavedPlayer> players = new HashMap<>();
+    private Map<UUID, SavedPlayer> players = new HashMap<>();
     private long endTime;
 
     public StoredGame(String server, long startTime, String gameType)
@@ -41,7 +42,7 @@ public class StoredGame
         return players.get(player);
     }
 
-    public HashMap<UUID, SavedPlayer> getPlayers()
+    public Map<UUID, SavedPlayer> getPlayers()
     {
         return players;
     }

@@ -48,7 +48,6 @@ public class UHCRun extends JavaPlugin implements Listener
     private Location spawnLocation;
     private FileConfiguration config;
     private Logger logger;
-    private boolean needGen;
     private BukkitTask startTimer;
     private OrePopulator populator;
     private IGame game;
@@ -80,7 +79,6 @@ public class UHCRun extends JavaPlugin implements Listener
         logger.info("Checking wether world exists at : " + conf.getAbsolutePath());
         if (!conf.exists())
         {
-            needGen = true;
             logger.info("No world exists. Will be generated.");
         } else
         {

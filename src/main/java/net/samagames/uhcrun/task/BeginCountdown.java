@@ -66,7 +66,9 @@ public class BeginCountdown implements Runnable
                 Bukkit.broadcastMessage(StaticMessages.NOTENOUGTHPLAYERS.get(game.getCoherenceMachine()));
                 game.updateStatus(Status.Available);
                 for (Player p : Bukkit.getOnlinePlayers())
+                {
                     p.setLevel(countdown - 1);
+                }
             }
 
             if (ready)

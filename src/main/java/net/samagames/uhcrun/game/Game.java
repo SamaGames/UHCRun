@@ -173,7 +173,7 @@ public abstract class Game implements IGame
             Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
             Bukkit.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
             Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
-            Bukkit.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "d�briefing de partie" + ChatColor.GOLD + " ici : ");
+            Bukkit.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
             Bukkit.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
             Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
@@ -198,8 +198,10 @@ public abstract class Game implements IGame
         players.add(player.getUniqueId());
         messageManager.writeWelcomeInGameMessage(player);
         messageManager.writePlayerJoinArenaMessage(player, this);
+
         player.setGameMode(GameMode.ADVENTURE);
-        player.sendMessage("Tracker: https://docs.google.com/document/d/1AqPxBYF7QyJ5LE0mVhNDfbOgnOJKH8yBw9aGfliNCx0/edit?usp=sharing");
+        player.sendMessage(ChatColor.GOLD + "Cette partie utilise une version Beta de l'UHCRun, des bugs peuvent survenir");
+        player.sendMessage(ChatColor.AQUA + "Report de bugs: https://bitbucket.org/samagames/uhcrun/issues");
         player.teleport(plugin.getSpawnLocation());
     }
 

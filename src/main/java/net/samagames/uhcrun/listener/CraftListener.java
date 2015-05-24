@@ -47,10 +47,7 @@ public class CraftListener implements Listener
 
     public void onCraft(Recipe recipe, CraftingInventory inventory)
     {
-        if (recipe.getResult().getType() == Material.GOLDEN_APPLE && recipe.getResult().getDurability() == 1)
-        {
-            inventory.setResult(new ItemStack(Material.AIR));
-        } else if (recipe.getResult().getType() == Material.FLINT_AND_STEEL)
+        if ((recipe.getResult().getType() == Material.GOLDEN_APPLE && recipe.getResult().getDurability() == 1) || (recipe.getResult().getType() == Material.FLINT_AND_STEEL) || (recipe.getResult().getType() == Material.BEACON))
         {
             inventory.setResult(new ItemStack(Material.AIR));
         } else if (recipe.getResult().getType() == Material.WOOD_PICKAXE)
