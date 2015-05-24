@@ -16,12 +16,11 @@ import net.samagames.utils.Titles;
 import net.zyuiop.MasterBundle.MasterBundle;
 import net.zyuiop.coinsManager.CoinsManager;
 import net.zyuiop.statsapi.StatsApi;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -208,6 +207,55 @@ public abstract class Game implements IGame
     @Override
     public void quit(Player player)
     {
+        if (this.getStatus() == Status.InGame)
+        {
+            this.gameLoop.removePlayer(player.getUniqueId());
+            if (this.isPvpEnabled())
+            {
+                this.stumpPlayer(player, true);
+                Location time = player.getLocation();
+                World w = time.getWorld();
+                ItemStack[] var4 = player.getInventory().getContents();
+                int var5 = var4.length;
+
+                for (ItemStack stack : var4)
+                {
+                    if (stack != null)
+                    {
+                        w.dropItemNaturally(time, stack);
+                    }
+                }
+            } else
+            {
+                int var8 = this.getPreparingTime() * 60 - this.gameLoop.getTime();
+                GameAPI.joinManagement.addRejoinList(player.getUniqueId(), (long) var8);
+                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
+            }
+        } else
+        {
+            this.players.remove(player.getUniqueId());
+        }
+    }
+
+
+    @Override
+    public void rejoin(UUID playerID)
+    {
+        final Player pl = Bukkit.getPlayer(playerID);
+
+        if (pl != null)
+        {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+
+                pl.setScoreboard(this.scoreboard);
+                ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "≡ UHCRun ≡");
+                sign.addReceiver(pl);
+                this.gameLoop.addPlayer(playerID, sign);
+                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + pl.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
+            }, 10L);
+
+        }
+
 
     }
 
@@ -467,5 +515,11 @@ public abstract class Game implements IGame
     public GameLoop getGameLoop()
     {
         return gameLoop;
+    }
+
+    @Override
+    public boolean isDisconnected(UUID player)
+    {
+        return GameAPI.joinManagement.isInRejoinList(player);
     }
 }

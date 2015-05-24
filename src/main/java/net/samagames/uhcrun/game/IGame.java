@@ -35,6 +35,8 @@ public interface IGame extends GameArena
 
     void quit(Player player);
 
+    void rejoin(UUID playerID);
+
     boolean hasTeleportPlayers();
 
     void enableDamages();
@@ -72,4 +74,6 @@ public interface IGame extends GameArena
     void checkStump(Player player);
 
     GameLoop getGameLoop();
+
+    boolean isDisconnected(UUID player);
 }

@@ -198,19 +198,7 @@ public class GameListener implements Listener
     {
         if (game.isInGame(event.getPlayer().getUniqueId()))
         {
-            game.stumpPlayer(event.getPlayer(), true);
-            if (game.getStatus() == Status.InGame)
-            {
-                Location l = event.getPlayer().getLocation();
-                World w = l.getWorld();
-                for (ItemStack stack : event.getPlayer().getInventory().getContents())
-                {
-                    if (stack != null)
-                    {
-                        w.dropItemNaturally(l, stack);
-                    }
-                }
-            }
+            game.quit(event.getPlayer());
         }
     }
 

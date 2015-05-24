@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.
- * Created by Thog92
+ * Created by Thog
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
@@ -31,6 +31,9 @@ public class LoginListener implements Listener
     {
         if (game.getStatus() == Status.Generating)
             event.refuse(ChatColor.RED + "Map en génération.");
+        else if (game.getStatus() == Status.InGame && game.isDisconnected(event.getPlayer()))
+            event.refuse(ChatColor.RED + "La partie a déjà commencé !");
+
     }
 
 
