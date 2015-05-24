@@ -1,6 +1,7 @@
 package net.samagames.uhcrun.listener;
 
 import net.md_5.bungee.api.ChatColor;
+import net.samagames.gameapi.events.RejoinPlayerEvent;
 import net.samagames.gameapi.json.Status;
 import net.samagames.uhcrun.game.IGame;
 import org.bukkit.Bukkit;
@@ -100,6 +101,19 @@ public class SpectatorListener implements Listener
     {
         if (e.getEntity() instanceof Player)
             e.setCancelled(cancel((Player) e.getEntity()));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRejoin(RejoinPlayerEvent event) {
+        if (game.getStatus() == Status.InGame && game.isDisconnected(event.getPlayer()))
+        {
+            event.refuse(org.bukkit.ChatColor.RED + "La partie a déjà commencé !");
+            return;
+        }
+        
+        this.game.rejoin(event.getPlayer());
+
+
     }
 
 }
