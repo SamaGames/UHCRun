@@ -31,7 +31,7 @@ public class LoginListener implements Listener
     {
         if (game.getStatus() == Status.Generating)
             event.refuse(ChatColor.RED + "Map en génération.");
-        else if (game.getStatus() == Status.InGame && game.isDisconnected(event.getPlayer()))
+        else if (game.getStatus() == Status.InGame && !game.isDisconnected(event.getPlayer()))
             event.refuse(ChatColor.RED + "La partie a déjà commencé !");
 
     }
