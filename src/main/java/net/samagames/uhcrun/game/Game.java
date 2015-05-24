@@ -200,7 +200,7 @@ public abstract class Game implements IGame
 
         player.setGameMode(GameMode.ADVENTURE);
         player.sendMessage(ChatColor.GOLD + "Cette partie utilise une version Beta de l'UHCRun, des bugs peuvent survenir");
-        player.sendMessage(ChatColor.AQUA + "Report de bugs: https://bitbucket.org/samagames/uhcrun/issues");
+        //player.sendMessage(ChatColor.AQUA + "Report de bugs: https://bitbucket.org/samagames/uhcrun/issues");
         player.teleport(plugin.getSpawnLocation());
     }
 

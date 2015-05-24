@@ -88,7 +88,7 @@ public class UHCRun extends JavaPlugin implements Listener
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
 
 
-        this.game = new SoloGame((short) 10, (short) 20, (short) 4);
+        this.game = new SoloGame((short) 20, (short) 4, (short) 10);
         pluginManager.registerEvents(this, this);
 
         /*if (playersPerTeam <= 1)
