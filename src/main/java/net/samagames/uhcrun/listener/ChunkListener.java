@@ -33,7 +33,7 @@ public class ChunkListener implements Runnable, Listener
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
         if (!lastChunkCleanUp.containsKey(event.getChunk()))
-            lastChunkCleanUp.put(event.getChunk(), 0L);
+            lastChunkCleanUp.put(event.getChunk(), System.currentTimeMillis());
 
         event.setCancelled(true);
     }
@@ -56,7 +56,7 @@ public class ChunkListener implements Runnable, Listener
                 }
             }
 
-            lastChunkCleanUp.replace(chunk, currentTime);
+            lastChunkCleanUp.remove(chunk);
         }
 
     }
