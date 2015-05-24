@@ -12,6 +12,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,11 +45,20 @@ public class ChunkListener implements Runnable, Listener
     public void run()
     {
         final long currentTime = System.currentTimeMillis();
+        final List<Chunk> toRemove = new ArrayList<>();
         // Clear entities
         for (Chunk chunk : lastChunkCleanUp.keySet())
         {
-            if (plugin.getGame().getStatus() == Status.Generating || !chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 10000))
+            if (plugin.getGame().getStatus() == Status.Generating || !chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 40000))
                 continue;
+
+            if (containPlayer(chunk))
+            {
+                toRemove.add(chunk);
+                continue;
+            }
+
+
 
             for (Entity entity : chunk.getEntities())
             {
@@ -59,5 +71,20 @@ public class ChunkListener implements Runnable, Listener
             lastChunkCleanUp.remove(chunk);
         }
 
+        // Remove Chunks that contains players (don't need to be cleaned)
+        toRemove.stream().filter(chunk -> lastChunkCleanUp.containsKey(chunk)).forEach(lastChunkCleanUp::remove);
+
+    }
+
+    private boolean containPlayer(Chunk chunk)
+    {
+        for (Entity entity : chunk.getEntities())
+        {
+            if (entity instanceof HumanEntity)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

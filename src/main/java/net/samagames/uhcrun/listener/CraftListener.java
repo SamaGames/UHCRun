@@ -50,6 +50,9 @@ public class CraftListener implements Listener
         if ((recipe.getResult().getType() == Material.GOLDEN_APPLE && recipe.getResult().getDurability() == 1) || (recipe.getResult().getType() == Material.FLINT_AND_STEEL) || (recipe.getResult().getType() == Material.BEACON))
         {
             inventory.setResult(new ItemStack(Material.AIR));
+        } else if (recipe.getResult().getType() == Material.WOOD_SWORD)
+        {
+            inventory.setResult(new ItemStack(Material.STONE_SWORD));
         } else if (recipe.getResult().getType() == Material.WOOD_PICKAXE)
         {
             inventory.setResult(new ItemStack(Material.STONE_PICKAXE));
