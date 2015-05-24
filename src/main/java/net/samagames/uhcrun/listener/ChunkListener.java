@@ -4,7 +4,6 @@ import net.samagames.gameapi.json.Status;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -13,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,7 +32,7 @@ public class ChunkListener implements Runnable, Listener
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
-        if(!lastChunkCleanUp.containsKey(event.getChunk()))
+        if (!lastChunkCleanUp.containsKey(event.getChunk()))
             lastChunkCleanUp.put(event.getChunk(), 0L);
 
         event.setCancelled(true);
@@ -45,9 +43,9 @@ public class ChunkListener implements Runnable, Listener
     {
         final long currentTime = System.currentTimeMillis();
         // Clear entities
-        for(Chunk chunk : lastChunkCleanUp.keySet())
+        for (Chunk chunk : lastChunkCleanUp.keySet())
         {
-            if(plugin.getGame().getStatus() == Status.Generating || !chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 10000))
+            if (plugin.getGame().getStatus() == Status.Generating || !chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 10000))
                 continue;
 
             for (Entity entity : chunk.getEntities())

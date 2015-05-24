@@ -10,12 +10,14 @@ public class CommandNextEvent implements CommandExecutor
 
     private IGame game;
 
-    public CommandNextEvent(IGame game) {
+    public CommandNextEvent(IGame game)
+    {
         this.game = game;
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args)
+    {
         game.getGameLoop().forceNextEvent();
         return true;
     }

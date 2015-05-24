@@ -43,6 +43,8 @@ public interface IGame extends GameArena
 
     boolean isDamagesEnabled();
 
+    void disablePVP();
+
     void enablePVP();
 
     CoherenceMachine getCoherenceMachine();

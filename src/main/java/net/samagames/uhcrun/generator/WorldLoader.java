@@ -6,23 +6,19 @@ import net.samagames.gameapi.json.Status;
 import net.samagames.gameapi.network.NetworkManager;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 public class WorldLoader
 {
+    private static HashMap<PartialLocation, Integer> highestBlocks = new HashMap<>();
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;
     private UHCRun plugin = UHCRun.getInstance();
-    private static HashMap<PartialLocation, Integer> highestBlocks = new HashMap<>();
 
     public static Integer getHighestNaturalBlockAt(int x, int z)
     {

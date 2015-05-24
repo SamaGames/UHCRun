@@ -67,7 +67,6 @@ public abstract class Game implements IGame
         this.mapName = mapName;
         this.normalSlots = normalSlots;
         this.vipSlots = vipSlots;
-        this.pvpEnabled = true;
         this.coherenceMachine = new CoherenceMachine("UHCRun");
         this.messageManager = this.coherenceMachine.getMessageManager();
         this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
@@ -232,6 +231,12 @@ public abstract class Game implements IGame
     public boolean isDamagesEnabled()
     {
         return damages;
+    }
+
+    @Override
+    public void disablePVP()
+    {
+        this.pvpEnabled = false;
     }
 
     @Override

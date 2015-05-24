@@ -248,8 +248,10 @@ public class GameListener implements Listener
     }
 
     @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
-        if (!game.isPvpEnabled() && (event.getBlockPlaced().getType() == Material.LAVA || event.getBlockPlaced().getType() == Material.STATIONARY_LAVA)) {
+    public void onBlockPlace(BlockPlaceEvent event)
+    {
+        if (!game.isPvpEnabled() && (event.getBlockPlaced().getType() == Material.LAVA || event.getBlockPlaced().getType() == Material.STATIONARY_LAVA))
+        {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
         }
@@ -258,7 +260,8 @@ public class GameListener implements Listener
         int y = event.getBlockPlaced().getY();
         int z = event.getBlockPlaced().getZ();
 
-        if (x > -50 && x < 50 && z > -50 && z < 50 && y > WorldLoader.getHighestNaturalBlockAt(x, z) + 17) {
+        if (x > -50 && x < 50 && z > -50 && z < 50 && y > WorldLoader.getHighestNaturalBlockAt(x, z) + 17)
+        {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + "Towers" + ChatColor.DARK_RED + "] " + ChatColor.RED + "Les Towers sont interdites en UHCRun.");
         }
