@@ -101,6 +101,7 @@ public class GameLoop implements Runnable
                 {
                     public void run()
                     {
+                        game.startFight();
                         game.enablePVP();
                         game.enableDamages();
                         Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP sont maintenant activés. Bonne chance !");

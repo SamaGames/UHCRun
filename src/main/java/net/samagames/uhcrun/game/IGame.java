@@ -76,4 +76,6 @@ public interface IGame extends GameArena
     GameLoop getGameLoop();
 
     boolean isDisconnected(UUID player);
+
+    void startFight();
 }

@@ -48,6 +48,7 @@ public abstract class Game implements IGame
     private final BukkitTask beginCountdown;
     private final MessageManager messageManager;
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
+    protected List<UUID> disconnected = new ArrayList<>();
     protected AbstractMap<UUID, Integer> kills = new ConcurrentHashMap<>();
     protected Status status;
     private StoredGame storedGame;
@@ -216,7 +217,6 @@ public abstract class Game implements IGame
                 Location time = player.getLocation();
                 World w = time.getWorld();
                 ItemStack[] var4 = player.getInventory().getContents();
-                int var5 = var4.length;
 
                 for (ItemStack stack : var4)
                 {
@@ -228,7 +228,9 @@ public abstract class Game implements IGame
             } else
             {
                 int var8 = this.getPreparingTime() * 60 - this.gameLoop.getTime();
+
                 GameAPI.joinManagement.addRejoinList(player.getUniqueId(), (long) var8);
+                disconnected.add(player.getUniqueId());
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
             }
         } else
@@ -252,6 +254,8 @@ public abstract class Game implements IGame
                 sign.addReceiver(pl);
                 this.gameLoop.addPlayer(playerID, sign);
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + pl.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
+                disconnected.remove(playerID);
+                GameAPI.joinManagement.removeRejoinList(playerID);
             }, 10L);
 
         }
@@ -515,6 +519,13 @@ public abstract class Game implements IGame
     public GameLoop getGameLoop()
     {
         return gameLoop;
+    }
+
+    @Override
+    public void startFight()
+    {
+        disconnected.forEach(GameAPI.joinManagement::removeRejoinList);
+        disconnected.clear();
     }
 
     @Override
