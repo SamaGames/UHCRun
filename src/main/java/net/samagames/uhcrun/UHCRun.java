@@ -2,13 +2,9 @@ package net.samagames.uhcrun;
 
 import net.minecraft.server.v1_8_R1.BiomeBase;
 import net.minecraft.server.v1_8_R1.BiomeForest;
-import net.samagames.gameapi.GameAPI;
-import net.samagames.gameapi.json.Status;
+import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.Status;
 import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.commands.CommandStart;
-import net.samagames.uhcrun.database.IDatabase;
-import net.samagames.uhcrun.database.NoDatabase;
-import net.samagames.uhcrun.database.RedisDatabase;
 import net.samagames.uhcrun.game.IGame;
 import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
@@ -16,7 +12,6 @@ import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.listener.*;
-import net.zyuiop.MasterBundle.MasterBundle;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
@@ -54,8 +49,8 @@ public class UHCRun extends JavaPlugin implements Listener
     private boolean worldLoaded;
     private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
-    private IDatabase database;
     private WorldLoader worldLoader;
+    private SamaGamesAPI samaGamesAPI;
 
     public static UHCRun getInstance()
     {
@@ -69,6 +64,7 @@ public class UHCRun extends JavaPlugin implements Listener
         pluginManager = Bukkit.getPluginManager();
         config = this.getConfig();
         logger = this.getLogger();
+        samaGamesAPI = SamaGamesAPI.get();
 
 
         this.saveResource("lobby.schematic", false);
@@ -123,10 +119,9 @@ public class UHCRun extends JavaPlugin implements Listener
 
     private void postInit()
     {
-        GameAPI.registerGame(this.config.getString("gameName", "uhcrun"), game);
+        samaGamesAPI.getGameManager().registerGame(game);
         getCommand("nextevent").setExecutor(new CommandNextEvent(game));
-        getCommand("start").setExecutor(new CommandStart(game));
-        game.setStatus(Status.Generating);
+        game.setStatus(Status.STARTING);
         this.startTimer.cancel();
 
         this.worldLoaded = true;
@@ -138,12 +133,6 @@ public class UHCRun extends JavaPlugin implements Listener
         pluginManager.registerEvents(new BlockListener(), this);
 
         game.postInit();
-
-
-        if (MasterBundle.pool == null)
-            this.database = new NoDatabase();
-        else
-            this.database = new RedisDatabase(MasterBundle.pool);
 
         worldLoader = new WorldLoader();
 
@@ -196,18 +185,13 @@ public class UHCRun extends JavaPlugin implements Listener
     @EventHandler
     public void onPreJoin(PlayerJoinEvent event)
     {
-        if (game == null || game.getStatus() == Status.Available)
+        if (game == null || game.getStatus() == Status.WAITING_FOR_PLAYERS)
             event.getPlayer().teleport(spawnLocation);
     }
 
     public Location getSpawnLocation()
     {
         return spawnLocation;
-    }
-
-    public IDatabase getDatabse()
-    {
-        return database;
     }
 
     public void removeSpawn()
@@ -266,5 +250,10 @@ public class UHCRun extends JavaPlugin implements Listener
         mf.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
         field.set(null, obj);
+    }
+
+    public SamaGamesAPI getAPI()
+    {
+        return samaGamesAPI;
     }
 }

@@ -1,9 +1,7 @@
 package net.samagames.uhcrun.generator;
 
 
-import net.samagames.gameapi.GameAPI;
-import net.samagames.gameapi.json.Status;
-import net.samagames.gameapi.network.NetworkManager;
+import net.samagames.api.games.Status;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -52,7 +50,6 @@ public class WorldLoader
             private int todo = (1200 * 1200) / (16 * 16);
             private int x = -600;
             private int z = -600;
-            private NetworkManager networkManager = GameAPI.getManager();
 
             @Override
             public void run()
@@ -65,7 +62,6 @@ public class WorldLoader
                     if (percentage > lastShow && percentage % 10 == 0)
                     {
                         lastShow = percentage;
-                        networkManager.sendArena(networkManager.buildJson(plugin.getGame(), percentage));
                         plugin.getLogger().info("Loading chunks (" + percentage + "%)");
                     }
 
@@ -79,7 +75,7 @@ public class WorldLoader
                     if (x >= 600)
                     {
                         task.cancel();
-                        plugin.getGame().updateStatus(Status.Available);
+                        plugin.getGame().updateStatus(Status.WAITING_FOR_PLAYERS);
                         plugin.getLogger().info("Ready in " + (System.currentTimeMillis() - startTime) + "ms");
                         return;
                     }

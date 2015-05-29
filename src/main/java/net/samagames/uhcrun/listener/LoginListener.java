@@ -1,13 +1,6 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.gameapi.events.FinishJoinPlayerEvent;
-import net.samagames.gameapi.events.PreJoinPlayerEvent;
-import net.samagames.gameapi.json.Status;
 import net.samagames.uhcrun.game.IGame;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 /**
@@ -26,7 +19,7 @@ public class LoginListener implements Listener
         this.game = game;
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPreJoin(PreJoinPlayerEvent event)
     {
         if (game.getStatus() == Status.Generating)
@@ -48,5 +41,5 @@ public class LoginListener implements Listener
         }
 
         game.join(player);
-    }
+    }*/
 }

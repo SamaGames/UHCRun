@@ -1,10 +1,8 @@
 package net.samagames.uhcrun.game;
 
+import net.samagames.api.player.PlayerData;
+import net.samagames.tools.Titles;
 import net.samagames.uhcrun.utils.Colors;
-import net.samagames.utils.Titles;
-import net.zyuiop.MasterBundle.StarsManager;
-import net.zyuiop.coinsManager.CoinsManager;
-import net.zyuiop.statsapi.StatsApi;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -57,21 +55,23 @@ public class SoloGame extends Game
     @Override
     public void creditKillCoins(Player player)
     {
-        CoinsManager.creditJoueur(player.getUniqueId(), 20, true, true, "Un joueur tué !");
+        PlayerData playerData = getPlayerData(player);
+        playerData.creditCoins(20, "Un joueur tué !", true);
     }
 
     @Override
     public void checkStump(Player player)
     {
+        PlayerData playerData = getPlayerData(player);
         if (this.players.size() == 2)
         {
-            CoinsManager.creditJoueur(player.getUniqueId(), 20, true, true, "Troisième au classement !");
+            playerData.creditCoins(20, "Troisième au classement !", true);
         }
 
         if (this.players.size() == 1)
         {
-            CoinsManager.creditJoueur(player.getUniqueId(), 50, true, true, "Second au classement !");
-            StarsManager.creditJoueur(player.getUniqueId(), 1, "Second au classement !");
+            playerData.creditCoins(50, "Second au classement !", true);
+            playerData.creditStars(1, "Second au classement !");
             UUID winnerId = this.players.iterator().next();
             Player winner = Bukkit.getPlayer(winnerId);
             if (winner == null)
@@ -93,12 +93,13 @@ public class SoloGame extends Game
 
     public void win(final Player player)
     {
-        CoinsManager.creditJoueur(player.getUniqueId(), 100, true, true, "Victoire !");
-        StarsManager.creditJoueur(player.getUniqueId(), 2, "Victoire !");
+        final PlayerData playerData = plugin.getAPI().getPlayerManager().getPlayerData(player.getUniqueId());
+        playerData.creditStars(2, "Victoire !");
+        playerData.creditCoins(100, "Victoire ! ", true);
 
         try
         {
-            StatsApi.increaseStat(player, "uhcrun", "victories", 1);
+            stats.increase(player.getUniqueId(), "victories", 1);
         } catch (Exception ex)
         {
         }

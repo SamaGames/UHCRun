@@ -1,6 +1,5 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.gameapi.json.Status;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -13,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +47,7 @@ public class ChunkListener implements Runnable, Listener
         // Clear entities
         for (Chunk chunk : lastChunkCleanUp.keySet())
         {
-            if (plugin.getGame().getStatus() == Status.Generating || !chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 40000))
+            if (!chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 40000))
                 continue;
 
             if (containPlayer(chunk))
@@ -57,7 +55,6 @@ public class ChunkListener implements Runnable, Listener
                 toRemove.add(chunk);
                 continue;
             }
-
 
 
             for (Entity entity : chunk.getEntities())

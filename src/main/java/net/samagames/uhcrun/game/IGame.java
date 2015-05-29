@@ -1,9 +1,9 @@
 package net.samagames.uhcrun.game;
 
-import net.samagames.gameapi.GameAPI;
-import net.samagames.gameapi.json.Status;
-import net.samagames.gameapi.themachine.CoherenceMachine;
-import net.samagames.gameapi.types.GameArena;
+import net.samagames.api.games.IReconnectGame;
+import net.samagames.api.games.Status;
+import net.samagames.api.games.themachine.CoherenceMachine;
+import net.samagames.api.player.PlayerData;
 import net.samagames.uhcrun.task.GameLoop;
 import org.bukkit.entity.Player;
 
@@ -16,26 +16,19 @@ import java.util.UUID;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public interface IGame extends GameArena
+public interface IGame extends IReconnectGame
 {
 
     void postInit();
 
-    void start();
+    void startGame();
 
     void finish();
 
     default void updateStatus(Status status)
     {
         setStatus(status);
-        GameAPI.getManager().sendArena();
     }
-
-    void join(Player player);
-
-    void quit(Player player);
-
-    void rejoin(UUID playerID);
 
     boolean hasTeleportPlayers();
 
@@ -78,4 +71,11 @@ public interface IGame extends GameArena
     boolean isDisconnected(UUID player);
 
     void startFight();
+
+    PlayerData getPlayerData(UUID uuid);
+
+    default PlayerData getPlayerData(Player player)
+    {
+        return getPlayerData(player.getUniqueId());
+    }
 }

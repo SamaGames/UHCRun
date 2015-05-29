@@ -1,8 +1,8 @@
 package net.samagames.uhcrun.task;
 
+import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.IGame;
-import net.samagames.utils.ObjectiveSign;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -154,7 +154,7 @@ public class GameLoop implements Runnable
             } else
             {
                 objective.setLine(-1, ChatColor.BLUE + " ");
-                objective.setLine(-2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.countGamePlayers());
+                objective.setLine(-2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getConnectedPlayers());
                 objective.setLine(-3, ChatColor.GRAY + "  ");
                 int lastLine = -2;
                 /*if(game instanceof TeamGame) {

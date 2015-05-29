@@ -1,7 +1,7 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.gameapi.GameUtils;
-import net.samagames.gameapi.json.Status;
+import net.samagames.api.games.Status;
+import net.samagames.tools.GameUtils;
 import net.samagames.uhcrun.game.IGame;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.utils.Metadatas;
@@ -19,7 +19,6 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -194,14 +193,14 @@ public class GameListener implements Listener
         }
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onLogout(PlayerQuitEvent event)
     {
         if (game.isInGame(event.getPlayer().getUniqueId()))
         {
             game.quit(event.getPlayer());
         }
-    }
+    }*/
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event)
@@ -320,7 +319,7 @@ public class GameListener implements Listener
     @EventHandler
     public void onLoseFood(FoodLevelChangeEvent event)
     {
-        event.setCancelled(this.game.getStatus() != Status.InGame || !this.game.isInGame(event.getEntity().getUniqueId()));
+        event.setCancelled(this.game.getStatus() != Status.IN_GAME || !this.game.isInGame(event.getEntity().getUniqueId()));
     }
 
     @EventHandler

@@ -1,9 +1,9 @@
 package net.samagames.uhcrun.task;
 
-import net.samagames.gameapi.json.Status;
-import net.samagames.gameapi.themachine.messages.StaticMessages;
+import net.samagames.api.games.Status;
+import net.samagames.api.games.themachine.messages.MessageManager;
+import net.samagames.tools.Titles;
 import net.samagames.uhcrun.game.Game;
-import net.samagames.utils.Titles;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -23,9 +23,9 @@ public class BeginCountdown implements Runnable
     private final Game game;
     private final int maxPlayers;
     private final int minPlayers;
+    private final MessageManager messageManager;
     private boolean ready = false;
     private int countdown = 121; // 2 minutes
-    private String startingMessage;
 
     public BeginCountdown(Game game, int maxPlayers, int minPlayers, int time)
     {
@@ -34,13 +34,13 @@ public class BeginCountdown implements Runnable
         this.minPlayers = minPlayers;
         this.time = time;
         this.countdown = time;
-        startingMessage = StaticMessages.STARTIN.get(this.game.getCoherenceMachine());
+        this.messageManager = this.game.getCoherenceMachine().getMessageManager();
     }
 
     @Override
     public void run()
     {
-        int nPlayers = game.countGamePlayers();
+        int nPlayers = game.getConnectedPlayers();
 
         if (nPlayers >= maxPlayers && countdown > (time / 4))
         {
@@ -51,7 +51,7 @@ public class BeginCountdown implements Runnable
             if (nPlayers >= minPlayers && !ready)
             {
                 ready = true;
-                game.updateStatus(Status.Starting);
+                game.updateStatus(Status.STARTING);
                 countdown = time / 2;
             }
 
@@ -63,8 +63,8 @@ public class BeginCountdown implements Runnable
             if (nPlayers < minPlayers && ready)
             {
                 ready = false;
-                Bukkit.broadcastMessage(StaticMessages.NOTENOUGTHPLAYERS.get(game.getCoherenceMachine()));
-                game.updateStatus(Status.Available);
+                messageManager.writeNotEnougthPlayersToStart();
+                game.updateStatus(Status.WAITING_FOR_PLAYERS);
                 for (Player p : Bukkit.getOnlinePlayers())
                 {
                     p.setLevel(countdown - 1);
@@ -81,7 +81,7 @@ public class BeginCountdown implements Runnable
         countdown--;
         if (countdown == 0)
         {
-            game.start();
+            game.startGame();
             return;
         }
 
@@ -97,7 +97,7 @@ public class BeginCountdown implements Runnable
 
         if (countdown <= 5 || countdown == 10 || countdown % 30 == 0)
         {
-            Bukkit.broadcastMessage(startingMessage.replace("${TIME}", countdown + " seconde" + ((countdown > 1) ? "s" : "")));
+            messageManager.writeGameStartIn(countdown);
         }
     }
 }

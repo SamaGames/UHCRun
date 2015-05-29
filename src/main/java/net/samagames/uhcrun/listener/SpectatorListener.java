@@ -1,8 +1,7 @@
 package net.samagames.uhcrun.listener;
 
 import net.md_5.bungee.api.ChatColor;
-import net.samagames.gameapi.events.RejoinPlayerEvent;
-import net.samagames.gameapi.json.Status;
+import net.samagames.api.games.Status;
 import net.samagames.uhcrun.game.IGame;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -36,7 +35,7 @@ public class SpectatorListener implements Listener
 
     public boolean cancel(Player p)
     {
-        return game.getStatus() != Status.InGame ? true : !game.isInGame(p.getUniqueId());
+        return game.getStatus() != Status.IN_GAME ? true : !game.isInGame(p.getUniqueId());
     }
 
     @EventHandler
@@ -84,7 +83,7 @@ public class SpectatorListener implements Listener
     @EventHandler
     public void onMove(PlayerMoveEvent event)
     {
-        if ((game.getStatus() == Status.Starting || game.getStatus() == Status.Available || game.getStatus() == Status.Generating) && event.getTo().getY() < 125)
+        if ((game.getStatus() == Status.STARTING || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125)
         {
             event.setCancelled(true);
             event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 162, 0));
@@ -111,7 +110,7 @@ public class SpectatorListener implements Listener
             e.setCancelled(cancel((Player) e.getEntity()));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    /*@EventHandler(priority = EventPriority.MONITOR)
     public void onRejoin(RejoinPlayerEvent event)
     {
         if (game.getStatus() == Status.InGame && !game.isDisconnected(event.getPlayer()))
@@ -123,6 +122,6 @@ public class SpectatorListener implements Listener
         this.game.rejoin(event.getPlayer());
 
 
-    }
+    }*/
 
 }

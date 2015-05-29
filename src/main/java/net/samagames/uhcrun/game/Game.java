@@ -1,21 +1,18 @@
 package net.samagames.uhcrun.game;
 
-import net.samagames.gameapi.GameAPI;
-import net.samagames.gameapi.json.Status;
-import net.samagames.gameapi.themachine.CoherenceMachine;
-import net.samagames.gameapi.themachine.messages.MessageManager;
+import net.samagames.api.games.Status;
+import net.samagames.api.games.themachine.CoherenceMachine;
+import net.samagames.api.games.themachine.messages.MessageManager;
+import net.samagames.api.player.PlayerData;
+import net.samagames.api.stats.StatsManager;
+import net.samagames.tools.Titles;
+import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
-import net.samagames.uhcrun.database.IDatabase;
 import net.samagames.uhcrun.game.data.SavedPlayer;
 import net.samagames.uhcrun.game.data.StoredGame;
 import net.samagames.uhcrun.task.BeginCountdown;
 import net.samagames.uhcrun.task.GameLoop;
 import net.samagames.uhcrun.utils.Metadatas;
-import net.samagames.utils.ObjectiveSign;
-import net.samagames.utils.Titles;
-import net.zyuiop.MasterBundle.MasterBundle;
-import net.zyuiop.coinsManager.CoinsManager;
-import net.zyuiop.statsapi.StatsApi;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
 import org.bukkit.entity.Player;
@@ -49,13 +46,15 @@ public abstract class Game implements IGame
     private final MessageManager messageManager;
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
     protected List<UUID> disconnected = new ArrayList<>();
+    protected Map<UUID, PlayerData> playerDataCaches = new HashMap<>();
     protected AbstractMap<UUID, Integer> kills = new ConcurrentHashMap<>();
     protected Status status;
+    protected CoherenceMachine coherenceMachine;
+    protected StatsManager stats;
     private StoredGame storedGame;
     private BukkitTask mainTask;
     private Scoreboard scoreboard;
     private Objective life;
-    private CoherenceMachine coherenceMachine;
     private GameLoop gameLoop;
     private boolean pvpEnabled;
     private boolean damages;
@@ -63,11 +62,12 @@ public abstract class Game implements IGame
     public Game(String mapName, short normalSlots, short vipSlots, short minPlayers)
     {
         this.plugin = UHCRun.getInstance();
-        this.status = Status.Idle;
+        this.status = Status.NOT_RESPONDING;
         this.mapName = mapName;
         this.normalSlots = normalSlots;
         this.vipSlots = vipSlots;
-        this.coherenceMachine = new CoherenceMachine("UHCRun");
+        this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
+        this.stats = plugin.getAPI().getStatsManager("uhcrun");
         this.messageManager = this.coherenceMachine.getMessageManager();
         this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
     }
@@ -79,11 +79,11 @@ public abstract class Game implements IGame
     }
 
     @Override
-    public void start()
+    public void startGame()
     {
-        storedGame = new StoredGame(MasterBundle.getServerName(), System.currentTimeMillis(), mapName);
+        storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), mapName);
         plugin.removeSpawn();
-        updateStatus(Status.InGame);
+        updateStatus(Status.IN_GAME);
 
         life = scoreboard.registerNewObjective("vie", "health");
         Objective lifeb = scoreboard.registerNewObjective("vieb", "health");
@@ -109,7 +109,7 @@ public abstract class Game implements IGame
 
             try
             {
-                StatsApi.increaseStat(uuid, "uhcrun", "played", 1);
+                stats.increase(uuid, "played", 1);
             } catch (Exception ignored)
             {
             }
@@ -139,9 +139,8 @@ public abstract class Game implements IGame
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             storedGame.setEndTime(System.currentTimeMillis());
             String json = new Gson().toJson(storedGame);
-            IDatabase database = plugin.getDatabse();
-            String gameId = MasterBundle.getServerName() + System.currentTimeMillis();
-            database.hset("uhcrungames", gameId, json);
+            String gameId = plugin.getAPI().getServerName() + System.currentTimeMillis();
+            plugin.getAPI().getResource().hset("uhcrungames", gameId, json);
 
             TreeMap<UUID, Integer> ranks = new TreeMap<>((a, b) -> {
                 Integer ka = kills.get(a);
@@ -164,7 +163,7 @@ public abstract class Game implements IGame
             {
                 Map.Entry<UUID, Integer> val = ids.next();
                 top[i] = Bukkit.getOfflinePlayer(val.getKey()).getName() + "" + ChatColor.AQUA + " (" + val.getValue() + ")";
-                CoinsManager.creditJoueur(val.getKey(), (3 - i) * 10, true, true, "Rang " + (i + 1) + " au classement de kills !");
+                getPlayerData(val.getKey()).creditCoins((3 - i) * 10, "Rang " + (i + 1) + " au classement de kills !", true);
                 i++;
             }
 
@@ -179,12 +178,12 @@ public abstract class Game implements IGame
         });
 
         Bukkit.getScheduler().runTaskLater(plugin, mainTask::cancel, 20);
-        setStatus(Status.Stopping);
-        GameAPI.getManager().sendArena();
+        setStatus(Status.REBOOTING);
+        plugin.getAPI().getGameManager().refreshArena();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             try
             {
-                Bukkit.getOnlinePlayers().forEach(GameAPI::kickPlayer);
+                Bukkit.getOnlinePlayers().forEach(player -> plugin.getAPI().getGameManager().kickPlayer(player, "#FinDuGame"));
             } catch (Exception ex)
             {
             }
@@ -193,11 +192,11 @@ public abstract class Game implements IGame
     }
 
     @Override
-    public void join(Player player)
+    public void playerJoin(Player player)
     {
         players.add(player.getUniqueId());
-        messageManager.writeWelcomeInGameMessage(player);
-        messageManager.writePlayerJoinArenaMessage(player, this);
+        messageManager.writeWelcomeInGameToPlayer(player);
+        messageManager.writePlayerJoinToAll(player);
 
         player.setGameMode(GameMode.ADVENTURE);
         player.sendMessage(ChatColor.GOLD + "Cette partie utilise une version Beta de l'UHCRun, des bugs peuvent survenir");
@@ -206,9 +205,9 @@ public abstract class Game implements IGame
     }
 
     @Override
-    public void quit(Player player)
+    public void playerDisconnect(Player player)
     {
-        if (this.getStatus() == Status.InGame)
+        if (this.getStatus() == Status.IN_GAME)
         {
             this.gameLoop.removePlayer(player.getUniqueId());
             if (this.isPvpEnabled())
@@ -229,7 +228,8 @@ public abstract class Game implements IGame
             {
                 int var8 = this.getPreparingTime() * 60 - this.gameLoop.getTime();
 
-                GameAPI.joinManagement.addRejoinList(player.getUniqueId(), (long) var8);
+                // ...
+
                 disconnected.add(player.getUniqueId());
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
             }
@@ -237,13 +237,25 @@ public abstract class Game implements IGame
         {
             this.players.remove(player.getUniqueId());
         }
+
+
     }
 
 
     @Override
-    public void rejoin(UUID playerID)
+    public void playerReconnect(Player player)
     {
-        final Player pl = Bukkit.getPlayer(playerID);
+        this.rejoin(player);
+    }
+
+    @Override
+    public void playerReconnectTimeOut(Player player)
+    {
+        this.rejoin(player);
+    }
+
+    public void rejoin(Player pl)
+    {
 
         if (pl != null)
         {
@@ -252,10 +264,9 @@ public abstract class Game implements IGame
                 pl.setScoreboard(this.scoreboard);
                 ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "≡ UHCRun ≡");
                 sign.addReceiver(pl);
-                this.gameLoop.addPlayer(playerID, sign);
+                this.gameLoop.addPlayer(pl.getUniqueId(), sign);
                 Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + pl.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
-                disconnected.remove(playerID);
-                GameAPI.joinManagement.removeRejoinList(playerID);
+                disconnected.remove(pl.getUniqueId());
             }, 10L);
 
         }
@@ -266,7 +277,7 @@ public abstract class Game implements IGame
     @Override
     public boolean hasTeleportPlayers()
     {
-        return status != Status.InGame;
+        return status != Status.IN_GAME;
     }
 
     @Override
@@ -300,7 +311,7 @@ public abstract class Game implements IGame
     }
 
     @Override
-    public int countGamePlayers()
+    public int getConnectedPlayers()
     {
         return players.size();
     }
@@ -308,19 +319,7 @@ public abstract class Game implements IGame
     @Override
     public int getMaxPlayers()
     {
-        return normalSlots;
-    }
-
-    @Override
-    public int getTotalMaxPlayers()
-    {
-        return getMaxPlayers() + getVIPSlots();
-    }
-
-    @Override
-    public int getVIPSlots()
-    {
-        return vipSlots;
+        return normalSlots + vipSlots;
     }
 
     @Override
@@ -342,9 +341,9 @@ public abstract class Game implements IGame
     }
 
     @Override
-    public boolean hasPlayer(UUID uuid)
+    public String getGameName()
     {
-        return players.contains(uuid);
+        return plugin.getConfig().getString("gameName", "uhcrun");
     }
 
     public CoherenceMachine getCoherenceMachine()
@@ -395,7 +394,7 @@ public abstract class Game implements IGame
     public void stumpPlayer(Player player, boolean logout)
     {
         this.players.remove(player.getUniqueId());
-        if (this.status == Status.InGame)
+        if (this.status == Status.IN_GAME)
         {
             Object lastDamager = Metadatas.getMetadata(player, "lastDamager");
             Player killer = null;
@@ -409,7 +408,7 @@ public abstract class Game implements IGame
 
                     try
                     {
-                        StatsApi.increaseStat(killer, "uhcrun", "kills", 1);
+                        stats.increase(killer.getUniqueId(), "kills", 1);
                         this.addKill(killer.getUniqueId());
                         e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
                         e.kill(player);
@@ -464,7 +463,7 @@ public abstract class Game implements IGame
             {
                 try
                 {
-                    StatsApi.increaseStat(player, "uhcrun", "stumps", 1);
+                    stats.increase(player.getUniqueId(), "stumps", 1);
                 } catch (Exception ex)
                 {
                 }
@@ -524,13 +523,25 @@ public abstract class Game implements IGame
     @Override
     public void startFight()
     {
-        disconnected.forEach(GameAPI.joinManagement::removeRejoinList);
         disconnected.clear();
     }
 
     @Override
     public boolean isDisconnected(UUID player)
     {
-        return GameAPI.joinManagement.isInRejoinList(player);
+        return disconnected.contains(player);
+    }
+
+
+    @Override
+    public PlayerData getPlayerData(UUID uuid)
+    {
+        return playerDataCaches.get(uuid);
+    }
+
+    @Override
+    public PlayerData getPlayerData(Player player)
+    {
+        return getPlayerData(player.getUniqueId());
     }
 }

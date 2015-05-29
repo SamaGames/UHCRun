@@ -25,7 +25,7 @@ public class CommandStart implements CommandExecutor
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args)
     {
-        game.start();
+        game.startGame();
         return true;
     }
 }
