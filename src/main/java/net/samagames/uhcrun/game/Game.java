@@ -75,9 +75,9 @@ public abstract class Game extends AbstractGame
     public void postInit()
     {
         this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
         this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
         this.messageManager = this.coherenceMachine.getMessageManager();
+        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
     }
 
     @Override
