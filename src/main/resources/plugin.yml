@@ -1,7 +1,7 @@
 name: UHCRun
 main: net.samagames.uhcrun.UHCRun
 version: 1.0
-depend: [MasterBundle, SamaPermissionsBukkit, WorldEdit]
+depend: [SamaGamesAPI, WorldEdit]
 load: STARTUP
 commands:
    start:
