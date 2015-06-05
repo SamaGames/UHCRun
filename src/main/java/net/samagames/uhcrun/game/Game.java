@@ -43,7 +43,7 @@ public abstract class Game extends AbstractGame
     private final String mapName;
     private final short normalSlots, vipSlots;
     private final BukkitTask beginCountdown;
-    private final MessageManager messageManager;
+    private MessageManager messageManager;
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
     protected List<UUID> disconnected = new ArrayList<>();
     protected Map<UUID, PlayerData> playerDataCaches = new HashMap<>();
@@ -66,9 +66,7 @@ public abstract class Game extends AbstractGame
         this.mapName = mapName;
         this.normalSlots = normalSlots;
         this.vipSlots = vipSlots;
-        this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
         this.stats = plugin.getAPI().getStatsManager("uhcrun");
-        this.messageManager = this.coherenceMachine.getMessageManager();
         this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
     }
 
@@ -76,6 +74,8 @@ public abstract class Game extends AbstractGame
     public void postInit()
     {
         this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
+        this.messageManager = this.coherenceMachine.getMessageManager();
     }
 
     @Override
