@@ -538,7 +538,7 @@ public abstract class Game extends AbstractGame
     @Override
     public PlayerData getPlayerData(UUID uuid)
     {
-        return playerDataCaches.get(uuid);
+        return !playerDataCaches.containsKey(uuid) ? plugin.getAPI().getPlayerManager().getPlayerData(uuid) : playerDataCaches.get(uuid);
     }
 
     @Override
