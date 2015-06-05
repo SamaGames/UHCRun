@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.game.AbstractGame;
 import org.bukkit.event.Listener;
 
 /**
@@ -12,9 +12,9 @@ import org.bukkit.event.Listener;
  */
 public class LoginListener implements Listener
 {
-    private IGame game;
+    private AbstractGame game;
 
-    public LoginListener(IGame game)
+    public LoginListener(AbstractGame game)
     {
         this.game = game;
     }

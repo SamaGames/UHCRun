@@ -14,7 +14,7 @@ import net.samagames.uhcrun.task.BeginCountdown;
 import net.samagames.uhcrun.task.GameLoop;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
+import com.google.gson.Gson;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +36,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class Game implements IGame
+public abstract class Game extends AbstractGame
 {
 
     protected final UHCRun plugin;

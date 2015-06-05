@@ -91,7 +91,7 @@ public class BeginCountdown implements Runnable
             if (countdown <= 5 || countdown == 10)
             {
                 Titles.sendTitle(player, 2, 16, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + countdown + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
-                player.playSound(player.getPlayer().getPlayer().getLocation(), Sound.NOTE_PIANO, 1.0F, 1.0F);
+                player.playSound(player.getLocation(), Sound.NOTE_PIANO, 1.0F, 1.0F);
             }
         }
 

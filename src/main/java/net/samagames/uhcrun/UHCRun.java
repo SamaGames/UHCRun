@@ -1,11 +1,11 @@
 package net.samagames.uhcrun;
 
-import net.minecraft.server.v1_8_R1.BiomeBase;
-import net.minecraft.server.v1_8_R1.BiomeForest;
+import net.minecraft.server.v1_8_R2.BiomeBase;
+import net.minecraft.server.v1_8_R2.BiomeForest;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.game.AbstractGame;
 import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
@@ -45,7 +45,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private Logger logger;
     private BukkitTask startTimer;
     private OrePopulator populator;
-    private IGame game;
+    private AbstractGame game;
     private boolean worldLoaded;
     private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
@@ -199,7 +199,7 @@ public class UHCRun extends JavaPlugin implements Listener
         loobyPopulator.remove();
     }
 
-    public IGame getGame()
+    public AbstractGame getGame()
     {
         return game;
     }

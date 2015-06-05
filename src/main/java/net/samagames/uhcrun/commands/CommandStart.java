@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.commands;
 
-import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.game.AbstractGame;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,9 +15,9 @@ import org.bukkit.command.CommandSender;
 public class CommandStart implements CommandExecutor
 {
 
-    private IGame game;
+    private AbstractGame game;
 
-    public CommandStart(IGame game)
+    public CommandStart(AbstractGame game)
     {
         this.game = game;
     }

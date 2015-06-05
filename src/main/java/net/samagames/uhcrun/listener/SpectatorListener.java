@@ -2,7 +2,7 @@ package net.samagames.uhcrun.listener;
 
 import net.md_5.bungee.api.ChatColor;
 import net.samagames.api.games.Status;
-import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.game.AbstractGame;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -26,9 +26,9 @@ import org.bukkit.event.weather.WeatherChangeEvent;
  */
 public class SpectatorListener implements Listener
 {
-    protected IGame game;
+    protected AbstractGame game;
 
-    public SpectatorListener(IGame parent)
+    public SpectatorListener(AbstractGame parent)
     {
         this.game = parent;
     }

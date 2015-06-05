@@ -2,7 +2,7 @@ package net.samagames.uhcrun.listener;
 
 import net.samagames.api.games.Status;
 import net.samagames.tools.GameUtils;
-import net.samagames.uhcrun.game.IGame;
+import net.samagames.uhcrun.game.AbstractGame;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.ChatColor;
@@ -39,10 +39,10 @@ import java.util.stream.Collectors;
 public class GameListener implements Listener
 {
 
-    private IGame game;
+    private AbstractGame game;
     private Random random;
 
-    public GameListener(IGame game)
+    public GameListener(AbstractGame game)
     {
         this.game = game;
         this.random = new Random();
