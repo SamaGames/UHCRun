@@ -42,7 +42,8 @@ public abstract class Game extends AbstractGame
     protected final UHCRun plugin;
     private final String mapName;
     private final short normalSlots, vipSlots, minPlayers;
-    private BukkitTask beginCountdown;
+    protected final Server server;
+    private BukkitTask beginCountdown, mainTask;
     private MessageManager messageManager;
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
     protected List<UUID> disconnected = new ArrayList<>();
@@ -52,32 +53,30 @@ public abstract class Game extends AbstractGame
     protected CoherenceMachine coherenceMachine;
     protected StatsManager stats;
     private StoredGame storedGame;
-    private BukkitTask mainTask;
     private Scoreboard scoreboard;
     private Objective life;
     private GameLoop gameLoop;
-    private boolean pvpEnabled;
-    private boolean damages;
+    private boolean pvpEnabled, damages;
 
     public Game(String mapName, short normalSlots, short vipSlots, short minPlayers)
     {
         this.plugin = UHCRun.getInstance();
+        this.server = plugin.getServer();
         this.status = Status.NOT_RESPONDING;
         this.mapName = mapName;
         this.normalSlots = normalSlots;
         this.vipSlots = vipSlots;
         this.minPlayers = minPlayers;
         this.stats = plugin.getAPI().getStatsManager("uhcrun");
-
     }
 
     @Override
     public void postInit()
     {
-        this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        this.scoreboard = server.getScoreboardManager().getMainScoreboard();
         this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
         this.messageManager = this.coherenceMachine.getMessageManager();
-        this.beginCountdown = Bukkit.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
+        this.beginCountdown = server.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
     }
 
     @Override
@@ -96,13 +95,13 @@ public abstract class Game extends AbstractGame
 
         if (beginCountdown != null) beginCountdown.cancel();
 
-        gameLoop = new GameLoop(this);
-        mainTask = Bukkit.getScheduler().runTaskTimer(plugin, gameLoop, 20, 20);
+        gameLoop = new GameLoop(this, plugin, server);
+        mainTask = server.getScheduler().runTaskTimer(plugin, gameLoop, 20, 20);
         teleport();
 
         for (UUID uuid : players)
         {
-            Player player = Bukkit.getPlayer(uuid);
+            Player player = server.getPlayer(uuid);
             if (player == null)
             {
                 players.remove(uuid);
@@ -130,7 +129,7 @@ public abstract class Game extends AbstractGame
             kills.put(uuid, 0);
         }
 
-        Bukkit.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
+        server.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
     }
 
     protected abstract void teleport();
@@ -138,7 +137,7 @@ public abstract class Game extends AbstractGame
     @Override
     public void finish()
     {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        server.getScheduler().runTaskAsynchronously(plugin, () -> {
             storedGame.setEndTime(System.currentTimeMillis());
             String json = new Gson().toJson(storedGame);
             String gameId = plugin.getAPI().getServerName() + System.currentTimeMillis();
@@ -164,32 +163,32 @@ public abstract class Game extends AbstractGame
             while (i < 3 && ids.hasNext())
             {
                 Map.Entry<UUID, Integer> val = ids.next();
-                top[i] = Bukkit.getOfflinePlayer(val.getKey()).getName() + "" + ChatColor.AQUA + " (" + val.getValue() + ")";
+                top[i] = server.getOfflinePlayer(val.getKey()).getName() + "" + ChatColor.AQUA + " (" + val.getValue() + ")";
                 getPlayerData(val.getKey()).creditCoins((3 - i) * 10, "Rang " + (i + 1) + " au classement de kills !", true);
                 i++;
             }
 
-            Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
-            Bukkit.broadcastMessage(ChatColor.GOLD + "                        Classement Kills      ");
-            Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
-            Bukkit.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
-            Bukkit.broadcastMessage(ChatColor.GOLD + "                                                    ");
-            Bukkit.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
-            Bukkit.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
-            Bukkit.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
+            server.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
+            server.broadcastMessage(ChatColor.GOLD + "                        Classement Kills      ");
+            server.broadcastMessage(ChatColor.GOLD + "                                                    ");
+            server.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
+            server.broadcastMessage(ChatColor.GOLD + "                                                    ");
+            server.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
+            server.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
+            server.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
 
-        Bukkit.getScheduler().runTaskLater(plugin, mainTask::cancel, 20);
+        server.getScheduler().runTaskLater(plugin, mainTask::cancel, 20);
         setStatus(Status.REBOOTING);
         plugin.getAPI().getGameManager().refreshArena();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        server.getScheduler().runTaskLater(plugin, () -> {
             try
             {
-                Bukkit.getOnlinePlayers().forEach(player -> plugin.getAPI().getGameManager().kickPlayer(player, "#FinDuGame"));
+                server.getOnlinePlayers().forEach(player -> plugin.getAPI().getGameManager().kickPlayer(player, "#FinDuGame"));
             } catch (Exception ex)
             {
             }
-            Bukkit.getServer().shutdown();
+            server.shutdown();
         }, 20 * 30);
     }
 
@@ -233,7 +232,7 @@ public abstract class Game extends AbstractGame
                 // ...
 
                 disconnected.add(player.getUniqueId());
-                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
             }
         } else
         {
@@ -261,13 +260,13 @@ public abstract class Game extends AbstractGame
 
         if (pl != null)
         {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            server.getScheduler().runTaskLater(plugin, () -> {
 
                 pl.setScoreboard(this.scoreboard);
                 ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "≡ UHCRun ≡");
                 sign.addReceiver(pl);
                 this.gameLoop.addPlayer(pl.getUniqueId(), sign);
-                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + pl.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + pl.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
                 disconnected.remove(pl.getUniqueId());
             }, 10L);
 
@@ -334,6 +333,7 @@ public abstract class Game extends AbstractGame
     public void setStatus(Status status)
     {
         this.status = status;
+        super.setStatus(status);
     }
 
     @Override
@@ -426,13 +426,13 @@ public abstract class Game extends AbstractGame
 
             if (logout)
             {
-                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté.");
             } else if (killer != null)
             {
-                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
             } else
             {
-                Bukkit.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
             }
 
             this.checkStump(player);

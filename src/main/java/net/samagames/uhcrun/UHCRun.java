@@ -61,7 +61,7 @@ public class UHCRun extends JavaPlugin implements Listener
     public void onEnable()
     {
         instance = this;
-        pluginManager = Bukkit.getPluginManager();
+        pluginManager = getServer().getPluginManager();
         config = this.getConfig();
         logger = this.getLogger();
         samaGamesAPI = SamaGamesAPI.get();
@@ -93,11 +93,10 @@ public class UHCRun extends JavaPlugin implements Listener
             game = new TeamGame(playersPerTeam);*/
         pluginManager.registerEvents(new ChunkListener(), this);
         pluginManager.registerEvents(new SpectatorListener(game), this);
-        pluginManager.registerEvents(new LoginListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
         pluginManager.registerEvents(new CompassTargeter(this), this);
 
-        this.startTimer = Bukkit.getScheduler().runTaskTimer(this, this::postInit, 20L, 20L);
+        this.startTimer = getServer().getScheduler().runTaskTimer(this, this::postInit, 20L, 20L);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -136,7 +135,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
         worldLoader = new WorldLoader();
 
-        worldLoader.begin(Bukkit.getWorld("world"));
+        worldLoader.begin(getServer().getWorld("world"));
 
     }
 

@@ -110,18 +110,4 @@ public class SpectatorListener implements Listener
             e.setCancelled(cancel((Player) e.getEntity()));
     }
 
-    /*@EventHandler(priority = EventPriority.MONITOR)
-    public void onRejoin(RejoinPlayerEvent event)
-    {
-        if (game.getStatus() == Status.InGame && !game.isDisconnected(event.getPlayer()))
-        {
-            event.refuse(org.bukkit.ChatColor.RED + "La partie a déjà commencé !");
-            return;
-        }
-
-        this.game.rejoin(event.getPlayer());
-
-
-    }*/
-
 }

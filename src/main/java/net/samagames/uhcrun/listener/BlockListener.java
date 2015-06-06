@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.
- * Created by Thog92
+ * Created by Thog
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
@@ -127,6 +127,8 @@ public class BlockListener implements Listener
         });
     }
 
+    //TODO: Rewrite this
+    @Deprecated
     private void breakLeaf(World world, int x, int y, int z)
     {
         Block block = world.getBlockAt(x, y, z);

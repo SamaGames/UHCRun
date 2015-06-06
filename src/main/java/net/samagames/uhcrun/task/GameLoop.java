@@ -3,8 +3,9 @@ package net.samagames.uhcrun.task;
 import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.AbstractGame;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -13,29 +14,34 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.
- * Created by Thog92
+ * Created by Thog
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
 public class GameLoop implements Runnable
 {
-    protected AbstractGame game;
-    protected int minutes = 0;
-    protected int seconds = 0;
-    protected GameLoop.TimedEvent nextEvent;
-    protected ConcurrentHashMap<UUID, ObjectiveSign> objectives = new ConcurrentHashMap<>();
-    private UHCRun plugin;
+    private final World world;
+    private final AbstractGame game;
+    private int minutes = 0;
+    private int seconds = 0;
+    private GameLoop.TimedEvent nextEvent;
+    private final ConcurrentHashMap<UUID, ObjectiveSign> objectives = new ConcurrentHashMap<>();
+    private final UHCRun plugin;
+    private final Server server;
 
-    public GameLoop(AbstractGame game)
+    public GameLoop(AbstractGame game, UHCRun plugin, Server server)
     {
         this.game = game;
-        this.plugin = UHCRun.getInstance();
+        this.plugin = plugin;
+        this.server = server;
+        this.world = server.getWorld("world");
         this.nextEvent = new GameLoop.TimedEvent(1, 0, ChatColor.GOLD + "Dégats actifs", ChatColor.GOLD)
         {
+            @Override
             public void run()
             {
-                Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats sont désormais actifs.");
-                Bukkit.broadcastMessage(ChatColor.GOLD + "La map sera réduite dans " + (game.getPreparingTime() - 1) + " minutes. Le PVP sera activé à ce moment là.");
+                server.broadcastMessage(ChatColor.GOLD + "Les dégats sont désormais actifs.");
+                server.broadcastMessage(ChatColor.GOLD + "La map sera réduite dans " + (game.getPreparingTime() - 1) + " minutes. Le PVP sera activé à ce moment là.");
                 game.enableDamages();
                 createReductionEvent();
             }
@@ -80,7 +86,7 @@ public class GameLoop implements Runnable
 
                 try
                 {
-                    Bukkit.getWorld("world").getWorldBorder().setSize((double) size, 0L);
+                    world.getWorldBorder().setSize((double) size, 0L);
                 } catch (Exception var5)
                 {
                     var5.printStackTrace();
@@ -88,35 +94,37 @@ public class GameLoop implements Runnable
 
                 try
                 {
-                    Bukkit.getWorld("world").getWorldBorder().setSize(10.0D, (long) (game.getReductionTime() * 60));
+                    world.getWorldBorder().setSize(10.0D, (long) (game.getReductionTime() * 60));
                 } catch (Exception var4)
                 {
                     var4.printStackTrace();
                 }
 
-                Bukkit.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite en " + size + " * " + size);
-                Bukkit.broadcastMessage(ChatColor.GOLD + "Les bordures sont en coordonnées " + ChatColor.RED + "-" + border + " +" + border);
-                Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP seront activés dans 30 secondes !");
+                server.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite en " + size + " * " + size);
+                server.broadcastMessage(ChatColor.GOLD + "Les bordures sont en coordonnées " + ChatColor.RED + "-" + border + " +" + border);
+                server.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP seront activés dans 30 secondes !");
                 nextEvent = new GameLoop.TimedEvent(0, 30, ChatColor.RED + "PVP Activé", ChatColor.RED)
                 {
+                    @Override
                     public void run()
                     {
                         game.startFight();
                         game.enablePVP();
                         game.enableDamages();
-                        Bukkit.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP sont maintenant activés. Bonne chance !");
-                        Bukkit.broadcastMessage(ChatColor.GOLD + "La map est maintenant en réduction constante pendant les 10 prochaines minutes.");
+                        server.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP sont maintenant activés. Bonne chance !");
+                        server.broadcastMessage(ChatColor.GOLD + "La map est maintenant en réduction constante pendant les 10 prochaines minutes.");
                         nextEvent = new GameLoop.TimedEvent(game.getReductionTime() - 1, 30, "Fin de réduction", ChatColor.WHITE)
                         {
+                            @Override
                             public void run()
                             {
-                                Bukkit.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite. Fin de partie forcée dans 2 minutes.");
+                                server.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite. Fin de partie forcée dans 2 minutes.");
                                 nextEvent = new GameLoop.TimedEvent(2, 0, ChatColor.RED + "Fin de partie", ChatColor.RED)
                                 {
                                     public void run()
                                     {
-                                        Bukkit.broadcastMessage(ChatColor.GOLD + "La partie se termine.");
-                                        Bukkit.getServer().shutdown();
+                                        server.broadcastMessage(ChatColor.GOLD + "La partie se termine.");
+                                        server.shutdown();
                                     }
                                 };
                             }
@@ -129,9 +137,7 @@ public class GameLoop implements Runnable
 
     public String time(int minutes, int seconds)
     {
-        String min = (minutes < 10 ? "0" : "") + minutes;
-        String sec = (seconds < 10 ? "0" : "") + seconds;
-        return min + ":" + sec;
+        return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
     }
 
     public void run()
@@ -146,56 +152,55 @@ public class GameLoop implements Runnable
         for (UUID player : this.objectives.keySet())
         {
             final ObjectiveSign objective = this.objectives.get(player);
-            Player player1 = Bukkit.getPlayer(player);
+            Player player1 = server.getPlayer(player);
             if (player1 == null)
             {
-                Bukkit.getLogger().info("Player null :  " + player);
+                server.getLogger().info("Player null :  " + player);
                 this.objectives.remove(player);
             } else
             {
-                objective.setLine(-1, ChatColor.BLUE + " ");
-                objective.setLine(-2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getConnectedPlayers());
-                objective.setLine(-3, ChatColor.GRAY + "  ");
-                int lastLine = -2;
+                objective.setLine(1, ChatColor.BLUE + " ");
+                objective.setLine(2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getConnectedPlayers());
+                objective.setLine(3, ChatColor.GRAY + "  ");
+                int lastLine = 2;
                 /*if(game instanceof TeamGame) {
-                    objective.setLine(-3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame)this.parent).getTeams().size());
-                    objective.setLine(-4, ChatColor.RED + "   ");
-                    lastLine = -4;
-                }*/
-
-                if (this.nextEvent != null)
+                    objective.setLine(3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame)this.parent).getTeams().size());
+                    objective.setLine(4, ChatColor.RED + "   ");
+                    lastLine = 4;
+                }
+                else */if (this.nextEvent != null)
                 {
-                    objective.setLine(lastLine - 1, this.nextEvent.string);
-                    objective.setLine(lastLine - 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));
-                    objective.setLine(lastLine - 3, ChatColor.GOLD + "     ");
-                    lastLine -= 3;
+                    objective.setLine(lastLine + 1, this.nextEvent.string);
+                    objective.setLine(lastLine + 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));
+                    objective.setLine(lastLine + 3, ChatColor.GOLD + "     ");
+                    lastLine += 3;
                 }
 
-                int kills = this.game.getKills(player);
+                final int kills = this.game.getKills(player);
                 if (kills > 0)
                 {
-                    objective.setLine(lastLine - 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
-                    objective.setLine(lastLine - 2, ChatColor.AQUA + "      ");
+                    objective.setLine(lastLine + 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
+                    objective.setLine(lastLine + 2, ChatColor.AQUA + "      ");
                     lastLine -= 2;
                 }
 
-                objective.setLine(lastLine - 1, ChatColor.GRAY + "Bordure :");
-                objective.setLine(lastLine - 2, ChatColor.WHITE + "-" + (int) Bukkit.getWorld("world").getWorldBorder().getSize() / 2 + " +" + (int) Bukkit.getWorld("world").getWorldBorder().getSize() / 2);
-                objective.setLine(lastLine - 3, ChatColor.RED + "              ");
-                objective.setLine(lastLine - 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.time(this.minutes, this.seconds));
+                objective.setLine(lastLine + 1, ChatColor.GRAY + "Bordure :");
+                objective.setLine(lastLine + 2, ChatColor.WHITE + "-" + (int) world.getWorldBorder().getSize() / 2 + " +" + (int) world.getWorldBorder().getSize() / 2);
+                objective.setLine(lastLine + 3, ChatColor.RED + "              ");
+                objective.setLine(lastLine + 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.time(this.minutes, this.seconds));
                 objective.updateLines();
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, objective::updateLines);
+                server.getScheduler().runTaskAsynchronously(plugin, objective::updateLines);
             }
         }
 
         if (this.nextEvent.seconds == 0 && this.nextEvent.minutes <= 3 && this.nextEvent.minutes > 0 || this.nextEvent.minutes == 0 && (this.nextEvent.seconds < 6 || this.nextEvent.seconds == 10 || this.nextEvent.seconds == 30))
         {
-            Bukkit.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " dans " + (this.nextEvent.minutes != 0 ? this.nextEvent.minutes + "min" : this.nextEvent.seconds + " sec"));
+            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " dans " + (this.nextEvent.minutes != 0 ? this.nextEvent.minutes + "min" : this.nextEvent.seconds + " sec"));
         }
 
         if (this.nextEvent.seconds == 0 && 0 == this.nextEvent.minutes)
         {
-            Bukkit.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " maintenant !");
+            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " maintenant !");
         }
 
         this.nextEvent.decrement();

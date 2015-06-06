@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.
- * Created by Thog92
+ * Created by Thog
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
@@ -38,7 +38,7 @@ public class SoloGame extends Game
         super.postInit();
         this.disableDamages();
 
-        World world = Bukkit.getWorld("world");
+        World world = server.getWorld("world");
 
         for (int i = 0; i < this.getMaxPlayers(); i++)
         {
@@ -73,7 +73,7 @@ public class SoloGame extends Game
             playerData.creditCoins(50, "Second au classement !", true);
             playerData.creditStars(1, "Second au classement !");
             UUID winnerId = this.players.iterator().next();
-            Player winner = Bukkit.getPlayer(winnerId);
+            Player winner = server.getPlayer(winnerId);
             if (winner == null)
             {
                 this.finish();
@@ -86,7 +86,7 @@ public class SoloGame extends Game
             this.finish();
         } else
         {
-            Bukkit.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + this.players.size() + ChatColor.YELLOW + " joueur(s) en vie.");
+            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + this.players.size() + ChatColor.YELLOW + " joueur(s) en vie.");
         }
 
     }
@@ -104,14 +104,14 @@ public class SoloGame extends Game
         {
         }
 
-        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
+        server.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
 
-        for (Player user : Bukkit.getOnlinePlayers())
+        for (Player user : server.getOnlinePlayers())
         {
             Titles.sendTitle(user, 5, 70, 5, ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
         }
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
+        server.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
         {
             int timer = 0;
 
@@ -173,7 +173,7 @@ public class SoloGame extends Game
 
         for (UUID uuid : this.players)
         {
-            Player player = Bukkit.getPlayer(uuid);
+            Player player = server.getPlayer(uuid);
             if (player == null)
             {
                 this.players.remove(uuid);
@@ -201,7 +201,7 @@ public class SoloGame extends Game
 
         for (UUID uuid : this.players)
         {
-            Player player = Bukkit.getPlayer(uuid);
+            Player player = server.getPlayer(uuid);
             if (player == null)
             {
                 this.players.remove(uuid);

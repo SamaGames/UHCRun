@@ -92,7 +92,7 @@ public class GameListener implements Listener
     }
 
     @EventHandler
-    public void brewevent(BrewEvent event)
+    public void onBrewUse(BrewEvent event)
     {
         if (event.getContents().getIngredient().getType() == Material.GLOWSTONE_DUST)
             event.setCancelled(true);
@@ -192,15 +192,6 @@ public class GameListener implements Listener
             }
         }
     }
-
-    /*@EventHandler
-    public void onLogout(PlayerQuitEvent event)
-    {
-        if (game.isInGame(event.getPlayer().getUniqueId()))
-        {
-            game.quit(event.getPlayer());
-        }
-    }*/
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event)
