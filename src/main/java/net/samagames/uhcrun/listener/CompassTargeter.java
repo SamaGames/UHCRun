@@ -24,8 +24,8 @@ import java.util.UUID;
  */
 public class CompassTargeter implements Listener
 {
-    protected UHCRun plugin;
-    protected HashMap<UUID, BukkitTask> tasks = new HashMap<>();
+    private UHCRun plugin;
+    private HashMap<UUID, BukkitTask> tasks = new HashMap<>();
 
     public CompassTargeter(UHCRun plugin)
     {
@@ -71,7 +71,7 @@ public class CompassTargeter implements Listener
         }
     }
 
-    public void unregisterTask(UUID player)
+    private void unregisterTask(UUID player)
     {
         BukkitTask current = tasks.get(player);
         if (current != null)
@@ -79,7 +79,7 @@ public class CompassTargeter implements Listener
         tasks.remove(player);
     }
 
-    public void targetPlayer(final Player player, final Player target)
+    private void targetPlayer(final Player player, final Player target)
     {
         BukkitTask sched = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (target.isOnline())
@@ -91,7 +91,7 @@ public class CompassTargeter implements Listener
         updateTask(player.getUniqueId(), sched);
     }
 
-    public void updateTask(UUID player, BukkitTask task)
+    private void updateTask(UUID player, BukkitTask task)
     {
         unregisterTask(player);
         tasks.put(player, task);

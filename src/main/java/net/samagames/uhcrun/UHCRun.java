@@ -91,7 +91,7 @@ public class UHCRun extends JavaPlugin implements Listener
             game = new SoloGame();
         else
             game = new TeamGame(playersPerTeam);*/
-        pluginManager.registerEvents(new ChunkListener(), this);
+        pluginManager.registerEvents(new ChunkListener(this), this);
         pluginManager.registerEvents(new SpectatorListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
         pluginManager.registerEvents(new CompassTargeter(this), this);

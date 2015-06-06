@@ -26,14 +26,14 @@ import org.bukkit.event.weather.WeatherChangeEvent;
  */
 public class SpectatorListener implements Listener
 {
-    protected AbstractGame game;
+    private AbstractGame game;
 
     public SpectatorListener(AbstractGame parent)
     {
         this.game = parent;
     }
 
-    public boolean cancel(Player p)
+    private boolean cancel(Player p)
     {
         return game.getStatus() != Status.IN_GAME ? true : !game.isInGame(p.getUniqueId());
     }

@@ -221,7 +221,7 @@ public class BlockListener implements Listener
         }
     }
 
-    public boolean validChunk(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    private boolean validChunk(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
         if (maxY >= 0 && minY < world.getMaxHeight())
         {

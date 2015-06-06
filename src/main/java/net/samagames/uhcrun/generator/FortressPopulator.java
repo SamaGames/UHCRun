@@ -62,7 +62,7 @@ public class FortressPopulator extends BlockPopulator
         }
     }
 
-    public void generateBlazeFortress(World world, int x, int z)
+    private void generateBlazeFortress(World world, int x, int z)
     {
         if (!plugin.isWorldLoaded())
             return;

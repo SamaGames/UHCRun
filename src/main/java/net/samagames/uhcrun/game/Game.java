@@ -54,7 +54,6 @@ public abstract class Game extends AbstractGame
     protected StatsManager stats;
     private StoredGame storedGame;
     private Scoreboard scoreboard;
-    private Objective life;
     private GameLoop gameLoop;
     private boolean pvpEnabled, damages;
 
@@ -86,7 +85,7 @@ public abstract class Game extends AbstractGame
         plugin.removeSpawn();
         updateStatus(Status.IN_GAME);
 
-        life = scoreboard.registerNewObjective("vie", "health");
+        Objective life = scoreboard.registerNewObjective("vie", "health");
         Objective lifeb = scoreboard.registerNewObjective("vieb", "health");
         life.setDisplaySlot(DisplaySlot.BELOW_NAME);
         lifeb.setDisplayName("HP");
@@ -187,6 +186,7 @@ public abstract class Game extends AbstractGame
                 server.getOnlinePlayers().forEach(player -> plugin.getAPI().getGameManager().kickPlayer(player, "#FinDuGame"));
             } catch (Exception ex)
             {
+                ex.printStackTrace();
             }
             server.shutdown();
         }, 20 * 30);
@@ -200,8 +200,6 @@ public abstract class Game extends AbstractGame
         messageManager.writePlayerJoinToAll(player);
 
         player.setGameMode(GameMode.ADVENTURE);
-        player.sendMessage(ChatColor.GOLD + "Cette partie utilise une version Beta de l'UHCRun, des bugs peuvent survenir");
-        //player.sendMessage(ChatColor.AQUA + "Report de bugs: https://bitbucket.org/samagames/uhcrun/issues");
         player.teleport(plugin.getSpawnLocation());
     }
 
@@ -255,7 +253,7 @@ public abstract class Game extends AbstractGame
         this.rejoin(player);
     }
 
-    public void rejoin(Player pl)
+    private void rejoin(Player pl)
     {
 
         if (pl != null)
@@ -345,7 +343,7 @@ public abstract class Game extends AbstractGame
     @Override
     public String getGameName()
     {
-        return plugin.getConfig().getString("gameName", "uhcrun");
+        return plugin.getConfig().getString("gameName", "UHCRun");
     }
 
     public CoherenceMachine getCoherenceMachine()
@@ -486,7 +484,7 @@ public abstract class Game extends AbstractGame
         this.kills.put(player, val + 1);
     }
 
-    public String getDamageCause(EntityDamageEvent.DamageCause cause)
+    private String getDamageCause(EntityDamageEvent.DamageCause cause)
     {
         switch (cause)
         {

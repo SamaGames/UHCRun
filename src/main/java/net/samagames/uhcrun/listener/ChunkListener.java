@@ -1,6 +1,5 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
@@ -10,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +27,9 @@ public class ChunkListener implements Runnable, Listener
 {
 
     private Map<Chunk, Long> lastChunkCleanUp;
-    private UHCRun plugin;
 
-    public ChunkListener()
+    public ChunkListener(JavaPlugin plugin)
     {
-        this.plugin = UHCRun.getInstance();
         // Allow Concurrent modification
         lastChunkCleanUp = new ConcurrentHashMap<>();
         Bukkit.getScheduler().runTaskTimer(plugin, this, 20, 200);
@@ -76,7 +74,7 @@ public class ChunkListener implements Runnable, Listener
         }
 
         // Remove Chunks that contains players (don't need to be cleaned)
-        toRemove.stream().filter(chunk -> lastChunkCleanUp.containsKey(chunk)).forEach(lastChunkCleanUp::remove);
+        toRemove.stream().filter(lastChunkCleanUp::containsKey).forEach(lastChunkCleanUp::remove);
 
     }
 

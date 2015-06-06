@@ -72,7 +72,7 @@ public class GameLoop implements Runnable
         this.objectives.remove(uuid);
     }
 
-    protected void createReductionEvent()
+    private void createReductionEvent()
     {
         this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, ChatColor.RED + "Téléportation", ChatColor.RED)
         {
@@ -135,7 +135,7 @@ public class GameLoop implements Runnable
         };
     }
 
-    public String time(int minutes, int seconds)
+    private String time(int minutes, int seconds)
     {
         return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
     }

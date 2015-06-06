@@ -45,7 +45,7 @@ public class CraftListener implements Listener
         this.onCraft(event.getRecipe(), event.getInventory());
     }
 
-    public void onCraft(Recipe recipe, CraftingInventory inventory)
+    private void onCraft(Recipe recipe, CraftingInventory inventory)
     {
         if ((recipe.getResult().getType() == Material.GOLDEN_APPLE && recipe.getResult().getDurability() == 1) || (recipe.getResult().getType() == Material.FLINT_AND_STEEL) || (recipe.getResult().getType() == Material.BEACON))
         {
