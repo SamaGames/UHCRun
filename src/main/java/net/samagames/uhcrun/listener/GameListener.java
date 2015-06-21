@@ -2,7 +2,7 @@ package net.samagames.uhcrun.listener;
 
 import net.samagames.api.games.Status;
 import net.samagames.tools.GameUtils;
-import net.samagames.uhcrun.game.AbstractGame;
+import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.ChatColor;
@@ -39,10 +39,10 @@ import java.util.stream.Collectors;
 public class GameListener implements Listener
 {
 
-    private AbstractGame game;
+    private Game game;
     private Random random;
 
-    public GameListener(AbstractGame game)
+    public GameListener(Game game)
     {
         this.game = game;
         this.random = new Random();
@@ -63,7 +63,7 @@ public class GameListener implements Listener
                     event.setCancelled(true);
                     return;
                 }
-                Metadatas.setMetadata(damaged, "lastDamager", damager);
+                Metadatas.setMetadata(game.getPlugin(), damaged, "lastDamager", damager);
 
                 if (((Player) damager).hasPotionEffect(PotionEffectType.INCREASE_DAMAGE))
                 {
@@ -80,7 +80,7 @@ public class GameListener implements Listener
                         event.setCancelled(true);
                         return;
                     }
-                    Metadatas.setMetadata(damaged, "lastDamager", shooter);
+                    Metadatas.setMetadata(game.getPlugin(), damaged, "lastDamager", shooter);
 
                     if (((Player) shooter).hasPotionEffect(PotionEffectType.INCREASE_DAMAGE))
                     {
@@ -101,13 +101,13 @@ public class GameListener implements Listener
     @EventHandler
     public void onDrop(PlayerDropItemEvent event)
     {
-        Metadatas.setMetadata(event.getItemDrop(), "playerDrop", true);
+        Metadatas.setMetadata(game.getPlugin(), event.getItemDrop(), "playerDrop", true);
     }
 
     @EventHandler
     public void itemSpawn(ItemSpawnEvent event)
     {
-        if (Metadatas.getMetadata(event.getEntity(), "playerDrop") != null)
+        if (Metadatas.getMetadata(game.getPlugin(), event.getEntity(), "playerDrop") != null)
             return;
 
         String CHECK_LINE = ChatColor.GRAY + "© Aperture Science - All rights reserved";
@@ -156,6 +156,7 @@ public class GameListener implements Listener
                 break;
             case CACTUS:
                 event.getEntity().setItemStack(new ItemStack(Material.LOG, 2));
+                break;
         }
     }
 

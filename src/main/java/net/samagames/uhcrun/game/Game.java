@@ -1,5 +1,7 @@
 package net.samagames.uhcrun.game;
 
+import com.google.gson.Gson;
+import net.samagames.api.games.IReconnectGame;
 import net.samagames.api.games.Status;
 import net.samagames.api.games.themachine.CoherenceMachine;
 import net.samagames.api.games.themachine.messages.MessageManager;
@@ -14,7 +16,6 @@ import net.samagames.uhcrun.task.BeginCountdown;
 import net.samagames.uhcrun.task.GameLoop;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
-import com.google.gson.Gson;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,15 +37,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class Game extends AbstractGame
+public abstract class Game extends IReconnectGame
 {
 
-    protected final UHCRun plugin;
-    private final String mapName;
-    private final short normalSlots, vipSlots, minPlayers;
-    protected final Server server;
-    private BukkitTask beginCountdown, mainTask;
-    private MessageManager messageManager;
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
     protected List<UUID> disconnected = new ArrayList<>();
     protected Map<UUID, PlayerData> playerDataCaches = new HashMap<>();
@@ -52,10 +47,18 @@ public abstract class Game extends AbstractGame
     protected Status status;
     protected CoherenceMachine coherenceMachine;
     protected StatsManager stats;
+    protected final Server server;
+    protected final UHCRun plugin;
+
     private StoredGame storedGame;
     private Scoreboard scoreboard;
     private GameLoop gameLoop;
     private boolean pvpEnabled, damages;
+    private BukkitTask beginCountdown, mainTask;
+    private MessageManager messageManager;
+    private final String mapName;
+    private final short normalSlots, vipSlots, minPlayers;
+
 
     public Game(String mapName, short normalSlots, short vipSlots, short minPlayers)
     {
@@ -69,7 +72,6 @@ public abstract class Game extends AbstractGame
         this.stats = plugin.getAPI().getStatsManager("uhcrun");
     }
 
-    @Override
     public void postInit()
     {
         this.scoreboard = server.getScoreboardManager().getMainScoreboard();
@@ -81,16 +83,22 @@ public abstract class Game extends AbstractGame
     @Override
     public void startGame()
     {
+        // Init Online Stats Data
         storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), mapName);
-        plugin.removeSpawn();
-        updateStatus(Status.IN_GAME);
 
-        Objective life = scoreboard.registerNewObjective("vie", "health");
-        Objective lifeb = scoreboard.registerNewObjective("vieb", "health");
-        life.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        lifeb.setDisplayName("HP");
-        life.setDisplayName("HP");
-        lifeb.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        // Remove the lobby
+        plugin.removeSpawn();
+
+        // Notify to the network that the game is starting
+        setStatus(Status.IN_GAME);
+
+        Objective displayNameLife = scoreboard.registerNewObjective("vie", "health");
+        Objective playerListLife = scoreboard.registerNewObjective("vieb", "health");
+
+        playerListLife.setDisplayName("HP");
+        displayNameLife.setDisplayName("HP");
+        displayNameLife.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        playerListLife.setDisplaySlot(DisplaySlot.PLAYER_LIST);
 
         if (beginCountdown != null) beginCountdown.cancel();
 
@@ -117,12 +125,12 @@ public abstract class Game extends AbstractGame
             player.setGameMode(GameMode.SURVIVAL);
             player.setFoodLevel(20);
             player.setScoreboard(scoreboard);
-            life.getScore(player.getName()).setScore(20);
-            lifeb.getScore(player.getName()).setScore(20);
+            displayNameLife.getScore(player.getName()).setScore(20);
+            playerListLife.getScore(player.getName()).setScore(20);
             player.setLevel(0);
             player.getInventory().clear();
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 24000, 0));
-            ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "â‰¡ UHCRun â‰¡");
+            ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
             sign.addReceiver(player);
             gameLoop.addPlayer(player.getUniqueId(), sign);
             kills.put(uuid, 0);
@@ -131,9 +139,6 @@ public abstract class Game extends AbstractGame
         server.broadcastMessage(coherenceMachine.getGameTag() + ChatColor.GOLD + "La partie commence !");
     }
 
-    protected abstract void teleport();
-
-    @Override
     public void finish()
     {
         server.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -172,7 +177,7 @@ public abstract class Game extends AbstractGame
             server.broadcastMessage(ChatColor.GOLD + "                                                    ");
             server.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
             server.broadcastMessage(ChatColor.GOLD + "                                                    ");
-            server.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "dÃ©briefing de partie" + ChatColor.GOLD + " ici : ");
+            server.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
             server.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
             server.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
@@ -191,6 +196,239 @@ public abstract class Game extends AbstractGame
             server.shutdown();
         }, 20 * 30);
     }
+
+
+    @Override
+    public Status getStatus()
+    {
+        return status;
+    }
+
+    @Override
+    public void setStatus(Status status)
+    {
+        this.status = status;
+        super.setStatus(status);
+    }
+
+    protected abstract void teleport();
+
+    // FIXME: seem strange
+    public boolean hasTeleportPlayers()
+    {
+        return status != Status.IN_GAME;
+    }
+
+    public void enableDamages()
+    {
+        this.damages = true;
+    }
+
+    public void disableDamages()
+    {
+        this.damages = false;
+    }
+
+    public boolean isDamagesEnabled()
+    {
+        return damages;
+    }
+
+    public void disablePVP()
+    {
+        this.pvpEnabled = false;
+    }
+
+    public void enablePVP()
+    {
+        this.pvpEnabled = true;
+    }
+
+    @Override
+    public int getConnectedPlayers()
+    {
+        return players.size();
+    }
+
+    @Override
+    public int getMaxPlayers()
+    {
+        return normalSlots + vipSlots;
+    }
+
+    @Override
+    public final String getMapName()
+    {
+        return mapName;
+    }
+
+    @Override
+    public final String getGameName()
+    {
+        return plugin.getConfig().getString("gameName", "UHCRun");
+    }
+
+    public final CoherenceMachine getCoherenceMachine()
+    {
+        return coherenceMachine;
+    }
+
+    public int getKills(UUID player)
+    {
+        return kills.get(player);
+    }
+
+
+    // FIXME: more modular system
+    public int getPreparingTime()
+    {
+        return 20;
+    }
+
+    public int getDeathMatchSize()
+    {
+        return 400;
+    }
+
+    public int getReductionTime()
+    {
+        return 10;
+    }
+
+    public abstract void teleportDeathMatch();
+
+    public boolean isPvpEnabled()
+    {
+        return pvpEnabled;
+    }
+
+    public boolean isInGame(UUID player)
+    {
+        return players.contains(player);
+    }
+
+    public void stumpPlayer(Player player, boolean logout)
+    {
+        this.players.remove(player.getUniqueId());
+        if (this.status == Status.IN_GAME)
+        {
+            Object lastDamager = Metadatas.getMetadata(plugin, player, "lastDamager");
+            Player killer = null;
+            SavedPlayer e;
+            if (lastDamager != null && lastDamager instanceof Player)
+            {
+                killer = (Player) lastDamager;
+                if (killer.isOnline() && this.isInGame(killer.getUniqueId()))
+                {
+                    this.creditKillCoins(killer);
+
+                    try
+                    {
+                        stats.increase(killer.getUniqueId(), "kills", 1);
+                        this.addKill(killer.getUniqueId());
+                        e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
+                        e.kill(player);
+                        killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
+                    } catch (Exception ex)
+                    {
+                    }
+                } else
+                {
+                    killer = null;
+                }
+            }
+
+            if (logout)
+            {
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté.");
+            } else if (killer != null)
+            {
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
+            } else
+            {
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
+            }
+
+            this.checkStump(player);
+
+            try
+            {
+                e = this.storedGame.getPlayer(player.getUniqueId(), player.getName());
+                String killedBy;
+                if (logout)
+                {
+                    killedBy = "Déconnexion";
+                } else if (killer != null)
+                {
+                    killedBy = killer.getDisplayName();
+                } else
+                {
+                    EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
+                    killedBy = getDamageCause(cause);
+                }
+
+                e.die(this.players.size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
+            } catch (Exception var9)
+            {
+                var9.printStackTrace();
+            }
+
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setHealth(20.0D);
+            if (!logout)
+            {
+                try
+                {
+                    stats.increase(player.getUniqueId(), "stumps", 1);
+                } catch (Exception ex)
+                {
+                }
+
+                Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
+            }
+        }
+    }
+
+    public void addKill(UUID player)
+    {
+        Integer val = this.kills.get(player);
+
+        // impossible but check it by security
+        if (val == null) val = 0;
+
+        this.kills.put(player, val + 1);
+    }
+
+    public abstract void creditKillCoins(Player killer);
+
+    public abstract void checkStump(Player player);
+
+    public final GameLoop getGameLoop()
+    {
+        return gameLoop;
+    }
+
+    public void startFight()
+    {
+        disconnected.clear();
+    }
+
+    public PlayerData getPlayerData(UUID uuid)
+    {
+        return !playerDataCaches.containsKey(uuid) ? plugin.getAPI().getPlayerManager().getPlayerData(uuid) : playerDataCaches.get(uuid);
+    }
+
+    public PlayerData getPlayerData(Player player)
+    {
+        return getPlayerData(player.getUniqueId());
+    }
+
+    public UHCRun getPlugin()
+    {
+        return plugin;
+    }
+
+    // --- CONNECTION --- //
 
     @Override
     public void playerJoin(Player player)
@@ -230,7 +468,7 @@ public abstract class Game extends AbstractGame
                 // ...
 
                 disconnected.add(player.getUniqueId());
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est dÃ©connectÃ©. Il peut se reconnecter jusqu\'Ã  la fin de la prÃ©paration.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
             }
         } else
         {
@@ -240,248 +478,38 @@ public abstract class Game extends AbstractGame
 
     }
 
+    public boolean isDisconnected(UUID player)
+    {
+        return disconnected.contains(player);
+    }
 
     @Override
     public void playerReconnect(Player player)
     {
-        this.rejoin(player);
+        this.rejoin(player, false);
     }
 
     @Override
     public void playerReconnectTimeOut(Player player)
     {
-        this.rejoin(player);
+        this.rejoin(player, true);
     }
 
-    private void rejoin(Player pl)
+    public void rejoin(Player thePlayer, boolean timeOut)
     {
-
-        if (pl != null)
+        if (thePlayer != null)
         {
             server.getScheduler().runTaskLater(plugin, () -> {
 
-                pl.setScoreboard(this.scoreboard);
-                ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "â‰¡ UHCRun â‰¡");
-                sign.addReceiver(pl);
-                this.gameLoop.addPlayer(pl.getUniqueId(), sign);
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + pl.getDisplayName() + ChatColor.GOLD + " s\'est reconnectÃ©.");
-                disconnected.remove(pl.getUniqueId());
+                thePlayer.setScoreboard(this.scoreboard);
+                ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
+                sign.addReceiver(thePlayer);
+                this.gameLoop.addPlayer(thePlayer.getUniqueId(), sign);
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + thePlayer.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
+                disconnected.remove(thePlayer.getUniqueId());
             }, 10L);
 
         }
-
-
-    }
-
-    @Override
-    public boolean hasTeleportPlayers()
-    {
-        return status != Status.IN_GAME;
-    }
-
-    @Override
-    public void enableDamages()
-    {
-        this.damages = true;
-    }
-
-    @Override
-    public void disableDamages()
-    {
-        this.damages = false;
-    }
-
-    @Override
-    public boolean isDamagesEnabled()
-    {
-        return damages;
-    }
-
-    @Override
-    public void disablePVP()
-    {
-        this.pvpEnabled = false;
-    }
-
-    @Override
-    public void enablePVP()
-    {
-        this.pvpEnabled = true;
-    }
-
-    @Override
-    public int getConnectedPlayers()
-    {
-        return players.size();
-    }
-
-    @Override
-    public int getMaxPlayers()
-    {
-        return normalSlots + vipSlots;
-    }
-
-    @Override
-    public Status getStatus()
-    {
-        return status;
-    }
-
-    @Override
-    public void setStatus(Status status)
-    {
-        this.status = status;
-        super.setStatus(status);
-    }
-
-    @Override
-    public String getMapName()
-    {
-        return mapName;
-    }
-
-    @Override
-    public String getGameName()
-    {
-        return plugin.getConfig().getString("gameName", "UHCRun");
-    }
-
-    public CoherenceMachine getCoherenceMachine()
-    {
-        return coherenceMachine;
-    }
-
-    @Override
-    public int getKills(UUID player)
-    {
-        return kills.get(player);
-    }
-
-    @Override
-    public int getPreparingTime()
-    {
-        return 20;
-    }
-
-    @Override
-    public abstract void teleportDeathMatch();
-
-    @Override
-    public int getDeathMatchSize()
-    {
-        return 400;
-    }
-
-    @Override
-    public int getReductionTime()
-    {
-        return 10;
-    }
-
-    @Override
-    public boolean isPvpEnabled()
-    {
-        return pvpEnabled;
-    }
-
-    @Override
-    public boolean isInGame(UUID player)
-    {
-        return players.contains(player);
-    }
-
-    @Override
-    public void stumpPlayer(Player player, boolean logout)
-    {
-        this.players.remove(player.getUniqueId());
-        if (this.status == Status.IN_GAME)
-        {
-            Object lastDamager = Metadatas.getMetadata(player, "lastDamager");
-            Player killer = null;
-            SavedPlayer e;
-            if (lastDamager != null && lastDamager instanceof Player)
-            {
-                killer = (Player) lastDamager;
-                if (killer.isOnline() && this.isInGame(killer.getUniqueId()))
-                {
-                    this.creditKillCoins(killer);
-
-                    try
-                    {
-                        stats.increase(killer.getUniqueId(), "kills", 1);
-                        this.addKill(killer.getUniqueId());
-                        e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
-                        e.kill(player);
-                        killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
-                    } catch (Exception ex)
-                    {
-                    }
-                } else
-                {
-                    killer = null;
-                }
-            }
-
-            if (logout)
-            {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est dÃ©connectÃ©.");
-            } else if (killer != null)
-            {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a Ã©tÃ© tuÃ© par " + killer.getDisplayName());
-            } else
-            {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
-            }
-
-            this.checkStump(player);
-
-            try
-            {
-                e = this.storedGame.getPlayer(player.getUniqueId(), player.getName());
-                String killedBy;
-                if (logout)
-                {
-                    killedBy = "DÃ©connexion";
-                } else if (killer != null)
-                {
-                    killedBy = killer.getDisplayName();
-                } else
-                {
-                    EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
-                    killedBy = getDamageCause(cause);
-                }
-
-                e.die(this.players.size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
-            } catch (Exception var9)
-            {
-                var9.printStackTrace();
-            }
-
-            player.setGameMode(GameMode.SPECTATOR);
-            player.setHealth(20.0D);
-            if (!logout)
-            {
-                try
-                {
-                    stats.increase(player.getUniqueId(), "stumps", 1);
-                } catch (Exception ex)
-                {
-                }
-
-                Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous Ãªtes mort !", ChatColor.GOLD + "Vous Ãªtes maintenant spectateur.");
-            }
-        }
-    }
-
-    @Override
-    public void addKill(UUID player)
-    {
-        Integer val = this.kills.get(player);
-
-        // impossible but check it by security
-        if (val == null) val = 0;
-
-        this.kills.put(player, val + 1);
     }
 
     private String getDamageCause(EntityDamageEvent.DamageCause cause)
@@ -513,35 +541,5 @@ public abstract class Game extends AbstractGame
             default:
                 return "Autre";
         }
-    }
-
-    public GameLoop getGameLoop()
-    {
-        return gameLoop;
-    }
-
-    @Override
-    public void startFight()
-    {
-        disconnected.clear();
-    }
-
-    @Override
-    public boolean isDisconnected(UUID player)
-    {
-        return disconnected.contains(player);
-    }
-
-
-    @Override
-    public PlayerData getPlayerData(UUID uuid)
-    {
-        return !playerDataCaches.containsKey(uuid) ? plugin.getAPI().getPlayerManager().getPlayerData(uuid) : playerDataCaches.get(uuid);
-    }
-
-    @Override
-    public PlayerData getPlayerData(Player player)
-    {
-        return getPlayerData(player.getUniqueId());
     }
 }

@@ -4,6 +4,7 @@ import net.samagames.uhcrun.UHCRun;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -16,23 +17,19 @@ import java.util.List;
  */
 public class Metadatas
 {
-    public static Object getMetadata(Metadatable object, String key)
+    public static Object getMetadata(JavaPlugin plugin, Metadatable object, String key)
     {
         List<MetadataValue> values = object.getMetadata(key);
         for (MetadataValue value : values)
-        {
-            // Plugins are singleton objects, so using == is safe here
-            if (value.getOwningPlugin() == UHCRun.getInstance())
-            {
+            if (value.getOwningPlugin().equals(plugin))
                 return value.value();
-            }
-        }
+
         return null;
     }
 
-    public static void setMetadata(Metadatable object, String key, Object value)
+    public static void setMetadata(JavaPlugin plugin, Metadatable object, String key, Object value)
     {
-        object.setMetadata(key, new FixedMetadataValue(UHCRun.getInstance(), value));
+        object.setMetadata(key, new FixedMetadataValue(plugin, value));
     }
 }
 

@@ -5,7 +5,7 @@ import net.minecraft.server.v1_8_R2.BiomeForest;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.AbstractGame;
+import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
@@ -45,7 +45,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private Logger logger;
     private BukkitTask startTimer;
     private OrePopulator populator;
-    private AbstractGame game;
+    private Game game;
     private boolean worldLoaded;
     private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
@@ -60,13 +60,16 @@ public class UHCRun extends JavaPlugin implements Listener
     @Override
     public void onEnable()
     {
+        // Define the instance
         instance = this;
+
         pluginManager = getServer().getPluginManager();
         config = this.getConfig();
         logger = this.getLogger();
         samaGamesAPI = SamaGamesAPI.get();
 
 
+        // Copy schematics
         this.saveResource("lobby.schematic", false);
         this.saveResource("nether.schematic", false);
 
@@ -74,23 +77,20 @@ public class UHCRun extends JavaPlugin implements Listener
         File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
         logger.info("Checking wether world exists at : " + conf.getAbsolutePath());
         if (!conf.exists())
-        {
             logger.info("No world exists. Will be generated.");
-        } else
-        {
+        else
             logger.info("World found!");
-        }
 
+        // TODO: Team Game
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
-
-
-        this.game = new SoloGame((short) 20, (short) 4, (short) 10);
-        pluginManager.registerEvents(this, this);
 
         /*if (playersPerTeam <= 1)
             game = new SoloGame();
         else
             game = new TeamGame(playersPerTeam);*/
+        this.game = new SoloGame((short) 20, (short) 4, (short) 10);
+        pluginManager.registerEvents(this, this);
+
         pluginManager.registerEvents(new ChunkListener(this), this);
         pluginManager.registerEvents(new SpectatorListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
@@ -104,9 +104,7 @@ public class UHCRun extends JavaPlugin implements Listener
     {
         World world = event.getWorld();
         if (world.getEnvironment() == World.Environment.NORMAL)
-        {
             this.setupNormalWorld(world);
-        }
     }
 
     @Override
@@ -150,15 +148,19 @@ public class UHCRun extends JavaPlugin implements Listener
         }
         // Init custom ore populator
         populator = new OrePopulator();
+
+        // FIXME: more modular system
         populator.addRule(new OrePopulator.Rule(Material.DIAMOND_ORE, 0, 4, 0, 64, 5));
         populator.addRule(new OrePopulator.Rule(Material.IRON_ORE, 0, 2, 0, 64, 15));
         populator.addRule(new OrePopulator.Rule(Material.GOLD_ORE, 0, 2, 0, 64, 8));
         populator.addRule(new OrePopulator.Rule(Material.LAPIS_ORE, 0, 3, 0, 64, 4));
         populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 0, 4, 0, 32, 6));
 
+
+        // FIXME: Must be on the config file
         spawnLocation = new Location(world, 0.6, 152, 0.6);
         world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
-        WorldBorder border = world.getWorldBorder();
+        final WorldBorder border = world.getWorldBorder();
 
         // Overworld settings
         border.setCenter(0D, 0D);
@@ -172,7 +174,10 @@ public class UHCRun extends JavaPlugin implements Listener
         world.setGameRuleValue("randomTickSpeed", "3");
         world.setFullTime(6000);
 
+        // Register Ore Populator
         world.getPopulators().add(populator);
+
+        // Register Fortress Populator
         world.getPopulators().add(new FortressPopulator(this));
     }
 
@@ -198,11 +203,10 @@ public class UHCRun extends JavaPlugin implements Listener
         loobyPopulator.remove();
     }
 
-    public AbstractGame getGame()
+    public Game getGame()
     {
         return game;
     }
-
 
     private void patchBiomes() throws ReflectiveOperationException
     {
@@ -213,6 +217,7 @@ public class UHCRun extends JavaPlugin implements Listener
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
         this.setFinalStatic(defaultBiomeField, defaultBiome);
 
+        // FIXME: more modular system
         biomesMap.remove("Ocean");
         biomesMap.remove("FrozenOcean");
         biomesMap.remove("FrozenRiver");
@@ -240,6 +245,7 @@ public class UHCRun extends JavaPlugin implements Listener
     }
 
 
+    // TODO: Move it to the API
     public void setFinalStatic(Field field, Object obj) throws ReflectiveOperationException
     {
         field.setAccessible(true);

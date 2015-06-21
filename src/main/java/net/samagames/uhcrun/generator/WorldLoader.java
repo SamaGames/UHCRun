@@ -47,7 +47,7 @@ public class WorldLoader
 
         task = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable()
         {
-            private int todo = (1200 * 1200) / (16 * 16);
+            private int todo = (1200 * 1200) / 256;
             private int x = -600;
             private int z = -600;
 
@@ -75,7 +75,7 @@ public class WorldLoader
                     if (x >= 600)
                     {
                         task.cancel();
-                        plugin.getGame().updateStatus(Status.WAITING_FOR_PLAYERS);
+                        plugin.getGame().setStatus(Status.WAITING_FOR_PLAYERS);
                         plugin.getLogger().info("Ready in " + (System.currentTimeMillis() - startTime) + "ms");
                         return;
                     }
@@ -87,6 +87,8 @@ public class WorldLoader
         }, 1L, 1L);
     }
 
+    @Deprecated
+    // FIXME: must be replace by int[]
     public static class PartialLocation
     {
         private final int x;

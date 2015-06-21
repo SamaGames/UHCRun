@@ -2,7 +2,7 @@ package net.samagames.uhcrun.task;
 
 import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
-import net.samagames.uhcrun.game.AbstractGame;
+import net.samagames.uhcrun.game.Game;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -21,15 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameLoop implements Runnable
 {
     private final World world;
-    private final AbstractGame game;
-    private int minutes = 0;
-    private int seconds = 0;
+    private final Game game;
+    private int minutes, seconds;
     private GameLoop.TimedEvent nextEvent;
     private final ConcurrentHashMap<UUID, ObjectiveSign> objectives = new ConcurrentHashMap<>();
     private final UHCRun plugin;
     private final Server server;
 
-    public GameLoop(AbstractGame game, UHCRun plugin, Server server)
+    public GameLoop(Game game, UHCRun plugin, Server server)
     {
         this.game = game;
         this.plugin = plugin;

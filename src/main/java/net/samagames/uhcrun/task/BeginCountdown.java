@@ -25,7 +25,7 @@ public class BeginCountdown implements Runnable
     private final int minPlayers;
     private final MessageManager messageManager;
     private boolean ready = false;
-    private int countdown = 121; // 2 minutes
+    private int countdown;
 
     public BeginCountdown(Game game, int maxPlayers, int minPlayers, int time)
     {
@@ -51,7 +51,7 @@ public class BeginCountdown implements Runnable
             if (nPlayers >= minPlayers && !ready)
             {
                 ready = true;
-                game.updateStatus(Status.STARTING);
+                game.setStatus(Status.STARTING);
                 countdown = time / 2;
             }
 
@@ -64,7 +64,7 @@ public class BeginCountdown implements Runnable
             {
                 ready = false;
                 messageManager.writeNotEnougthPlayersToStart();
-                game.updateStatus(Status.WAITING_FOR_PLAYERS);
+                game.setStatus(Status.WAITING_FOR_PLAYERS);
                 for (Player p : Bukkit.getOnlinePlayers())
                 {
                     p.setLevel(countdown - 1);
@@ -90,7 +90,7 @@ public class BeginCountdown implements Runnable
             player.setLevel(countdown);
             if (countdown <= 5 || countdown == 10)
             {
-                Titles.sendTitle(player, 2, 16, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + countdown + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
+                Titles.sendTitle(player, 2, 14, 2, ChatColor.GOLD + "Début dans " + ChatColor.RED + countdown + ChatColor.GOLD + " sec", ChatColor.GOLD + "Préparez vous au combat !");
                 player.playSound(player.getLocation(), Sound.NOTE_PIANO, 1.0F, 1.0F);
             }
         }
