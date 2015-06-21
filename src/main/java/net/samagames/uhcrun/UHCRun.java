@@ -3,6 +3,8 @@ package net.samagames.uhcrun;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -165,8 +167,9 @@ public class UHCRun extends JavaPlugin implements Listener {
         populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 0, 4, 0, 32, 6));
 
 
-        // FIXME: Must be on the config file
-        spawnLocation = new Location(world, 0.6, 152, 0.6);
+        List<Double> spawnPos = (List<Double>) config.getList("spawnLocation", Arrays.asList(0.6, 152D, 0.6));
+        spawnLocation = new Location(world, spawnPos.get(0), spawnPos.get(1), spawnPos.get(2));
+
         world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
         final WorldBorder border = world.getWorldBorder();
 
