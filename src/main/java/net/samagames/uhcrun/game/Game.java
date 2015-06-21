@@ -215,9 +215,8 @@ public abstract class Game extends IReconnectGame {
 
     protected abstract void teleport();
 
-    // FIXME: seem strange
     public boolean hasTeleportPlayers() {
-        return status != Status.IN_GAME;
+        return status == Status.IN_GAME;
     }
 
     public void enableDamages() {

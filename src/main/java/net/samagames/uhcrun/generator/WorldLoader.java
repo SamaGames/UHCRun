@@ -15,14 +15,14 @@ import net.samagames.uhcrun.UHCRun;
 
 
 public class WorldLoader {
-    private static Map<PartialLocation, Integer> highestBlocks = new HashMap<>();
+    private static Map<int[], Integer> highestBlocks = new HashMap<>();
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;
     private UHCRun plugin = UHCRun.getInstance();
 
     public static Integer getHighestNaturalBlockAt(int x, int z) {
-        PartialLocation loc = new PartialLocation(x, z);
+        int[] loc = new int[] {x, z};
 
         if (highestBlocks.containsKey(loc)) {
             return highestBlocks.get(loc);
@@ -38,7 +38,7 @@ public class WorldLoader {
             int z = -50;
             while (z < 50) {
                 Block block = world.getHighestBlockAt(x, z);
-                highestBlocks.put(new PartialLocation(x, z), block.getY());
+                highestBlocks.put(new int[] {x, z}, block.getY());
                 z++;
             }
             x++;
@@ -78,53 +78,5 @@ public class WorldLoader {
                 }
             }
         }, 1L, 1L);
-    }
-
-    @Deprecated
-    // FIXME: must be replace by int[]
-    public static class PartialLocation {
-        private final int x;
-        private final int z;
-
-        public PartialLocation(int x, int z) {
-            this.x = x;
-            this.z = z;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getZ() {
-            return z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof PartialLocation)) {
-                return false;
-            }
-
-            PartialLocation that = (PartialLocation) o;
-
-            return x == that.x && z == that.z;
-
-        }
-
-        @Override
-        public int hashCode() {
-            return x * z;
-        }
-
-        @Override
-        public String toString() {
-            return "PartialLocation{" +
-                    "x=" + x +
-                    ", z=" + z +
-                    '}';
-        }
     }
 }
