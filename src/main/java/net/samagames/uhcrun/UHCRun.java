@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import net.samagames.tools.Reflection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -245,19 +246,7 @@ public class UHCRun extends JavaPlugin implements Listener {
             }
         }
 
-        this.setFinalStatic(BiomeBase.class.getDeclaredField("biomes"), biomes);
-    }
-
-
-    // TODO: Move it to the API
-    public void setFinalStatic(Field field, Object obj) throws ReflectiveOperationException {
-        field.setAccessible(true);
-
-        Field mf = Field.class.getDeclaredField("modifiers");
-        mf.setAccessible(true);
-        mf.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, obj);
+        Reflection.setFinalStatic(BiomeBase.class.getDeclaredField("biomes"), biomes);
     }
 
     public SamaGamesAPI getAPI() {
