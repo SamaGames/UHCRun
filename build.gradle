@@ -15,6 +15,7 @@ targetCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 checkstyle {
+    toolVersion = "6.7"
     configFile = file('guidelines/uhcrun.checkstyle')
 }
 
