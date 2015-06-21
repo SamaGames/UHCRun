@@ -2,13 +2,11 @@ package net.samagames.uhcrun;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.samagames.tools.Reflection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,6 +26,7 @@ import net.minecraft.server.v1_8_R2.BiomeForest;
 
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
+import net.samagames.tools.Reflection;
 import net.samagames.uhcrun.commands.CommandNextEvent;
 import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.SoloGame;
@@ -42,8 +41,6 @@ import net.samagames.uhcrun.listener.CompassTargeter;
 import net.samagames.uhcrun.listener.CraftListener;
 import net.samagames.uhcrun.listener.GameListener;
 import net.samagames.uhcrun.listener.SpectatorListener;
-
-
 
 
 /**
