@@ -7,34 +7,28 @@ package net.samagames.uhcrun.game.data;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class HealingSource extends GameData
-{
+public class HealingSource extends GameData {
     private final String healMaterial;
     private double healAmount;
 
-    public HealingSource(String healMaterial, double healAmount)
-    {
+    public HealingSource(String healMaterial, double healAmount) {
         this.healMaterial = healMaterial;
         this.healAmount = healAmount;
     }
 
-    public String getHealMaterial()
-    {
+    public String getHealMaterial() {
         return healMaterial;
     }
 
-    public double getHealAmount()
-    {
+    public double getHealAmount() {
         return healAmount;
     }
 
-    public void setHealAmount(double healAmount)
-    {
+    public void setHealAmount(double healAmount) {
         this.healAmount = healAmount;
     }
 
-    public String getIdentification()
-    {
+    public String getIdentification() {
         return healMaterial;
     }
 }

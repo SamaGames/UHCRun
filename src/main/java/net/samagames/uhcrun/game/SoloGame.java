@@ -1,15 +1,25 @@
 package net.samagames.uhcrun.game;
 
-import net.samagames.api.player.PlayerData;
-import net.samagames.tools.Titles;
-import net.samagames.uhcrun.utils.Colors;
-import org.bukkit.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.UUID;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-import java.util.*;
+import net.samagames.api.player.PlayerData;
+import net.samagames.tools.Titles;
+import net.samagames.uhcrun.utils.Colors;
+
 
 /**
  * This file is a part of the SamaGames Project CodeBase
@@ -18,13 +28,11 @@ import java.util.*;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class SoloGame extends Game
-{
+public class SoloGame extends Game {
     private final java.util.List<Location> spawnPoints;
     private final Random rand;
 
-    public SoloGame(short normalSlots, short vipSlots, short minPlayers)
-    {
+    public SoloGame(short normalSlots, short vipSlots, short minPlayers) {
         super("Solo", normalSlots, vipSlots, minPlayers);
 
         this.rand = new Random();
@@ -33,18 +41,15 @@ public class SoloGame extends Game
 
 
     @Override
-    public void postInit()
-    {
+    public void postInit() {
         super.postInit();
         this.disableDamages();
 
         World world = server.getWorld("world");
 
-        for (int i = 0; i < this.getMaxPlayers(); i++)
-        {
+        for (int i = 0; i < this.getMaxPlayers(); i++) {
             final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
-            for (int y = 0; y < 16; y++)
-            {
+            for (int y = 0; y < 16; y++) {
                 world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
             }
 
@@ -53,99 +58,79 @@ public class SoloGame extends Game
     }
 
     @Override
-    public void creditKillCoins(Player player)
-    {
+    public void creditKillCoins(Player player) {
         PlayerData playerData = getPlayerData(player);
         playerData.creditCoins(20, "Un joueur tué !", true);
     }
 
     @Override
-    public void checkStump(Player player)
-    {
+    public void checkStump(Player player) {
         PlayerData playerData = getPlayerData(player);
-        if (this.players.size() == 2)
-        {
+        if (this.players.size() == 2) {
             playerData.creditCoins(20, "Troisième au classement !", true);
         }
 
-        if (this.players.size() == 1)
-        {
+        if (this.players.size() == 1) {
             playerData.creditCoins(50, "Second au classement !", true);
             playerData.creditStars(1, "Second au classement !");
             UUID winnerId = this.players.iterator().next();
             Player winner = server.getPlayer(winnerId);
-            if (winner == null)
-            {
+            if (winner == null) {
                 this.finish();
-            } else
-            {
+            } else {
                 this.win(winner);
             }
-        } else if (this.players.size() == 0)
-        {
+        } else if (this.players.size() == 0) {
             this.finish();
-        } else
-        {
+        } else {
             server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + this.players.size() + ChatColor.YELLOW + " joueur(s) en vie.");
         }
 
     }
 
-    public void win(final Player player)
-    {
+    public void win(final Player player) {
         final PlayerData playerData = plugin.getAPI().getPlayerManager().getPlayerData(player.getUniqueId());
         playerData.creditStars(2, "Victoire !");
         playerData.creditCoins(100, "Victoire ! ", true);
 
-        try
-        {
+        try {
             stats.increase(player.getUniqueId(), "victories", 1);
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
         }
 
         server.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
 
-        for (Player user : server.getOnlinePlayers())
-        {
+        for (Player user : server.getOnlinePlayers()) {
             Titles.sendTitle(user, 5, 70, 5, ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
         }
 
-        server.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
-        {
+        server.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             int timer = 0;
 
-            public void run()
-            {
-                if (this.timer < 20)
-                {
+            public void run() {
+                if (this.timer < 20) {
                     Firework fw = (Firework) player.getWorld().spawnEntity(player.getPlayer().getLocation(), EntityType.FIREWORK);
                     FireworkMeta fwm = fw.getFireworkMeta();
                     Random r = new Random();
                     int rt = r.nextInt(4) + 1;
                     FireworkEffect.Type type = FireworkEffect.Type.BALL;
-                    if (rt == 1)
-                    {
+                    if (rt == 1) {
                         type = FireworkEffect.Type.BALL;
                     }
 
-                    if (rt == 2)
-                    {
+                    if (rt == 2) {
                         type = FireworkEffect.Type.BALL_LARGE;
                     }
 
-                    if (rt == 3)
-                    {
+                    if (rt == 3) {
                         type = FireworkEffect.Type.BURST;
                     }
 
-                    if (rt == 4)
-                    {
+                    if (rt == 4) {
                         type = FireworkEffect.Type.CREEPER;
                     }
 
-                    if (rt == 5)
-                    {
+                    if (rt == 5) {
                         type = FireworkEffect.Type.STAR;
                     }
 
@@ -166,22 +151,18 @@ public class SoloGame extends Game
     }
 
     @Override
-    protected void teleport()
-    {
+    protected void teleport() {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.players)
-        {
+        for (UUID uuid : this.players) {
             Player player = server.getPlayer(uuid);
-            if (player == null)
-            {
+            if (player == null) {
                 this.players.remove(uuid);
                 continue;
             }
 
-            if (!locationIterator.hasNext())
-            {
+            if (!locationIterator.hasNext()) {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                 this.players.remove(uuid);
                 continue;
@@ -194,22 +175,18 @@ public class SoloGame extends Game
     }
 
     @Override
-    public void teleportDeathMatch()
-    {
+    public void teleportDeathMatch() {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.players)
-        {
+        for (UUID uuid : this.players) {
             Player player = server.getPlayer(uuid);
-            if (player == null)
-            {
+            if (player == null) {
                 this.players.remove(uuid);
                 return;
             }
 
-            if (!locationIterator.hasNext())
-            {
+            if (!locationIterator.hasNext()) {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                 this.players.remove(uuid);
                 return;
@@ -217,7 +194,7 @@ public class SoloGame extends Game
 
             Location location = locationIterator.next();
 
-            player.teleport(new Location(location.getWorld(), ((location.getX() * 4) / 10), 150.0, ((location.getZ() * 4) / 10)));
+            player.teleport(new Location(location.getWorld(), location.getX() * 4 / 10, 150.0, location.getZ() * 4 / 10));
         }
     }
 }

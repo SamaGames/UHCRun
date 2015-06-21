@@ -1,18 +1,15 @@
 package net.samagames.uhcrun;
 
-import net.minecraft.server.v1_8_R2.BiomeBase;
-import net.minecraft.server.v1_8_R2.BiomeForest;
-import net.samagames.api.SamaGamesAPI;
-import net.samagames.api.games.Status;
-import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.Game;
-import net.samagames.uhcrun.game.SoloGame;
-import net.samagames.uhcrun.generator.FortressPopulator;
-import net.samagames.uhcrun.generator.LobbyPopulator;
-import net.samagames.uhcrun.generator.OrePopulator;
-import net.samagames.uhcrun.generator.WorldLoader;
-import net.samagames.uhcrun.listener.*;
-import org.bukkit.*;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,11 +20,28 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.logging.Logger;
+import net.minecraft.server.v1_8_R2.BiomeBase;
+import net.minecraft.server.v1_8_R2.BiomeForest;
+
+import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.Status;
+import net.samagames.uhcrun.commands.CommandNextEvent;
+import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.SoloGame;
+import net.samagames.uhcrun.generator.FortressPopulator;
+import net.samagames.uhcrun.generator.LobbyPopulator;
+import net.samagames.uhcrun.generator.OrePopulator;
+import net.samagames.uhcrun.generator.WorldLoader;
+
+import net.samagames.uhcrun.listener.BlockListener;
+import net.samagames.uhcrun.listener.ChunkListener;
+import net.samagames.uhcrun.listener.CompassTargeter;
+import net.samagames.uhcrun.listener.CraftListener;
+import net.samagames.uhcrun.listener.GameListener;
+import net.samagames.uhcrun.listener.SpectatorListener;
+
+
+
 
 /**
  * This file is a part of the SamaGames Project CodeBase
@@ -36,8 +50,7 @@ import java.util.logging.Logger;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class UHCRun extends JavaPlugin implements Listener
-{
+public class UHCRun extends JavaPlugin implements Listener {
 
     private static UHCRun instance;
     private Location spawnLocation;
@@ -52,14 +65,12 @@ public class UHCRun extends JavaPlugin implements Listener
     private WorldLoader worldLoader;
     private SamaGamesAPI samaGamesAPI;
 
-    public static UHCRun getInstance()
-    {
+    public static UHCRun getInstance() {
         return instance;
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         // Define the instance
         instance = this;
 
@@ -76,10 +87,11 @@ public class UHCRun extends JavaPlugin implements Listener
 
         File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
         logger.info("Checking wether world exists at : " + conf.getAbsolutePath());
-        if (!conf.exists())
+        if (!conf.exists()) {
             logger.info("No world exists. Will be generated.");
-        else
+        } else {
             logger.info("World found!");
+        }
 
         // TODO: Team Game
         int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
@@ -100,22 +112,21 @@ public class UHCRun extends JavaPlugin implements Listener
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onWorldInit(final WorldInitEvent event)
-    {
+    public void onWorldInit(final WorldInitEvent event) {
         World world = event.getWorld();
-        if (world.getEnvironment() == World.Environment.NORMAL)
+        if (world.getEnvironment() == World.Environment.NORMAL) {
             this.setupNormalWorld(world);
+        }
     }
 
     @Override
-    public void onDisable()
-    {
-        if (loobyPopulator != null)
+    public void onDisable() {
+        if (loobyPopulator != null) {
             loobyPopulator.remove();
+        }
     }
 
-    private void postInit()
-    {
+    private void postInit() {
         samaGamesAPI.getGameManager().registerGame(game);
         getCommand("nextevent").setExecutor(new CommandNextEvent(game));
         game.setStatus(Status.STARTING);
@@ -137,13 +148,10 @@ public class UHCRun extends JavaPlugin implements Listener
 
     }
 
-    private void setupNormalWorld(World world)
-    {
-        try
-        {
+    private void setupNormalWorld(World world) {
+        try {
             this.patchBiomes();
-        } catch (ReflectiveOperationException e)
-        {
+        } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
         // Init custom ore populator
@@ -181,35 +189,30 @@ public class UHCRun extends JavaPlugin implements Listener
         world.getPopulators().add(new FortressPopulator(this));
     }
 
-    public boolean isWorldLoaded()
-    {
+    public boolean isWorldLoaded() {
         return worldLoaded;
     }
 
     @EventHandler
-    public void onPreJoin(PlayerJoinEvent event)
-    {
-        if (game == null || game.getStatus() == Status.WAITING_FOR_PLAYERS)
+    public void onPreJoin(PlayerJoinEvent event) {
+        if (game == null || game.getStatus() == Status.WAITING_FOR_PLAYERS) {
             event.getPlayer().teleport(spawnLocation);
+        }
     }
 
-    public Location getSpawnLocation()
-    {
+    public Location getSpawnLocation() {
         return spawnLocation;
     }
 
-    public void removeSpawn()
-    {
+    public void removeSpawn() {
         loobyPopulator.remove();
     }
 
-    public Game getGame()
-    {
+    public Game getGame() {
         return game;
     }
 
-    private void patchBiomes() throws ReflectiveOperationException
-    {
+    private void patchBiomes() throws ReflectiveOperationException {
         BiomeBase[] biomes = BiomeBase.getBiomes();
         Map<String, BiomeBase> biomesMap = BiomeBase.o;
         BiomeForest defaultBiome = new BiomeForest(0, 0);
@@ -233,10 +236,8 @@ public class UHCRun extends JavaPlugin implements Listener
         biomesMap.remove("Mesa Plateau F");
         biomesMap.remove("Mesa Plateau");
 
-        for (int i = 0; i < biomes.length; i++)
-        {
-            if (biomes[i] != null && !biomesMap.containsKey(biomes[i].ah))
-            {
+        for (int i = 0; i < biomes.length; i++) {
+            if (biomes[i] != null && !biomesMap.containsKey(biomes[i].ah)) {
                 biomes[i] = null;
             }
         }
@@ -246,8 +247,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
 
     // TODO: Move it to the API
-    public void setFinalStatic(Field field, Object obj) throws ReflectiveOperationException
-    {
+    public void setFinalStatic(Field field, Object obj) throws ReflectiveOperationException {
         field.setAccessible(true);
 
         Field mf = Field.class.getDeclaredField("modifiers");
@@ -257,8 +257,7 @@ public class UHCRun extends JavaPlugin implements Listener
         field.set(null, obj);
     }
 
-    public SamaGamesAPI getAPI()
-    {
+    public SamaGamesAPI getAPI() {
         return samaGamesAPI;
     }
 }

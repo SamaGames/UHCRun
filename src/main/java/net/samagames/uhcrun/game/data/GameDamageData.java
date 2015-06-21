@@ -10,41 +10,34 @@ import org.bukkit.Material;
  * All rights reserved.
  * FIXME: Can break the stats
  */
-public class GameDamageData extends GameData
-{
+public class GameDamageData extends GameData {
     private Material weapon;
     private String entityName;
     private double damage;
 
-    public GameDamageData(String entityName, Material weapon, double damage)
-    {
+    public GameDamageData(String entityName, Material weapon, double damage) {
         this.weapon = weapon;
         this.entityName = entityName;
         this.damage = damage;
     }
 
-    public Material getWeapon()
-    {
+    public Material getWeapon() {
         return weapon;
     }
 
-    public String getEntity()
-    {
+    public String getEntity() {
         return entityName;
     }
 
-    public double getDamage()
-    {
+    public double getDamage() {
         return damage;
     }
 
-    public void setDamage(double damage)
-    {
+    public void setDamage(double damage) {
         this.damage = damage;
     }
 
-    public String getIdentification()
-    {
+    public String getIdentification() {
         return weapon.toString() + "-" + entityName;
     }
 }

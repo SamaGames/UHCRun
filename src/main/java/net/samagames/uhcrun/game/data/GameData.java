@@ -7,12 +7,10 @@ package net.samagames.uhcrun.game.data;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class GameData
-{
+public abstract class GameData {
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         return o instanceof GameData && ((GameData) o).getIdentification().equals(this.getIdentification());
     }
 

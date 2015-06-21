@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+apply plugin: 'checkstyle'
 
 group = 'net.samagames'
 version = '2.0.0-SNAPSHOT'
@@ -13,22 +14,27 @@ targetCompatibility = 1.8
 //force UTF-8 to the compileJava task
 compileJava.options.encoding = 'UTF-8'
 
-repositories {
-        
-     maven { url "http://repo.md-5.net/content/groups/public/" }
-     maven {
-         url "http://maven.samagames.net/public/"
-         credentials {
-             username sguser
-             password sgpass
-         }
-     }
-     maven { url "http://maven.sk89q.com/repo/" }
-     maven { url "http://repo.maven.apache.org/maven2" }
+checkstyle {
+    configFile = file('guidelines/uhcrun.checkstyle')
 }
+
+repositories {
+    mavenCentral()
+    maven { url "http://repo.md-5.net/content/groups/public/" }
+    maven {
+        url "http://maven.samagames.net/public/"
+        credentials {
+            username sguser
+            password sgpass
+        }
+    }
+    maven { url "http://maven.sk89q.com/repo/" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
 dependencies {
     compile(group: 'net.samagames', name: 'samapi', version: '1.0.0-SNAPSHOT', classifier: 'jar-with-dependencies')
-    compile group: 'org.spigotmc', name: 'spigot', version:'1.8.3-R0.1-SNAPSHOT'
-    compile group: 'net.samagames', name: 'PermissionsBukkit', version:'0.0.1-SNAPSHOT'
-    compile group: 'com.sk89q', name: 'worldedit', version:'6.0.0-SNAPSHOT'
+    compile group: 'org.spigotmc', name: 'spigot', version: '1.8.3-R0.1-SNAPSHOT'
+    compile group: 'net.samagames', name: 'PermissionsBukkit', version: '0.0.1-SNAPSHOT'
+    compile group: 'com.sk89q', name: 'worldedit', version: '6.0.0-SNAPSHOT'
 }

@@ -10,8 +10,7 @@ package net.samagames.uhcrun.utils;
 
 import org.bukkit.Color;
 
-public enum Colors
-{
+public enum Colors {
 
     WHITE(Color.WHITE),
     AQUA(Color.AQUA),
@@ -34,8 +33,7 @@ public enum Colors
 
     private final Color color;
 
-    Colors(Color color)
-    {
+    Colors(Color color) {
         this.color = color;
     }
 
@@ -45,8 +43,7 @@ public enum Colors
      * @param i: color number
      * @return the Color object (if it's out of range, the color will be Color.WHITE)
      */
-    public static Color getColor(int i)
-    {
+    public static Color getColor(int i) {
         return i > values().length ? Color.WHITE : values()[i + 1].color;
     }
 }
