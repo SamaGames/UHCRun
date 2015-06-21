@@ -222,7 +222,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         BiomeForest defaultBiome = new BiomeForest(0, 0);
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
-        this.setFinalStatic(defaultBiomeField, defaultBiome);
+        Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
 
         // FIXME: more modular system
         biomesMap.remove("Ocean");
