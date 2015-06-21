@@ -183,7 +183,7 @@ public abstract class Game extends IReconnectGame {
             server.broadcastMessage(ChatColor.GOLD + "                                                    ");
             server.broadcastMessage(ChatColor.YELLOW + " " + top[0] + ChatColor.GRAY + "  " + top[1] + ChatColor.GOLD + "  " + top[2]);
             server.broadcastMessage(ChatColor.GOLD + "                                                    ");
-            server.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "débriefing de partie" + ChatColor.GOLD + " ici : ");
+            server.broadcastMessage(ChatColor.GOLD + " Visualisez votre " + ChatColor.RED + ChatColor.BOLD + "dÃ©briefing de partie" + ChatColor.GOLD + " ici : ");
             server.broadcastMessage(ChatColor.AQUA + " http://samagames.net/uhcrun/" + gameId);
             server.broadcastMessage(ChatColor.GOLD + "----------------------------------------------------");
         });
@@ -317,9 +317,9 @@ public abstract class Game extends IReconnectGame {
             }
 
             if (logout) {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est dÃ©connectÃ©.");
             } else if (killer != null) {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a Ã©tÃ© tuÃ© par " + killer.getDisplayName());
             } else {
                 server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
             }
@@ -330,7 +330,7 @@ public abstract class Game extends IReconnectGame {
                 e = this.storedGame.getPlayer(player.getUniqueId(), player.getName());
                 String killedBy;
                 if (logout) {
-                    killedBy = "Déconnexion";
+                    killedBy = "DÃ©connexion";
                 } else if (killer != null) {
                     killedBy = killer.getDisplayName();
                 } else {
@@ -351,7 +351,7 @@ public abstract class Game extends IReconnectGame {
                 } catch (Exception ex) {
                 }
 
-                Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
+                Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous Ãªtes mort !", ChatColor.GOLD + "Vous Ãªtes maintenant spectateur.");
             }
         }
     }
@@ -424,7 +424,7 @@ public abstract class Game extends IReconnectGame {
                 // ...
 
                 disconnected.add(player.getUniqueId());
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est déconnecté. Il peut se reconnecter jusqu\'à la fin de la préparation.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " s\'est dÃ©connectÃ©. Il peut se reconnecter jusqu\'Ã  la fin de la prÃ©paration.");
             }
         } else {
             this.players.remove(player.getUniqueId());
@@ -455,7 +455,7 @@ public abstract class Game extends IReconnectGame {
                 ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
                 sign.addReceiver(thePlayer);
                 this.gameLoop.addPlayer(thePlayer.getUniqueId(), sign);
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + thePlayer.getDisplayName() + ChatColor.GOLD + " s\'est reconnecté.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + thePlayer.getDisplayName() + ChatColor.GOLD + " s\'est reconnectÃ©.");
                 disconnected.remove(thePlayer.getUniqueId());
             }, 10L);
 
