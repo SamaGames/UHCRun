@@ -1,12 +1,19 @@
 package net.samagames.uhcrun;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
+import net.minecraft.server.v1_8_R2.*;
+import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.Status;
+import net.samagames.tools.Reflection;
+import net.samagames.uhcrun.commands.CommandNextEvent;
+import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.SoloGame;
+import net.samagames.uhcrun.generator.FortressPopulator;
+import net.samagames.uhcrun.generator.LobbyPopulator;
+import net.samagames.uhcrun.generator.OrePopulator;
+import net.samagames.uhcrun.generator.WorldLoader;
+import net.samagames.uhcrun.hook.BlockNewLog;
+import net.samagames.uhcrun.hook.BlockOldLog;
+import net.samagames.uhcrun.listener.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,26 +28,13 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.minecraft.server.v1_8_R2.BiomeBase;
-import net.minecraft.server.v1_8_R2.BiomeForest;
-
-import net.samagames.api.SamaGamesAPI;
-import net.samagames.api.games.Status;
-import net.samagames.tools.Reflection;
-import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.Game;
-import net.samagames.uhcrun.game.SoloGame;
-import net.samagames.uhcrun.generator.FortressPopulator;
-import net.samagames.uhcrun.generator.LobbyPopulator;
-import net.samagames.uhcrun.generator.OrePopulator;
-import net.samagames.uhcrun.generator.WorldLoader;
-
-import net.samagames.uhcrun.listener.BlockListener;
-import net.samagames.uhcrun.listener.ChunkListener;
-import net.samagames.uhcrun.listener.CompassTargeter;
-import net.samagames.uhcrun.listener.CraftListener;
-import net.samagames.uhcrun.listener.GameListener;
-import net.samagames.uhcrun.listener.SpectatorListener;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
@@ -71,6 +65,11 @@ public class UHCRun extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        try {
+            this.patchBlocks();
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
         // Define the instance
         instance = this;
 
@@ -190,6 +189,11 @@ public class UHCRun extends JavaPlugin implements Listener {
         world.getPopulators().add(new FortressPopulator(this));
     }
 
+    private void patchBlocks() throws ReflectiveOperationException {
+        this.overrideBlock(17, "log", "LOG", new BlockOldLog().c("log"));
+        this.overrideBlock(162, "log2", "LOG2", new BlockNewLog().c("log"));
+    }
+
     public boolean isWorldLoaded() {
         return worldLoaded;
     }
@@ -244,6 +248,23 @@ public class UHCRun extends JavaPlugin implements Listener {
         }
 
         Reflection.setFinalStatic(BiomeBase.class.getDeclaredField("biomes"), biomes);
+    }
+
+    private void overrideBlock(int id, String registryKey, String fieldName, Block newBlock) throws ReflectiveOperationException {
+        Block.REGISTRY.a(id, new MinecraftKey(registryKey), newBlock); //Update block register
+
+        Reflection.setFinalStatic(Blocks.class.getDeclaredField(fieldName), Block.REGISTRY.get(new MinecraftKey(registryKey))); //Update block reference
+
+        Block.d.a(newBlock.getBlockData(), Block.REGISTRY.b(newBlock) << 4 | newBlock.toLegacyData(newBlock.getBlockData())); //Update correct key
+
+        invokeMethod(Item.class, "c", new Class[]{Block.class}, newBlock); //Update item register
+    }
+
+    private void invokeMethod(Class clazz, String methodName, Class[] parameters, Object... args) throws ReflectiveOperationException {
+        @SuppressWarnings("unchecked")
+        Method method = clazz.getDeclaredMethod(methodName, parameters);
+        method.setAccessible(true);
+        method.invoke(null, args);
     }
 
     public SamaGamesAPI getAPI() {
