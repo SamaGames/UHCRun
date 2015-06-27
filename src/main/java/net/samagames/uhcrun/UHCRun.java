@@ -1,17 +1,12 @@
 package net.samagames.uhcrun;
 
-import net.minecraft.server.v1_8_R2.BiomeBase;
-import net.minecraft.server.v1_8_R2.BiomeForest;
-import net.samagames.api.SamaGamesAPI;
-import net.samagames.api.games.Status;
-import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.Game;
-import net.samagames.uhcrun.game.SoloGame;
-import net.samagames.uhcrun.generator.FortressPopulator;
-import net.samagames.uhcrun.generator.LobbyPopulator;
-import net.samagames.uhcrun.generator.OrePopulator;
-import net.samagames.uhcrun.generator.WorldLoader;
-import net.samagames.uhcrun.listener.*;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,13 +21,26 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
+import net.minecraft.server.v1_8_R2.BiomeBase;
+import net.minecraft.server.v1_8_R2.BiomeForest;
+
+import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.Status;
+import net.samagames.tools.Reflection;
+import net.samagames.uhcrun.commands.CommandNextEvent;
+import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.SoloGame;
+import net.samagames.uhcrun.generator.FortressPopulator;
+import net.samagames.uhcrun.generator.LobbyPopulator;
+import net.samagames.uhcrun.generator.OrePopulator;
+import net.samagames.uhcrun.generator.WorldLoader;
+
+import net.samagames.uhcrun.listener.BlockListener;
+import net.samagames.uhcrun.listener.ChunkListener;
+import net.samagames.uhcrun.listener.CompassTargeter;
+import net.samagames.uhcrun.listener.CraftListener;
+import net.samagames.uhcrun.listener.GameListener;
+import net.samagames.uhcrun.listener.SpectatorListener;
 
 
 /**
@@ -210,7 +218,8 @@ public class UHCRun extends JavaPlugin implements Listener {
         Map<String, BiomeBase> biomesMap = BiomeBase.o;
         BiomeForest defaultBiome = new BiomeForest(0, 0);
 
-        setFinalStatic(BiomeBase.class, "ad", defaultBiome);
+        Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
+        Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
 
         // FIXME: more modular system
         biomesMap.remove("Ocean");
@@ -234,23 +243,10 @@ public class UHCRun extends JavaPlugin implements Listener {
             }
         }
 
-        setFinalStatic(BiomeBase.class, "biomes", biomes);
+        Reflection.setFinalStatic(BiomeBase.class.getDeclaredField("biomes"), biomes);
     }
 
     public SamaGamesAPI getAPI() {
         return samaGamesAPI;
-    }
-
-    private void setFinalStatic(Class clazz, String fieldName, Object newValue) {
-        try {
-            Field field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            Field modifiers = field.getClass().getDeclaredField("modifiers");
-            modifiers.setAccessible(true);
-            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(null, newValue);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            ex.printStackTrace(System.err);
-        }
     }
 }
