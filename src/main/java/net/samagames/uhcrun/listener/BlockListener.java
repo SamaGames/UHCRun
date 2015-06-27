@@ -1,17 +1,9 @@
 package net.samagames.uhcrun.listener;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import net.samagames.uhcrun.UHCRun;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -20,9 +12,8 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import net.samagames.uhcrun.UHCRun;
+import java.util.Random;
 
 
 
@@ -50,7 +41,7 @@ public class BlockListener implements Listener {
         event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
 
         switch (mat) {
-            case LOG:
+            /*case LOG:
             case LOG_2:
                 final List<Block> bList = new ArrayList<>();
                 checkLeaves(event.getBlock());
@@ -80,7 +71,7 @@ public class BlockListener implements Listener {
                         }
                     }
                 }.runTaskTimer(UHCRun.getInstance(), 1, 1);
-                break;
+                break;*/
             case DIAMOND_ORE:
             case LAPIS_ORE:
             case GOLD_ORE:
@@ -124,11 +115,6 @@ public class BlockListener implements Listener {
     @Deprecated
     private void breakLeaf(World world, int x, int y, int z) {
         Block block = world.getBlockAt(x, y, z);
-        byte data = block.getData();
-
-        if ((data & 4) == 4) {
-            return; // player placed leaf, ignore
-        }
 
         byte range = 4;
         byte max = 32;
@@ -143,19 +129,11 @@ public class BlockListener implements Listener {
             int offX;
             int offY;
             int offZ;
-            int type;
 
             for (offX = -range; offX <= range; offX++) {
                 for (offY = -range; offY <= range; offY++) {
                     for (offZ = -range; offZ <= range; offZ++) {
                         Material mat = world.getBlockAt(x + offX, y + offY, z + offZ).getType();
-                        if (mat == Material.LEAVES || mat == Material.LEAVES_2) {
-                            type = Material.LEAVES.getId();
-                        } else {
-                            if (mat == Material.LOG || mat == Material.LOG_2) {
-                                type = Material.LOG.getId();
-                            }
-                        }
                         blocks[(offX + div) * mul + (offY + div) * max + offZ + div] = mat == Material.LOG || mat == Material.LOG_2 ? 0 : mat == Material.LEAVES || mat == Material.LEAVES_2 ? -2 : -1;
                     }
                 }
@@ -164,30 +142,30 @@ public class BlockListener implements Listener {
             for (offX = 1; offX <= 4; offX++) {
                 for (offY = -range; offY <= range; offY++) {
                     for (offZ = -range; offZ <= range; offZ++) {
-                        for (type = -range; type <= range; type++) {
-                            if (blocks[(offY + div) * mul + (offZ + div) * max + type + div] == offX - 1) {
-                                if (blocks[(offY + div - 1) * mul + (offZ + div) * max + type + div] == -2) {
-                                    blocks[(offY + div - 1) * mul + (offZ + div) * max + type + div] = offX;
+                        for (int i = -range; i <= range; i++) {
+                            if (blocks[(offY + div) * mul + (offZ + div) * max + i + div] == offX - 1) {
+                                if (blocks[(offY + div - 1) * mul + (offZ + div) * max + i + div] == -2) {
+                                    blocks[(offY + div - 1) * mul + (offZ + div) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div + 1) * mul + (offZ + div) * max + type + div] == -2) {
-                                    blocks[(offY + div + 1) * mul + (offZ + div) * max + type + div] = offX;
+                                if (blocks[(offY + div + 1) * mul + (offZ + div) * max + i + div] == -2) {
+                                    blocks[(offY + div + 1) * mul + (offZ + div) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div - 1) * max + type + div] == -2) {
-                                    blocks[(offY + div) * mul + (offZ + div - 1) * max + type + div] = offX;
+                                if (blocks[(offY + div) * mul + (offZ + div - 1) * max + i + div] == -2) {
+                                    blocks[(offY + div) * mul + (offZ + div - 1) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div + 1) * max + type + div] == -2) {
-                                    blocks[(offY + div) * mul + (offZ + div + 1) * max + type + div] = offX;
+                                if (blocks[(offY + div) * mul + (offZ + div + 1) * max + i + div] == -2) {
+                                    blocks[(offY + div) * mul + (offZ + div + 1) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div) * max + (type + div - 1)] == -2) {
-                                    blocks[(offY + div) * mul + (offZ + div) * max + (type + div - 1)] = offX;
+                                if (blocks[(offY + div) * mul + (offZ + div) * max + (i + div - 1)] == -2) {
+                                    blocks[(offY + div) * mul + (offZ + div) * max + (i + div - 1)] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div) * max + type + div + 1] == -2) {
-                                    blocks[(offY + div) * mul + (offZ + div) * max + type + div + 1] = offX;
+                                if (blocks[(offY + div) * mul + (offZ + div) * max + i + div + 1] == -2) {
+                                    blocks[(offY + div) * mul + (offZ + div) * max + i + div + 1] = offX;
                                 }
                             }
                         }

@@ -158,11 +158,11 @@ public class UHCRun extends JavaPlugin implements Listener {
         populator = new OrePopulator();
 
         // FIXME: more modular system
-        populator.addRule(new OrePopulator.Rule(Material.DIAMOND_ORE, 0, 4, 0, 64, 5));
-        populator.addRule(new OrePopulator.Rule(Material.IRON_ORE, 0, 2, 0, 64, 15));
-        populator.addRule(new OrePopulator.Rule(Material.GOLD_ORE, 0, 2, 0, 64, 8));
-        populator.addRule(new OrePopulator.Rule(Material.LAPIS_ORE, 0, 3, 0, 64, 4));
-        populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 0, 4, 0, 32, 6));
+        populator.addRule(new OrePopulator.Rule(Material.DIAMOND_ORE, 4, 0, 64, 5));
+        populator.addRule(new OrePopulator.Rule(Material.IRON_ORE, 2, 0, 64, 15));
+        populator.addRule(new OrePopulator.Rule(Material.GOLD_ORE, 2, 0, 64, 8));
+        populator.addRule(new OrePopulator.Rule(Material.LAPIS_ORE, 3, 0, 64, 4));
+        populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 4, 0, 32, 6));
 
 
         List<Double> spawnPos = (List<Double>) config.getList("spawnLocation", Arrays.asList(0.6, 152D, 0.6));

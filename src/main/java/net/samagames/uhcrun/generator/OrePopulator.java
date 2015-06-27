@@ -95,7 +95,6 @@ public class OrePopulator extends BlockPopulator {
                                     Block block = getBlock(world, ix, iy, iz);
                                     if (block != null && block.getType() == Material.STONE) {
                                         block.setType(material.id);
-                                        block.setData((byte) material.data);
                                     }
                                 }
                             }
@@ -126,15 +125,13 @@ public class OrePopulator extends BlockPopulator {
     public static class Rule {
 
         public Material id;
-        public int data;
         public int round;
         public int minY;
         public int maxY;
         public int size;
 
-        public Rule(Material type, int data, int round, int minY, int maxY, int size) {
+        public Rule(Material type, int round, int minY, int maxY, int size) {
             this.id = type;
-            this.data = data;
             this.round = round;
             this.minY = minY;
             this.maxY = maxY;
