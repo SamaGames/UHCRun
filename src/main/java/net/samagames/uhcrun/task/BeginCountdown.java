@@ -1,14 +1,13 @@
 package net.samagames.uhcrun.task;
 
+import net.samagames.api.games.Status;
+import net.samagames.api.games.themachine.messages.IMessageManager;
+import net.samagames.tools.Titles;
+import net.samagames.uhcrun.game.Game;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-
-import net.samagames.api.games.Status;
-import net.samagames.api.games.themachine.messages.MessageManager;
-import net.samagames.tools.Titles;
-import net.samagames.uhcrun.game.Game;
 
 
 
@@ -25,7 +24,7 @@ public class BeginCountdown implements Runnable {
     private final Game game;
     private final int maxPlayers;
     private final int minPlayers;
-    private final MessageManager messageManager;
+    private final IMessageManager messageManager;
     private boolean ready = false;
     private int countdown;
 

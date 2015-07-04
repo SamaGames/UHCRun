@@ -99,7 +99,7 @@ public class UHCRun extends JavaPlugin implements Listener {
             game = new SoloGame();
         else
             game = new TeamGame(playersPerTeam);*/
-        this.game = new SoloGame((short) 20, (short) 4, (short) 10);
+        this.game = new SoloGame();
         pluginManager.registerEvents(this, this);
 
         pluginManager.registerEvents(new ChunkListener(this), this);

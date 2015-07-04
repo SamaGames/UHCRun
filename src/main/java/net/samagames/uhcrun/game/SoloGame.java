@@ -1,24 +1,15 @@
 package net.samagames.uhcrun.game;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
-import org.bukkit.World;
+import net.samagames.api.player.AbstractPlayerData;
+import net.samagames.tools.Titles;
+import net.samagames.uhcrun.utils.Colors;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-import net.samagames.api.player.PlayerData;
-import net.samagames.tools.Titles;
-import net.samagames.uhcrun.utils.Colors;
+import java.util.*;
 
 
 /**
@@ -32,8 +23,8 @@ public class SoloGame extends Game {
     private final java.util.List<Location> spawnPoints;
     private final Random rand;
 
-    public SoloGame(short normalSlots, short vipSlots, short minPlayers) {
-        super("Solo", normalSlots, vipSlots, minPlayers);
+    public SoloGame() {
+        super("Solo");
 
         this.rand = new Random();
         this.spawnPoints = new ArrayList<>();
@@ -47,7 +38,7 @@ public class SoloGame extends Game {
 
         World world = server.getWorld("world");
 
-        for (int i = 0; i < this.getMaxPlayers(); i++) {
+        for (int i = 0; i < plugin.getAPI().getGameManager().getGameProperties().getMaxSlots(); i++) {
             final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
             for (int y = 0; y < 16; y++) {
                 world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
@@ -59,13 +50,13 @@ public class SoloGame extends Game {
 
     @Override
     public void creditKillCoins(Player player) {
-        PlayerData playerData = getPlayerData(player);
+        AbstractPlayerData playerData = getPlayerData(player);
         playerData.creditCoins(20, "Un joueur tué !", true);
     }
 
     @Override
     public void checkStump(Player player) {
-        PlayerData playerData = getPlayerData(player);
+        AbstractPlayerData playerData = getPlayerData(player);
         if (this.players.size() == 2) {
             playerData.creditCoins(20, "Troisième au classement !", true);
         }
@@ -89,12 +80,12 @@ public class SoloGame extends Game {
     }
 
     public void win(final Player player) {
-        final PlayerData playerData = plugin.getAPI().getPlayerManager().getPlayerData(player.getUniqueId());
+        final AbstractPlayerData playerData = plugin.getAPI().getPlayerManager().getPlayerData(player.getUniqueId());
         playerData.creditStars(2, "Victoire !");
         playerData.creditCoins(100, "Victoire ! ", true);
 
         try {
-            stats.increase(player.getUniqueId(), "victories", 1);
+            this.increaseStat(player.getUniqueId(), "victories", 1);
         } catch (Exception ex) {
         }
 

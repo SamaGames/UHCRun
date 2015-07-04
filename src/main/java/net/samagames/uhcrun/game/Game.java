@@ -1,23 +1,21 @@
 package net.samagames.uhcrun.game;
 
-import java.util.AbstractMap;
-import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import com.google.gson.Gson;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.World;
+import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.GamePlayer;
+import net.samagames.api.games.Status;
+import net.samagames.api.games.themachine.ICoherenceMachine;
+import net.samagames.api.games.themachine.messages.IMessageManager;
+import net.samagames.api.player.AbstractPlayerData;
+import net.samagames.tools.Titles;
+import net.samagames.tools.scoreboards.ObjectiveSign;
+import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.game.data.SavedPlayer;
+import net.samagames.uhcrun.game.data.StoredGame;
+import net.samagames.uhcrun.task.BeginCountdown;
+import net.samagames.uhcrun.task.GameLoop;
+import net.samagames.uhcrun.utils.Metadatas;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,20 +26,9 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import net.samagames.api.games.IReconnectGame;
-import net.samagames.api.games.Status;
-import net.samagames.api.games.themachine.CoherenceMachine;
-import net.samagames.api.games.themachine.messages.MessageManager;
-import net.samagames.api.player.PlayerData;
-import net.samagames.api.stats.StatsManager;
-import net.samagames.tools.Titles;
-import net.samagames.tools.scoreboards.ObjectiveSign;
-import net.samagames.uhcrun.UHCRun;
-import net.samagames.uhcrun.game.data.SavedPlayer;
-import net.samagames.uhcrun.game.data.StoredGame;
-import net.samagames.uhcrun.task.BeginCountdown;
-import net.samagames.uhcrun.task.GameLoop;
-import net.samagames.uhcrun.utils.Metadatas;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 
@@ -53,15 +40,14 @@ import net.samagames.uhcrun.utils.Metadatas;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class Game extends IReconnectGame {
+public abstract class Game extends net.samagames.api.games.Game {
 
     protected AbstractMap<UUID, Integer> kills = new ConcurrentHashMap<>();
     protected AbstractSet<UUID> players = new CopyOnWriteArraySet<>();
-    protected CoherenceMachine coherenceMachine;
+    protected ICoherenceMachine coherenceMachine;
     protected List<UUID> disconnected = new ArrayList<>();
-    protected Map<UUID, PlayerData> playerDataCaches = new HashMap<>();
+    protected Map<UUID, AbstractPlayerData> playerDataCaches = new HashMap<>();
     protected Status status;
-    protected StatsManager stats;
     protected final Server server;
     protected final UHCRun plugin;
 
@@ -70,27 +56,25 @@ public abstract class Game extends IReconnectGame {
     private GameLoop gameLoop;
     private boolean pvpEnabled, damages;
     private BukkitTask beginCountdown, mainTask;
-    private MessageManager messageManager;
+    private IMessageManager messageManager;
     private final String mapName;
-    private final short normalSlots, vipSlots, minPlayers;
+    private final int minPlayers;
 
 
-    public Game(String mapName, short normalSlots, short vipSlots, short minPlayers) {
+    public Game(String mapName) {
+        super("UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), GamePlayer.class);
         this.plugin = UHCRun.getInstance();
         this.server = plugin.getServer();
         this.status = Status.NOT_RESPONDING;
         this.mapName = mapName;
-        this.normalSlots = normalSlots;
-        this.vipSlots = vipSlots;
-        this.minPlayers = minPlayers;
-        this.stats = plugin.getAPI().getStatsManager("uhcrun");
+        this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
     }
 
     public void postInit() {
         this.scoreboard = server.getScoreboardManager().getMainScoreboard();
         this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
         this.messageManager = this.coherenceMachine.getMessageManager();
-        this.beginCountdown = server.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, getMaxPlayers(), minPlayers, 121), 20L, 20L);
+        this.beginCountdown = server.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots(), minPlayers, 121), 20L, 20L);
     }
 
     @Override
@@ -128,7 +112,7 @@ public abstract class Game extends IReconnectGame {
             }
 
             try {
-                stats.increase(uuid, "played", 1);
+                this.increaseStat(uuid, "played", 1);
             } catch (Exception ignored) {
             }
 
@@ -245,21 +229,11 @@ public abstract class Game extends IReconnectGame {
     }
 
     @Override
-    public int getMaxPlayers() {
-        return normalSlots + vipSlots;
-    }
-
-    @Override
-    public final String getMapName() {
-        return mapName;
-    }
-
-    @Override
     public final String getGameName() {
         return plugin.getConfig().getString("gameName", "UHCRun");
     }
 
-    public final CoherenceMachine getCoherenceMachine() {
+    public final ICoherenceMachine getCoherenceMachine() {
         return coherenceMachine;
     }
 
@@ -303,7 +277,7 @@ public abstract class Game extends IReconnectGame {
                     this.creditKillCoins(killer);
 
                     try {
-                        stats.increase(killer.getUniqueId(), "kills", 1);
+                        this.increaseStat(killer.getUniqueId(), "kills", 1);
                         this.addKill(killer.getUniqueId());
                         e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
                         e.kill(player);
@@ -346,7 +320,7 @@ public abstract class Game extends IReconnectGame {
             player.setHealth(20.0D);
             if (!logout) {
                 try {
-                    stats.increase(player.getUniqueId(), "stumps", 1);
+                    this.increaseStat(player.getUniqueId(), "stumps", 1);
                 } catch (Exception ex) {
                 }
 
@@ -378,11 +352,11 @@ public abstract class Game extends IReconnectGame {
         disconnected.clear();
     }
 
-    public PlayerData getPlayerData(UUID uuid) {
+    public AbstractPlayerData getPlayerData(UUID uuid) {
         return !playerDataCaches.containsKey(uuid) ? plugin.getAPI().getPlayerManager().getPlayerData(uuid) : playerDataCaches.get(uuid);
     }
 
-    public PlayerData getPlayerData(Player player) {
+    public AbstractPlayerData getPlayerData(Player player) {
         return getPlayerData(player.getUniqueId());
     }
 
@@ -393,17 +367,23 @@ public abstract class Game extends IReconnectGame {
     // --- CONNECTION --- //
 
     @Override
-    public void playerJoin(Player player) {
-        players.add(player.getUniqueId());
-        messageManager.writeWelcomeInGameToPlayer(player);
-        messageManager.writePlayerJoinToAll(player);
+    public void handleLogin(Player player, boolean reconnect) {
 
-        player.setGameMode(GameMode.ADVENTURE);
-        player.teleport(plugin.getSpawnLocation());
+        if (!reconnect) {
+            players.add(player.getUniqueId());
+            messageManager.writeWelcomeInGameToPlayer(player);
+            messageManager.writePlayerJoinToAll(player);
+
+            player.setGameMode(GameMode.ADVENTURE);
+            player.teleport(plugin.getSpawnLocation());
+        } else {
+            this.rejoin(player, false);
+        }
+
     }
 
     @Override
-    public void playerDisconnect(Player player) {
+    public void handleLogout(Player player) {
         if (this.getStatus() == Status.IN_GAME) {
             this.gameLoop.removePlayer(player.getUniqueId());
             if (this.isPvpEnabled()) {
@@ -432,17 +412,14 @@ public abstract class Game extends IReconnectGame {
 
     }
 
+
     public boolean isDisconnected(UUID player) {
         return disconnected.contains(player);
     }
 
     @Override
-    public void playerReconnect(Player player) {
-        this.rejoin(player, false);
-    }
-
-    @Override
-    public void playerReconnectTimeOut(Player player) {
+    public void handleReconnectTimeOut(Player player) {
+        // Handle time out
         this.rejoin(player, true);
     }
 

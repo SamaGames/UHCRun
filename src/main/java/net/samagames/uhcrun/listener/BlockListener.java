@@ -4,6 +4,7 @@ package net.samagames.uhcrun.listener;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,7 +13,10 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -41,7 +45,7 @@ public class BlockListener implements Listener {
         event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
 
         switch (mat) {
-            /*case LOG:
+            case LOG:
             case LOG_2:
                 final List<Block> bList = new ArrayList<>();
                 checkLeaves(event.getBlock());
@@ -52,12 +56,7 @@ public class BlockListener implements Listener {
                         for (int i = 0; i < bList.size(); i++) {
                             Block block = bList.get(i);
                             if (block.getType() == Material.LOG || block.getType() == Material.LOG_2) {
-                                for (ItemStack item : block.getDrops()) {
-                                    block.getWorld().dropItemNaturally(block.getLocation(), item);
-                                }
-
-                                block.setType(Material.AIR);
-                                checkLeaves(block);
+                                block.breakNaturally();
                             }
                             for (BlockFace face : BlockFace.values()) {
                                 if (block.getRelative(face).getType() == Material.LOG || block.getRelative(face).getType() == Material.LOG_2) {
@@ -71,7 +70,7 @@ public class BlockListener implements Listener {
                         }
                     }
                 }.runTaskTimer(UHCRun.getInstance(), 1, 1);
-                break;*/
+                break;
             case DIAMOND_ORE:
             case LAPIS_ORE:
             case GOLD_ORE:
