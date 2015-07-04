@@ -37,6 +37,13 @@ repositories {
             password sgpass
         }
     }
+    maven {
+        url "http://maven.samagames.net/network/"
+        credentials {
+            username sguser
+            password sgpass
+        }
+    }
     maven { url "http://maven.sk89q.com/repo/" }
     maven { url "http://repo.maven.apache.org/maven2" }
 }
