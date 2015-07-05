@@ -1,9 +1,5 @@
 package net.samagames.uhcrun.generator;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Logger;
-
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -11,11 +7,12 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.world.DataException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import net.samagames.uhcrun.UHCRun;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 
 
