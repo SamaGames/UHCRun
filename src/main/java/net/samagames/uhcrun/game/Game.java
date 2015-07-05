@@ -177,12 +177,14 @@ public abstract class Game extends net.samagames.api.games.Game {
         plugin.getAPI().getGameManager().refreshArena();
         server.getScheduler().runTaskLater(plugin, () -> {
             try {
-                server.getOnlinePlayers().forEach(player -> plugin.getAPI().getGameManager().kickPlayer(player, "#FinDuGame"));
+                server.getOnlinePlayers().forEach(player -> plugin.getAPI().getGameManager().kickPlayer(player, null));
+                Thread.sleep(10000);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+
             server.shutdown();
-        }, 20 * 30);
+        }, 20 * 10);
     }
 
 

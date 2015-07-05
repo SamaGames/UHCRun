@@ -65,11 +65,14 @@ public class UHCRun extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        try {
+
+
+        /*try {
             this.patchBlocks();
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
-        }
+        }*/
+
         // Define the instance
         instance = this;
 
@@ -92,14 +95,17 @@ public class UHCRun extends JavaPlugin implements Listener {
             logger.info("World found!");
         }
 
-        // TODO: Team Game
-        int playersPerTeam = Integer.valueOf(samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam"));
+        String nb = samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam");
 
-        /*if (playersPerTeam <= 1)
-            game = new SoloGame();
-        else
-            game = new TeamGame(playersPerTeam);*/
-        this.game = new SoloGame();
+        if (nb != null && !"1".equals(nb)) {
+            int playersPerTeam = Integer.valueOf(nb);
+            // TODO: Team Game
+        } else {
+            this.game = new SoloGame();
+        }
+
+        samaGamesAPI.getGameManager().registerGame(game);
+
         pluginManager.registerEvents(this, this);
 
         pluginManager.registerEvents(new ChunkListener(this), this);
@@ -126,7 +132,6 @@ public class UHCRun extends JavaPlugin implements Listener {
     }
 
     private void postInit() {
-        samaGamesAPI.getGameManager().registerGame(game);
         getCommand("nextevent").setExecutor(new CommandNextEvent(game));
         game.setStatus(Status.STARTING);
         this.startTimer.cancel();

@@ -125,8 +125,8 @@ public class SoloGame extends Game {
                         type = FireworkEffect.Type.STAR;
                     }
 
-                    int r1i = r.nextInt(17) + 1;
-                    int r2i = r.nextInt(17) + 1;
+                    int r1i = r.nextInt(15) + 1;
+                    int r2i = r.nextInt(15) + 1;
                     Color c1 = Colors.getColor(r1i);
                     Color c2 = Colors.getColor(r2i);
                     FireworkEffect effect = FireworkEffect.builder().flicker(r.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(r.nextBoolean()).build();
