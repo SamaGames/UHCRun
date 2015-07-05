@@ -2,6 +2,7 @@ package net.samagames.uhcrun.generator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -27,16 +28,17 @@ import net.samagames.uhcrun.UHCRun;
  * All rights reserved.
  */
 public class LobbyPopulator {
-    private UHCRun plugin;
+    private final Logger logger;
+    private final File file;
     private EditSession es;
 
-    public LobbyPopulator(UHCRun pl) {
-        this.plugin = pl;
+    public LobbyPopulator(Logger logger, File file) {
+        this.logger = logger;
+        this.file = new File(file, "/lobby.schematic");
     }
 
     public void generate() {
-        this.plugin.getLogger().info("Generating Looby...");
-        File file = new File(this.plugin.getDataFolder(), "/lobby.schematic");
+        logger.info("Generating Looby...");
 
         if (file.exists()) {
             try {
@@ -53,10 +55,10 @@ public class LobbyPopulator {
             }
 
         } else {
-            this.plugin.getLogger().severe("File does not exist. Abort...");
+            logger.severe("File does not exist. Abort...");
         }
 
-        this.plugin.getLogger().info("Done.");
+        logger.info("Done.");
     }
 
     public void remove() {

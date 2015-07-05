@@ -22,7 +22,7 @@ public class WorldLoader {
     private UHCRun plugin = UHCRun.getInstance();
 
     public static Integer getHighestNaturalBlockAt(int x, int z) {
-        int[] loc = new int[] {x, z};
+        final int[] loc = new int[] {x, z};
 
         if (highestBlocks.containsKey(loc)) {
             return highestBlocks.get(loc);

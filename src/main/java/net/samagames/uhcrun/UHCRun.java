@@ -93,7 +93,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         }
 
         // TODO: Team Game
-        int playersPerTeam = getConfig().getInt("playersPerTeam", 1);
+        int playersPerTeam = Integer.valueOf(samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam"));
 
         /*if (playersPerTeam <= 1)
             game = new SoloGame();
@@ -134,7 +134,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         this.worldLoaded = true;
 
         // Add the lobby
-        loobyPopulator = new LobbyPopulator(this);
+        loobyPopulator = new LobbyPopulator(this.getLogger(), this.getDataFolder());
         loobyPopulator.generate();
         pluginManager.registerEvents(new CraftListener(), this);
         pluginManager.registerEvents(new BlockListener(), this);

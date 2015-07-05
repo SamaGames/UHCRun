@@ -15,9 +15,9 @@ import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.world.DataException;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
@@ -75,26 +75,28 @@ public class FortressPopulator extends BlockPopulator {
             try {
                 com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(x, 40, z);
                 Chunk chunk = world.getChunkAt(new org.bukkit.Location(world, x, 40, z));
+                int chunkX = chunk.getX();
+                int chunkZ = chunk.getZ();
                 chunk.load(true);
-                int cx = chunk.getX() - 3;
-                int cz = chunk.getZ() - 3;
-                while (cx < chunk.getX() + 3) {
-                    while (cz < chunk.getZ() + 3) {
-                        if (cx != chunk.getX() || cz != chunk.getZ()) {
+                int cx = chunkX - 3;
+                int cz = chunkZ - 3;
+                while (cx < chunkX + 3) {
+                    while (cz < chunkZ + 3) {
+                        if (cx != chunkX || cz != chunkZ) {
                             world.getChunkAt(cx, cz).load(true);
                         }
                         cz++;
                     }
                     cx++;
                 }
-                world.getChunkAt(chunk.getX() - 1, chunk.getZ() + 1).load(true);
-                world.getChunkAt(chunk.getX() - 1, chunk.getZ() - 1).load(true);
-                world.getChunkAt(chunk.getX() - 1, chunk.getZ()).load(true);
-                world.getChunkAt(chunk.getX() + 1, chunk.getZ() + 1).load(true);
-                world.getChunkAt(chunk.getX() + 1, chunk.getZ() - 1).load(true);
-                world.getChunkAt(chunk.getX() + 1, chunk.getZ()).load(true);
-                world.getChunkAt(chunk.getX(), chunk.getZ() + 1).load(true);
-                world.getChunkAt(chunk.getX(), chunk.getZ() - 1).load(true);
+                world.getChunkAt(chunkX - 1, chunkZ + 1).load(true);
+                world.getChunkAt(chunkX - 1, chunkZ - 1).load(true);
+                world.getChunkAt(chunkX - 1, chunkZ).load(true);
+                world.getChunkAt(chunkX + 1, chunkZ + 1).load(true);
+                world.getChunkAt(chunkX + 1, chunkZ - 1).load(true);
+                world.getChunkAt(chunkX + 1, chunkZ).load(true);
+                world.getChunkAt(chunkX, chunkZ + 1).load(true);
+                world.getChunkAt(chunkX, chunkZ - 1).load(true);
 
 
                 es = new EditSession(bukkitWorld, 2000000);
@@ -108,11 +110,11 @@ public class FortressPopulator extends BlockPopulator {
                     while (bz < z + 35) {
                         int by = 40;
                         while (by > 0) {
-                            Location block = new org.bukkit.Location(world, bx, by, bz);
-                            if (block.getBlock().getType() == Material.MOB_SPAWNER) {
-                                block.getBlock().setType(Material.STONE);
-                                block.getBlock().setType(Material.MOB_SPAWNER);
-                                CreatureSpawner spawner = (CreatureSpawner) block.getBlock().getState();
+                            Block block = new org.bukkit.Location(world, bx, by, bz).getBlock();
+                            if (block.getType() == Material.MOB_SPAWNER) {
+                                block.setType(Material.STONE);
+                                block.setType(Material.MOB_SPAWNER);
+                                CreatureSpawner spawner = (CreatureSpawner) block.getState();
                                 spawner.setSpawnedType(EntityType.BLAZE);
                                 spawner.setDelay(1);
                                 spawner.update();
