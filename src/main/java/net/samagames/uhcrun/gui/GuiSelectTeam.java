@@ -44,7 +44,7 @@ public class GuiSelectTeam extends Gui {
 
     @Override
     public void display(Player player) {
-        this.inventory = Bukkit.getServer().createInventory(null, 54, "Sélection d'équipe");
+        this.inventory = Bukkit.getServer().createInventory(null, 54, "SÃ©lection d'Ã©quipe");
 
         try {
             this.signField = CraftSign.class.getDeclaredField("sign");
@@ -66,7 +66,7 @@ public class GuiSelectTeam extends Gui {
             ArrayList<String> lores = new ArrayList<>();
 
             if (team.isLocked()) {
-                lores.add(ChatColor.RED + "L'équipe est fermée !");
+                lores.add(ChatColor.RED + "L'Ã©quipe est fermÃ©e !");
                 lores.add("");
             }
 
@@ -87,12 +87,12 @@ public class GuiSelectTeam extends Gui {
             }
         }
 
-        setSlotData("Sortir de l'équipe", Material.ARROW, 31, null, "leave");
+        setSlotData("Sortir de l'Ã©quipe", Material.ARROW, 31, null, "leave");
 
-        String[] lores = new String[]{ChatColor.GREEN + "Réservé aux VIP :)"};
+        String[] lores = new String[]{ChatColor.GREEN + "RÃ©servÃ© aux VIP :)"};
 
-        setSlotData("Ouvrir/Fermer l'équipe", Material.BARRIER, 39, lores, "openclose");
-        setSlotData("Changer le nom de l'équipe", Material.BOOK_AND_QUILL, 40, lores, "teamname");
+        setSlotData("Ouvrir/Fermer l'Ã©quipe", Material.BARRIER, 39, lores, "openclose");
+        setSlotData("Changer le nom de l'Ã©quipe", Material.BOOK_AND_QUILL, 40, lores, "teamname");
         setSlotData("Inviter un joueur", Material.FEATHER, 41, lores, "invit");
 
         player.openInventory(this.inventory);
@@ -110,12 +110,12 @@ public class GuiSelectTeam extends Gui {
                                 game.getPlayerTeam(player.getUniqueId()).remove(player.getUniqueId());
                             }
                             team.join(player.getUniqueId());
-                            player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.YELLOW + "Vous êtes entré dans l'équipe " + team.getChatColor() + team.getTeamName() + ChatColor.YELLOW + " !");
+                            player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.YELLOW + "Vous Ãªtes entrÃ© dans l'Ã©quipe " + team.getChatColor() + team.getTeamName() + ChatColor.YELLOW + " !");
                         } else {
-                            player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "L'équipe choisie est pleine.");
+                            player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "L'Ã©quipe choisie est pleine.");
                         }
                     } else {
-                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "L'équipe choisie est fermée !");
+                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "L'Ã©quipe choisie est fermÃ©e !");
                     }
 
                     break;
@@ -150,26 +150,26 @@ public class GuiSelectTeam extends Gui {
                         }
                     }, 1L);
                 } else {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une Ã©quipe pour pouvoir utiliser cette fonction !");
                 }
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez Ãªtre VIP pour pouvoir utiliser cette fonction !");
             }
         } else if ("openclose".equals(action)) {
             if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamlock")) {
                 if (game.getPlayerTeam(player.getUniqueId()) != null) {
                     if (game.getPlayerTeam(player.getUniqueId()).isLocked()) {
                         game.getPlayerTeam(player.getUniqueId()).setLocked(false);
-                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Votre équipe est maintenant ouverte !");
+                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Votre Ã©quipe est maintenant ouverte !");
                     } else {
                         game.getPlayerTeam(player.getUniqueId()).setLocked(true);
-                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Votre équipe est maintenant fermée !");
+                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Votre Ã©quipe est maintenant fermÃ©e !");
                     }
                 } else {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une Ã©quipe pour pouvoir utiliser cette fonction !");
                 }
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez Ãªtre VIP pour pouvoir utiliser cette fonction !");
             }
         } else if ("invit".equals(action)) {
             if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teaminvite")) {
@@ -192,17 +192,17 @@ public class GuiSelectTeam extends Gui {
                         }
                     }
                 } else {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une Ã©quipe pour pouvoir utiliser cette fonction !");
                 }
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez Ãªtre VIP pour pouvoir utiliser cette fonction !");
             }
         } else if ("leave".equals(action)) {
             if (game.getPlayerTeam(player.getUniqueId()) != null) {
                 game.getPlayerTeam(player.getUniqueId()).remove(player.getUniqueId());
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Vous avez quitté l'équipe !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Vous avez quittÃ© l'Ã©quipe !");
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une Ã©quipe pour pouvoir utiliser cette fonction !");
             }
         }
     }

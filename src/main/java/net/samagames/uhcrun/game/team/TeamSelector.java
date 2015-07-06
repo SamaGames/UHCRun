@@ -70,17 +70,23 @@ public class TeamSelector implements Listener {
 
             if (!name.isEmpty()) {
                 team.setTeamName(name);
-                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Le nom de votre équipe est désormais : " + team.getChatColor() + team.getTeamName());
+                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Le nom de votre Ã©quipe est dÃ©sormais : " + team.getChatColor() + team.getTeamName());
                 this.openGui(event.getPlayer(), new GuiSelectTeam());
             } else {
-                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Le nom de l'équipe ne peut être vide.");
+                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Le nom de l'Ã©quipe ne peut Ãªtre vide.");
                 this.openGui(event.getPlayer(), new GuiSelectTeam());
             }
         }
     }
 
     public void openGui(Player player, Gui gui) {
+        if (this.playersGui.containsKey(player.getUniqueId())) {
+            player.closeInventory();
+            this.playersGui.remove(player.getUniqueId());
+        }
 
+        this.playersGui.put(player.getUniqueId(), gui);
+        gui.display(player);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

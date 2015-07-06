@@ -52,7 +52,7 @@ public class Team {
             for (UUID member : players) {
                 Player user = Bukkit.getPlayer(member);
                 if (user != null) {
-                    user.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.AQUA + newJoiner.getName() + ChatColor.YELLOW + " a rejoint l'équipe.");
+                    user.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.AQUA + newJoiner.getName() + ChatColor.YELLOW + " a rejoint l'Ã©quipe.");
                 }
 
             }
@@ -82,7 +82,7 @@ public class Team {
     public void invite(String inviter, UUID invited) {
         this.invited.add(invited);
 
-        new FancyMessage("Vous avez été invité dans l'équipe " + this.teamName + " par " + inviter + " ")
+        new FancyMessage("Vous avez Ã©tÃ© invitÃ© dans l'Ã©quipe " + this.teamName + " par " + inviter + " ")
                 .color(ChatColor.GOLD)
                 .style(ChatColor.BOLD)
                 .then("[Rejoindre]")
