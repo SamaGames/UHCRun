@@ -7,6 +7,7 @@ import net.samagames.tools.Reflection;
 import net.samagames.uhcrun.commands.CommandNextEvent;
 import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.SoloGame;
+import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
@@ -99,7 +100,7 @@ public class UHCRun extends JavaPlugin implements Listener {
 
         if (nb != null && !"1".equals(nb)) {
             int playersPerTeam = Integer.valueOf(nb);
-            // TODO: Team Game
+            this.game = new TeamGame(playersPerTeam);
         } else {
             this.game = new SoloGame();
         }
@@ -132,6 +133,7 @@ public class UHCRun extends JavaPlugin implements Listener {
     }
 
     private void postInit() {
+        World world = getServer().getWorld("world");
         getCommand("nextevent").setExecutor(new CommandNextEvent(game));
         game.setStatus(Status.STARTING);
         this.startTimer.cancel();
@@ -144,11 +146,11 @@ public class UHCRun extends JavaPlugin implements Listener {
         pluginManager.registerEvents(new CraftListener(), this);
         pluginManager.registerEvents(new BlockListener(), this);
 
-        game.postInit();
+        game.postInit(world);
 
         worldLoader = new WorldLoader();
 
-        worldLoader.begin(getServer().getWorld("world"));
+        worldLoader.begin(world);
 
     }
 

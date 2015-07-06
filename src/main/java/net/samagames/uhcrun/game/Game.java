@@ -14,11 +14,15 @@ import net.samagames.uhcrun.game.data.SavedPlayer;
 import net.samagames.uhcrun.game.data.StoredGame;
 import net.samagames.uhcrun.task.BeginCountdown;
 import net.samagames.uhcrun.task.GameLoop;
+import net.samagames.uhcrun.utils.Colors;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -29,8 +33,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-
 
 
 /**
@@ -50,6 +52,8 @@ public abstract class Game extends net.samagames.api.games.Game {
     protected Status status;
     protected final Server server;
     protected final UHCRun plugin;
+    protected final List<Location> spawnPoints;
+    protected final Random rand;
 
     private StoredGame storedGame;
     private Scoreboard scoreboard;
@@ -57,30 +61,47 @@ public abstract class Game extends net.samagames.api.games.Game {
     private boolean pvpEnabled, damages;
     private BukkitTask beginCountdown, mainTask;
     private IMessageManager messageManager;
-    private final String mapName;
-    private final int minPlayers;
+    private final int minPlayers, maxLocations;
 
 
-    public Game(String mapName) {
+    public Game(int maxLocations) {
         super("UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), GamePlayer.class);
         this.plugin = UHCRun.getInstance();
         this.server = plugin.getServer();
         this.status = Status.NOT_RESPONDING;
-        this.mapName = mapName;
+        this.spawnPoints = new ArrayList<>();
+        this.rand = new Random();
+        this.maxLocations = maxLocations;
         this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
     }
 
-    public void postInit() {
+    public void postInit(World world) {
         this.scoreboard = server.getScoreboardManager().getMainScoreboard();
         this.coherenceMachine = plugin.getAPI().getGameManager().getCoherenceMachine();
         this.messageManager = this.coherenceMachine.getMessageManager();
         this.beginCountdown = server.getScheduler().runTaskTimer(plugin, new BeginCountdown(this, SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots(), minPlayers, 121), 20L, 20L);
+        this.disableDamages();
+        this.computeSpawnLocations(world);
+    }
+
+    private void computeSpawnLocations(World world) {
+        for (int i = 0; i < maxLocations; i++) {
+            final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
+            for (int y = 0; y < 16; y++) {
+                world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
+            }
+
+            spawnPoints.add(randomLocation);
+        }
+
+        // Shuffle locations
+        Collections.shuffle(this.spawnPoints);
     }
 
     @Override
     public void startGame() {
         // Init Online Stats Data
-        storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), mapName);
+        storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), this.getClass().getSimpleName());
 
         // Remove the lobby
         plugin.removeSpawn();
@@ -124,7 +145,7 @@ public abstract class Game extends net.samagames.api.games.Game {
             player.setLevel(0);
             player.getInventory().clear();
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 24000, 0));
-            ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
+            ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "= UHCRun =");
             sign.addReceiver(player);
             gameLoop.addPlayer(player.getUniqueId(), sign);
             kills.put(uuid, 0);
@@ -267,6 +288,10 @@ public abstract class Game extends net.samagames.api.games.Game {
         return players.contains(player);
     }
 
+    public Set<UUID> getPlayers() {
+        return players;
+    }
+
     public void stumpPlayer(Player player, boolean logout) {
         this.players.remove(player.getUniqueId());
         if (this.status == Status.IN_GAME) {
@@ -276,7 +301,7 @@ public abstract class Game extends net.samagames.api.games.Game {
             if (lastDamager != null && lastDamager instanceof Player) {
                 killer = (Player) lastDamager;
                 if (killer.isOnline() && this.isInGame(killer.getUniqueId())) {
-                    this.creditKillCoins(killer);
+                    this.creditKillCoins(getPlayerData(killer));
 
                     try {
                         this.increaseStat(killer.getUniqueId(), "kills", 1);
@@ -342,7 +367,9 @@ public abstract class Game extends net.samagames.api.games.Game {
         this.kills.put(player, val + 1);
     }
 
-    public abstract void creditKillCoins(Player killer);
+    public void creditKillCoins(AbstractPlayerData killer) {
+        killer.creditCoins(20, "Un joueur tué !", true);
+    }
 
     public abstract void checkStump(Player player);
 
@@ -372,16 +399,20 @@ public abstract class Game extends net.samagames.api.games.Game {
     public void handleLogin(Player player, boolean reconnect) {
 
         if (!reconnect) {
-            players.add(player.getUniqueId());
-            messageManager.writeWelcomeInGameToPlayer(player);
-            messageManager.writePlayerJoinToAll(player);
-
-            player.setGameMode(GameMode.ADVENTURE);
-            player.teleport(plugin.getSpawnLocation());
+            this.join(player);
         } else {
             this.rejoin(player, false);
         }
 
+    }
+
+    public void join(Player player) {
+        players.add(player.getUniqueId());
+        messageManager.writeWelcomeInGameToPlayer(player);
+        messageManager.writePlayerJoinToAll(player);
+
+        player.setGameMode(GameMode.ADVENTURE);
+        player.teleport(plugin.getSpawnLocation());
     }
 
     @Override
@@ -467,5 +498,51 @@ public abstract class Game extends net.samagames.api.games.Game {
             default:
                 return "Autre";
         }
+    }
+
+    public void effectsOnWinner(Player player) {
+        server.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            int timer = 0;
+
+            public void run() {
+                if (this.timer < 20) {
+                    Firework fw = (Firework) player.getWorld().spawnEntity(player.getPlayer().getLocation(), EntityType.FIREWORK);
+                    FireworkMeta fwm = fw.getFireworkMeta();
+                    Random r = new Random();
+                    int rt = r.nextInt(4) + 1;
+                    FireworkEffect.Type type = FireworkEffect.Type.BALL;
+                    if (rt == 1) {
+                        type = FireworkEffect.Type.BALL;
+                    }
+
+                    if (rt == 2) {
+                        type = FireworkEffect.Type.BALL_LARGE;
+                    }
+
+                    if (rt == 3) {
+                        type = FireworkEffect.Type.BURST;
+                    }
+
+                    if (rt == 4) {
+                        type = FireworkEffect.Type.CREEPER;
+                    }
+
+                    if (rt == 5) {
+                        type = FireworkEffect.Type.STAR;
+                    }
+
+                    int r1i = r.nextInt(15) + 1;
+                    int r2i = r.nextInt(15) + 1;
+                    Color c1 = Colors.getColor(r1i);
+                    Color c2 = Colors.getColor(r2i);
+                    FireworkEffect effect = FireworkEffect.builder().flicker(r.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(r.nextBoolean()).build();
+                    fwm.addEffect(effect);
+                    int rp = r.nextInt(2) + 1;
+                    fwm.setPower(rp);
+                    fw.setFireworkMeta(fwm);
+                    ++this.timer;
+                }
+            }
+        }, 5L, 5L);
     }
 }
