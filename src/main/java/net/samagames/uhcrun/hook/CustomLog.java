@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.hook;
 
-import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_8_R3.*;
 
 import java.util.Iterator;
 

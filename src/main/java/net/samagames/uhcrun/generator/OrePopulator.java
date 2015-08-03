@@ -7,12 +7,12 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 
-import net.minecraft.server.v1_8_R2.ChunkSnapshot;
-import net.minecraft.server.v1_8_R2.WorldGenCanyon;
-import net.minecraft.server.v1_8_R2.WorldGenCaves;
+import net.minecraft.server.v1_8_R3.ChunkSnapshot;
+import net.minecraft.server.v1_8_R3.WorldGenCanyon;
+import net.minecraft.server.v1_8_R3.WorldGenCaves;
 
 
 /**

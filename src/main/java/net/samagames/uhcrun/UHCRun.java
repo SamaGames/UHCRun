@@ -1,6 +1,7 @@
 package net.samagames.uhcrun;
 
-import net.minecraft.server.v1_8_R2.*;
+import com.google.gson.JsonPrimitive;
+import net.minecraft.server.v1_8_R3.*;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.tools.Reflection;
@@ -96,9 +97,9 @@ public class UHCRun extends JavaPlugin implements Listener {
             logger.info("World found!");
         }
 
-        String nb = samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam");
+        int nb = samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam", new JsonPrimitive(1)).getAsInt();
 
-        if (nb != null && !"1".equals(nb)) {
+        if (nb > 1) {
             int playersPerTeam = Integer.valueOf(nb);
             this.game = new TeamGame(playersPerTeam);
         } else {
