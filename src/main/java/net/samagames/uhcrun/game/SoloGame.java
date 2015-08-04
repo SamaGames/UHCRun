@@ -49,6 +49,8 @@ public class SoloGame extends Game {
             playerData.addCoins(20, "Troisième au classement !");
         }
 
+        System.out.println(gamePlayers.size());
+
         if (gamePlayers.size() == 1) {
             playerData.addCoins(50, "Second au classement !");
             playerData.addStars(1, "Second au classement !");
@@ -118,13 +120,13 @@ public class SoloGame extends Game {
         for (UUID uuid : this.gamePlayers.keySet()) {
             Player player = server.getPlayer(uuid);
             if (player == null) {
-                gamePlayers.remove(player);
+                gamePlayers.remove(uuid);
                 continue;
             }
 
             if (!locationIterator.hasNext()) {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
-                gamePlayers.remove(player);
+                gamePlayers.remove(uuid);
                 continue;
             }
 

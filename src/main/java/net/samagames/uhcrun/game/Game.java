@@ -145,7 +145,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     }
 
     public void stumpPlayer(Player player, boolean logout) {
-        this.gamePlayers.remove(getPlayer(player.getUniqueId()));
+        this.gamePlayers.remove(player.getUniqueId());
         if (this.status == Status.IN_GAME) {
             Object lastDamager = Metadatas.getMetadata(plugin, player, "lastDamager");
             Player killer = null;

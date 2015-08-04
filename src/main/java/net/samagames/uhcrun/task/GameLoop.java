@@ -133,7 +133,7 @@ public class GameLoop implements Runnable {
                 this.objectives.remove(player);
             } else {
                 objective.setLine(1, ChatColor.BLUE + " ");
-                objective.setLine(2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getConnectedPlayers());
+                objective.setLine(2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getInGamePlayers().size());
                 objective.setLine(3, ChatColor.GRAY + "  ");
                 int lastLine = 2;
                 /*if(game instanceof TeamGame) {
