@@ -43,7 +43,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     private final int maxSpawnLocations;
     private final int minPlayers;
     private final StoredGame storedGame;
-    private final GameLoop gameLoop;
+    private GameLoop gameLoop;
     private GameLoop.TimedEvent nextEvent;
     private IMessageManager messageManager;
     private Scoreboard scoreboard;
@@ -59,13 +59,13 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         this.maxSpawnLocations = maxLocations;
         this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
         this.storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), this.getClass().getSimpleName());
-        this.gameLoop = new GameLoop(this, plugin, server);
         this.spawnPoints = new ArrayList<>();
         UHCPlayer.setGame(this);
     }
 
     public void postInit(World world) {
         this.scoreboard = server.getScoreboardManager().getMainScoreboard();
+        this.gameLoop = new GameLoop(this, plugin, server);
         this.disableDamages();
         this.computeSpawnLocations(world);
     }
