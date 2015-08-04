@@ -3,6 +3,7 @@ package net.samagames.uhcrun.task;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.samagames.uhcrun.game.UHCPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -91,7 +92,6 @@ public class GameLoop implements Runnable {
                 nextEvent = new GameLoop.TimedEvent(0, 30, ChatColor.RED + "PVP Activé", ChatColor.RED) {
                     @Override
                     public void run() {
-                        game.startFight();
                         game.enablePVP();
                         game.enableDamages();
                         server.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP sont maintenant activés. Bonne chance !");
@@ -149,7 +149,8 @@ public class GameLoop implements Runnable {
                     lastLine += 3;
                 }
 
-                final int kills = this.game.getKills(player);
+                UHCPlayer uhcPlayer = this.game.getPlayer(player);
+                final int kills = uhcPlayer == null ? 0 : uhcPlayer.getKills();
                 if (kills > 0) {
                     objective.setLine(lastLine + 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
                     objective.setLine(lastLine + 2, ChatColor.AQUA + "      ");
@@ -176,7 +177,7 @@ public class GameLoop implements Runnable {
         this.nextEvent.decrement();
     }
 
-    private abstract class TimedEvent {
+    public abstract class TimedEvent {
         public int minutes;
         public int seconds;
         public String string;

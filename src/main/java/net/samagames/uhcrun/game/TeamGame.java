@@ -1,7 +1,6 @@
 package net.samagames.uhcrun.game;
 
 import net.samagames.api.games.Status;
-import net.samagames.api.player.AbstractPlayerData;
 import net.samagames.tools.Titles;
 import net.samagames.uhcrun.game.data.Team;
 import net.samagames.uhcrun.game.data.TeamList;
@@ -9,10 +8,7 @@ import net.samagames.uhcrun.game.team.TeamSelector;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Iterator;
 import java.util.UUID;
@@ -59,17 +55,6 @@ public class TeamGame extends Game {
     }
 
     @Override
-    public void join(Player player) {
-        super.join(player);
-
-        ItemStack star = new ItemStack(Material.NETHER_STAR);
-        ItemMeta starMeta = star.getItemMeta();
-        starMeta.setDisplayName(ChatColor.GOLD + "Sélectionner une équipe");
-        star.setItemMeta(starMeta);
-        player.getInventory().setItem(4, star);
-    }
-
-    @Override
     protected void teleport() {
         Iterator<Location> locationIterator = spawnPoints.iterator();
 
@@ -81,8 +66,7 @@ public class TeamGame extends Game {
                     if (p != null) {
                         p.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                     }
-
-                    players.remove(player);
+                    gamePlayers.remove(player);
                 }
                 continue;
             }
@@ -92,7 +76,7 @@ public class TeamGame extends Game {
             for (UUID player : team.getPlayersUUID()) {
                 Player p = server.getPlayer(player);
                 if (p == null) {
-                    players.remove(player);
+                    gamePlayers.remove(player);
                 } else {
                     p.teleport(location);
                 }
@@ -112,8 +96,7 @@ public class TeamGame extends Game {
                     if (p != null) {
                         p.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                     }
-
-                    players.remove(player);
+                    gamePlayers.remove(player);
                 }
                 continue;
             }
@@ -123,7 +106,7 @@ public class TeamGame extends Game {
             for (UUID player : team.getPlayersUUID()) {
                 Player p = server.getPlayer(player);
                 if (p == null) {
-                    players.remove(player);
+                    gamePlayers.remove(player);
                 } else {
                     p.teleport(new Location(location.getWorld(), location.getX() * 4 / 10, 150.0, location.getZ() * 4 / 10));
                 }
@@ -132,14 +115,14 @@ public class TeamGame extends Game {
     }
 
     @Override
-    public void creditKillCoins(AbstractPlayerData killer) {
+    public void creditKillCoins(UHCPlayer killer) {
         super.creditKillCoins(killer);
 
-        UUID killerID = killer.getPlayerID();
+        UUID killerID = killer.getUUID();
 
         Team team = teams.getTeam(killerID);
         if (team != null) {
-            team.getPlayersUUID().stream().filter(otherPlayer -> !otherPlayer.equals(killerID)).forEach(otherPlayer -> getPlayerData(otherPlayer).creditCoins(10, "Votre équipe fait un kill !", true));
+            team.getPlayersUUID().stream().filter(otherPlayer -> !otherPlayer.equals(killerID)).forEach(otherPlayer -> getPlayer(otherPlayer).addCoins(10, "Votre équipe fait un kill !"));
         }
     }
 
@@ -161,7 +144,7 @@ public class TeamGame extends Game {
                     win(teams.get(0));
                     return;
                 } else if (left < 1) {
-                    finish();
+                    handleGameEnd();
                     return;
                 } else {
                     server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + teams.size() + ChatColor.YELLOW + " équipes en jeu.");
@@ -187,7 +170,7 @@ public class TeamGame extends Game {
                     if (left == 1) {
                         win(teams.get(0));
                     } else if (left < 1) {
-                        finish();
+                        handleGameEnd();
                     } else {
                         server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + teams.size() + ChatColor.YELLOW + " équipes en jeu.");
                     }
@@ -209,9 +192,9 @@ public class TeamGame extends Game {
 
 
         for (final UUID playerID : team.getPlayersUUID()) {
-            AbstractPlayerData playerData = getPlayerData(playerID);
-            playerData.creditCoins(100, "Victoire !", true);
-            playerData.creditStars(2, "Victoire !", true);
+            UHCPlayer playerData = getPlayer(playerID);
+            playerData.addCoins(100, "Victoire !");
+            playerData.addStars(2, "Victoire !");
 
             try {
                 this.increaseStat(playerID, "victories", 1);
@@ -227,7 +210,7 @@ public class TeamGame extends Game {
             this.effectsOnWinner(player);
         }
 
-        finish();
+        handleGameEnd();
     }
 
     @Override

@@ -44,25 +44,25 @@ public class SoloGame extends Game {
 
     @Override
     public void checkStump(Player player) {
-        AbstractPlayerData playerData = getPlayerData(player);
-        if (this.players.size() == 2) {
-            playerData.creditCoins(20, "Troisième au classement !", true);
+        UHCPlayer playerData = getPlayer(player.getUniqueId());
+        if (gamePlayers.size() == 2) {
+            playerData.addCoins(20, "Troisième au classement !");
         }
 
-        if (this.players.size() == 1) {
-            playerData.creditCoins(50, "Second au classement !", true);
-            playerData.creditStars(1, "Second au classement !");
-            UUID winnerId = this.players.iterator().next();
+        if (gamePlayers.size() == 1) {
+            playerData.addCoins(50, "Second au classement !");
+            playerData.addStars(1, "Second au classement !");
+            UUID winnerId = gamePlayers.keySet().iterator().next();
             Player winner = server.getPlayer(winnerId);
             if (winner == null) {
-                this.finish();
+                this.handleGameEnd();
             } else {
                 this.win(winner);
             }
-        } else if (this.players.size() == 0) {
-            this.finish();
+        } else if (gamePlayers.size() == 0) {
+            this.handleGameEnd();
         } else {
-            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + this.players.size() + ChatColor.YELLOW + " joueur(s) en vie.");
+            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + this.gamePlayers.size() + ChatColor.YELLOW + " joueur(s) en vie.");
         }
 
     }
@@ -84,23 +84,23 @@ public class SoloGame extends Game {
         }
 
         this.effectsOnWinner(player);
-        this.finish();
+        this.handleGameEnd();
     }
 
     @Override
     protected void teleport() {
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.players) {
+        for (UUID uuid : this.gamePlayers.keySet()) {
             Player player = server.getPlayer(uuid);
             if (player == null) {
-                this.players.remove(uuid);
+                gamePlayers.remove(uuid);
                 continue;
             }
 
             if (!locationIterator.hasNext()) {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
-                this.players.remove(uuid);
+                gamePlayers.remove(uuid);
                 continue;
             }
 
@@ -115,21 +115,20 @@ public class SoloGame extends Game {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.players) {
+        for (UUID uuid : this.gamePlayers.keySet()) {
             Player player = server.getPlayer(uuid);
             if (player == null) {
-                this.players.remove(uuid);
-                return;
+                gamePlayers.remove(player);
+                continue;
             }
 
             if (!locationIterator.hasNext()) {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
-                this.players.remove(uuid);
-                return;
+                gamePlayers.remove(player);
+                continue;
             }
 
             Location location = locationIterator.next();
-
             player.teleport(new Location(location.getWorld(), location.getX() * 4 / 10, 150.0, location.getZ() * 4 / 10));
         }
     }

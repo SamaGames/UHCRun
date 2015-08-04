@@ -176,7 +176,7 @@ public class GuiSelectTeam extends Gui {
                 if (game.getPlayerTeam(player.getUniqueId()) != null) {
                     player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.YELLOW + "Vous pouvez inviter les joueurs suivants :");
 
-                    Iterator<UUID> iter = game.getPlayers().iterator();
+                    Iterator<UUID> iter = game.getInGamePlayers().keySet().iterator();
                     while (iter.hasNext()) {
                         UUID aInvite = iter.next();
                         if (game.getPlayerTeam(aInvite) == null) {

@@ -107,6 +107,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         }
 
         samaGamesAPI.getGameManager().registerGame(game);
+        samaGamesAPI.getGameManager().setMaxReconnectTime(game.getReductionTime());
 
         pluginManager.registerEvents(this, this);
 
