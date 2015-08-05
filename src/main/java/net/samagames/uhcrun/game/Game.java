@@ -40,6 +40,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     protected final Server server;
     protected final Random rand;
     protected final List<Location> spawnPoints;
+    protected final HashMap<UUID, UHCPlayer> prevInGame;
     private final int maxSpawnLocations;
     private final int minPlayers;
     private final StoredGame storedGame;
@@ -60,6 +61,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
         this.storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), this.getClass().getSimpleName());
         this.spawnPoints = new ArrayList<>();
+        this.prevInGame = new HashMap<>();
         UHCPlayer.setGame(this);
     }
 
@@ -90,6 +92,18 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         this.messageManager = coherenceMachine.getMessageManager();
     }
 
+    protected void removeFromGame(UUID uuid) {
+        UHCPlayer player = this.gamePlayers.get(uuid);
+        if (player != null) {
+            player.setSpectator();
+        }
+    }
+
+    @Override
+    public void handleGameEnd() {
+        super.handleGameEnd();
+    }
+
     public UHCRun getPlugin() {
         return plugin;
     }
@@ -111,7 +125,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         for (UUID uuid : getInGamePlayers().keySet()) {
             Player player = server.getPlayer(uuid);
             if (player == null) {
-                this.gamePlayers.remove(uuid);
+                gamePlayers.remove(uuid);
                 continue;
             }
             this.increaseStat(uuid, "played", 1);
@@ -145,7 +159,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     }
 
     public void stumpPlayer(Player player, boolean logout) {
-        this.gamePlayers.remove(player.getUniqueId());
         if (this.status == Status.IN_GAME) {
             Object lastDamager = Metadatas.getMetadata(plugin, player, "lastDamager");
             Player killer = null;
@@ -153,7 +166,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
             if (lastDamager != null && lastDamager instanceof Player) {
                 killer = (Player) lastDamager;
                 if (killer.isOnline() && this.isInGame(killer.getUniqueId())) {
-                    this.creditKillCoins(getPlayer(player.getUniqueId()).addKill());
+                    this.creditKillCoins(getPlayer(killer.getUniqueId()).addKill());
                     this.increaseStat(killer.getUniqueId(), "kills", 1);
                     e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
                     e.kill(player);
@@ -185,7 +198,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
                     killedBy = getDamageCause(cause);
                 }
 
-                e.die(this.gamePlayers.size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
+                e.die(getInGamePlayers().size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
             } catch (Exception var9) {
                 var9.printStackTrace();
             }
@@ -196,6 +209,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
                 this.increaseStat(player.getUniqueId(), "stumps", 1);
                 Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
             }
+            removeFromGame(player.getUniqueId());
         }
     }
 
@@ -204,7 +218,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     }
 
     public boolean isInGame(UUID uniqueId) {
-        return this.gamePlayers.containsKey(uniqueId);
+        return this.gamePlayers.containsKey(uniqueId) && !this.gamePlayers.get(uniqueId).isSpectator();
     }
 
     private String getDamageCause(EntityDamageEvent.DamageCause cause) {

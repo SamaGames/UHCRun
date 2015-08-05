@@ -1,7 +1,6 @@
 package net.samagames.uhcrun.game;
 
 import net.samagames.api.SamaGamesAPI;
-import net.samagames.api.player.AbstractPlayerData;
 import net.samagames.tools.Titles;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -45,34 +44,38 @@ public class SoloGame extends Game {
     @Override
     public void checkStump(Player player) {
         UHCPlayer playerData = getPlayer(player.getUniqueId());
-        if (gamePlayers.size() == 2) {
+        if (getInGamePlayers().size() == 3) {
             playerData.addCoins(20, "Troisième au classement !");
         }
 
-        System.out.println(gamePlayers.size());
-
-        if (gamePlayers.size() == 1) {
+        if (getInGamePlayers().size() == 2) {
             playerData.addCoins(50, "Second au classement !");
             playerData.addStars(1, "Second au classement !");
-            UUID winnerId = gamePlayers.keySet().iterator().next();
+
+            // HACK
+            this.gamePlayers.remove(playerData.getUUID());
+            UUID winnerId = getInGamePlayers().keySet().iterator().next();
+            this.gamePlayers.put(playerData.getUUID(), playerData);
+
             Player winner = server.getPlayer(winnerId);
             if (winner == null) {
+                System.out.println("TEST");
                 this.handleGameEnd();
             } else {
                 this.win(winner);
             }
-        } else if (gamePlayers.size() == 0) {
+        } else if (getInGamePlayers().size() == 1) {
             this.handleGameEnd();
         } else {
-            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + this.gamePlayers.size() + ChatColor.YELLOW + " joueur(s) en vie.");
+            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + getInGamePlayers().size() + ChatColor.YELLOW + " joueur(s) en vie.");
         }
 
     }
 
     public void win(final Player player) {
-        final AbstractPlayerData playerData = plugin.getAPI().getPlayerManager().getPlayerData(player.getUniqueId());
-        playerData.creditStars(2, "Victoire !");
-        playerData.creditCoins(100, "Victoire ! ", true);
+        final UHCPlayer playerData = this.getPlayer(player.getUniqueId());
+        playerData.addStars(2, "Victoire !");
+        playerData.addCoins(100, "Victoire ! ");
 
         try {
             this.increaseStat(player.getUniqueId(), "victories", 1);
@@ -93,7 +96,7 @@ public class SoloGame extends Game {
     protected void teleport() {
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.gamePlayers.keySet()) {
+        for (UUID uuid : this.getInGamePlayers().keySet()) {
             Player player = server.getPlayer(uuid);
             if (player == null) {
                 gamePlayers.remove(uuid);
@@ -117,7 +120,7 @@ public class SoloGame extends Game {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.gamePlayers.keySet()) {
+        for (UUID uuid : this.getInGamePlayers().keySet()) {
             Player player = server.getPlayer(uuid);
             if (player == null) {
                 gamePlayers.remove(uuid);
