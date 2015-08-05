@@ -151,7 +151,6 @@ public class UHCRun extends JavaPlugin implements Listener {
         game.postInit(world);
 
         worldLoader = new WorldLoader();
-
         worldLoader.begin(world);
 
     }

@@ -40,7 +40,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     protected final Server server;
     protected final Random rand;
     protected final List<Location> spawnPoints;
-    protected final HashMap<UUID, UHCPlayer> prevInGame;
+    protected final TreeMap<UUID, UHCPlayer> prevInGame;
     private final int maxSpawnLocations;
     private final int minPlayers;
     private final StoredGame storedGame;
@@ -61,7 +61,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
         this.storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), this.getClass().getSimpleName());
         this.spawnPoints = new ArrayList<>();
-        this.prevInGame = new HashMap<>();
+        this.prevInGame = new TreeMap<>();
         UHCPlayer.setGame(this);
     }
 
@@ -268,7 +268,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     public int getReductionTime() {
         return 10;
     }
-
 
 
     public void disablePVP() {

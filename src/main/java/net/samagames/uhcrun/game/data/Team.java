@@ -18,12 +18,12 @@ public class Team {
 
     private static int maxSize = -1;
     private final ArrayList<UUID> players;
-    private String teamName;
     private final Game game;
-    private List<UUID> invited = new ArrayList<>();
     private final ItemStack icon;
     private final DyeColor color;
     private final ChatColor chatColor;
+    private String teamName;
+    private List<UUID> invited = new ArrayList<>();
     private boolean locked;
 
 
@@ -38,11 +38,6 @@ public class Team {
         if (maxSize == -1) {
             maxSize = game.getPersonsPerTeam();
         }
-    }
-
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
     }
 
     public void join(UUID player) {
@@ -65,6 +60,10 @@ public class Team {
         return locked;
     }
 
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     public void remove(UUID player) {
         players.remove(player);
 
@@ -73,10 +72,6 @@ public class Team {
 
     public ItemStack getIcon() {
         return icon;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
     }
 
     public void invite(String inviter, UUID invited) {
@@ -102,6 +97,10 @@ public class Team {
 
     public String getTeamName() {
         return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 
     public ChatColor getChatColor() {

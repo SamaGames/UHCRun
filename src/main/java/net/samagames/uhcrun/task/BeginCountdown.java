@@ -10,7 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 
-
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.

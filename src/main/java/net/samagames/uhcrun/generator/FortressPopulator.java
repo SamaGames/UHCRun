@@ -1,18 +1,13 @@
 package net.samagames.uhcrun.generator;
 
 
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
-import java.util.logging.Logger;
-
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.world.DataException;
+import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -22,7 +17,10 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
 
-import net.samagames.uhcrun.UHCRun;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * This file is a part of the SamaGames Project CodeBase

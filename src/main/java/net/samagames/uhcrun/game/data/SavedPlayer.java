@@ -1,10 +1,10 @@
 package net.samagames.uhcrun.game.data;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.entity.Player;
+
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
 
 /**
@@ -17,10 +17,10 @@ import org.bukkit.entity.Player;
 public class SavedPlayer {
     private final String name;
     private final UUID uuid;
-    private Map<String, GameDamageData> damageDone = new HashMap<>();
-    private Map<String, GameDamageData> damageTaken = new HashMap<>();
-    private Map<String, HealingSource> healingDone = new HashMap<>();
-    private Map<String, String> hasKilled = new HashMap<>();
+    private Map<String, GameDamageData> damageDone = new TreeMap<>();
+    private Map<String, GameDamageData> damageTaken = new TreeMap<>();
+    private Map<String, HealingSource> healingDone = new TreeMap<>();
+    private Map<String, String> hasKilled = new TreeMap<>();
     private String killedBy;
     private int finalRanking;
     private long deadAfter;

@@ -1,11 +1,10 @@
 package net.samagames.uhcrun.commands;
 
+import net.samagames.api.games.Status;
+import net.samagames.uhcrun.game.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import net.samagames.api.games.Status;
-import net.samagames.uhcrun.game.Game;
 
 /**
  * This file is a part of the SamaGames Project CodeBase

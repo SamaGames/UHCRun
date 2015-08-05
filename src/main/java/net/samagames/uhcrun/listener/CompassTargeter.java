@@ -1,8 +1,6 @@
 package net.samagames.uhcrun.listener;
 
-import java.util.HashMap;
-import java.util.UUID;
-
+import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,7 +12,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.samagames.uhcrun.UHCRun;
+import java.util.TreeMap;
+import java.util.UUID;
 
 
 /**
@@ -26,7 +25,7 @@ import net.samagames.uhcrun.UHCRun;
  */
 public class CompassTargeter implements Listener {
     private UHCRun plugin;
-    private HashMap<UUID, BukkitTask> tasks = new HashMap<>();
+    private TreeMap<UUID, BukkitTask> tasks = new TreeMap<>();
 
     public CompassTargeter(UHCRun plugin) {
         this.plugin = plugin;

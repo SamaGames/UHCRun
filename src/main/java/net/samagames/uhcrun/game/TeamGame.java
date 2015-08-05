@@ -10,20 +10,22 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 
 // TODO: TEAM GUI
 public class TeamGame extends Game {
 
-    private TeamList teams = new TeamList();
     private final int personsPerTeam;
+    private TeamList teams = new TeamList();
     private TeamSelector teamSelector;
 
 
     public TeamGame(int nbByTeam) {
-        super(nbByTeam);
+        super(12);
 
         this.personsPerTeam = nbByTeam;
         try {
@@ -33,7 +35,6 @@ public class TeamGame extends Game {
         }
 
         plugin.getServer().getPluginManager().registerEvents(teamSelector, plugin);
-
 
         // Register team
         registerTeam("Blanc", ChatColor.WHITE, DyeColor.WHITE);
@@ -57,10 +58,11 @@ public class TeamGame extends Game {
     @Override
     protected void teleport() {
         Iterator<Location> locationIterator = spawnPoints.iterator();
+        List<Team> toRemove = new ArrayList<>();
 
         for (Team team : teams) {
-            if (!locationIterator.hasNext()) {
-                teams.remove(team);
+            if (!locationIterator.hasNext() || team.isEmpty()) {
+                toRemove.add(team);
                 for (UUID player : team.getPlayersUUID()) {
                     Player p = server.getPlayer(player);
                     if (p != null) {
@@ -82,15 +84,18 @@ public class TeamGame extends Game {
                 }
             }
         }
+        teams.removeAll(toRemove);
+        toRemove.clear();
     }
 
     @Override
     public void teleportDeathMatch() {
         Iterator<Location> locationIterator = spawnPoints.iterator();
+        List<Team> toRemove = new ArrayList<>();
 
         for (Team team : teams) {
             if (!locationIterator.hasNext()) {
-                teams.remove(team);
+                toRemove.add(team);
                 for (UUID player : team.getPlayersUUID()) {
                     Player p = server.getPlayer(player);
                     if (p != null) {
@@ -112,6 +117,8 @@ public class TeamGame extends Game {
                 }
             }
         }
+        teams.removeAll(toRemove);
+        toRemove.clear();
     }
 
     @Override
@@ -129,6 +136,7 @@ public class TeamGame extends Game {
     @Override
     public void checkStump(final Player player) {
         server.getScheduler().runTaskLater(plugin, () -> {
+            List<Team> toRemvove = new ArrayList<>();
             Team team = teams.getTeam(player.getUniqueId());
             if (team == null) {
                 return;
@@ -164,7 +172,7 @@ public class TeamGame extends Game {
 
                 if (players1 == 0) {
                     server.broadcastMessage(ChatColor.GOLD + "L'équipe " + t.getChatColor() + t.getTeamName() + ChatColor.GOLD + " a été éliminée !");
-                    teams.remove(t);
+                    toRemvove.add(t);
 
                     left = teams.size();
                     if (left == 1) {
@@ -176,6 +184,7 @@ public class TeamGame extends Game {
                     }
                 }
             }
+            teams.removeAll(toRemvove);
         }, 2L);
     }
 

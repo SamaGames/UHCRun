@@ -13,17 +13,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 public class TeamSelector implements Listener {
 
     private static TeamSelector instance;
     private final TeamGame game;
-    private HashMap<UUID, Gui> playersGui;
+    private Map<UUID, Gui> playersGui;
 
     public TeamSelector(TeamGame game) throws IllegalAccessException {
         if (instance != null) {
@@ -31,7 +33,7 @@ public class TeamSelector implements Listener {
         }
         instance = this;
         this.game = game;
-        this.playersGui = new HashMap<>();
+        this.playersGui = new TreeMap<>();
     }
 
     public static TeamSelector getInstance() {
@@ -43,6 +45,8 @@ public class TeamSelector implements Listener {
         if (game.getStatus().equals(Status.IN_GAME)) {
             event.getHandlers().unregister(this);
             return;
+        } else if (event.getItem().getType() == Material.NETHER_STAR) {
+            this.openGui(event.getPlayer(), new GuiSelectTeam());
         }
     }
 
@@ -52,6 +56,15 @@ public class TeamSelector implements Listener {
         if (game.getStatus().equals(Status.IN_GAME)) {
             event.getHandlers().unregister(this);
             return;
+        } else if (event.getCurrentItem() != null && event.getCurrentItem().getItemMeta() != null && event.getView().getType() != InventoryType.PLAYER) {
+            Gui gui = this.playersGui.get(event.getWhoClicked().getUniqueId());
+            if (gui != null) {
+                String action = gui.getAction(event.getSlot());
+                if (action != null) {
+                    gui.onClick((Player) event.getWhoClicked(), event.getCurrentItem(), action, event.getClick());
+                }
+                event.setCancelled(true);
+            }
         }
     }
 

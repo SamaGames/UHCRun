@@ -1,28 +1,25 @@
 package net.samagames.uhcrun.generator;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import net.samagames.api.games.Status;
+import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.samagames.api.games.Status;
-import net.samagames.uhcrun.UHCRun;
-
-
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class WorldLoader {
-    private static Map<int[], Integer> highestBlocks = new HashMap<>();
+    private static Map<int[], Integer> highestBlocks = new TreeMap<>();
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;
     private UHCRun plugin = UHCRun.getInstance();
 
     public static Integer getHighestNaturalBlockAt(int x, int z) {
-        final int[] loc = new int[] {x, z};
+        final int[] loc = new int[]{x, z};
 
         if (highestBlocks.containsKey(loc)) {
             return highestBlocks.get(loc);
@@ -38,7 +35,7 @@ public class WorldLoader {
             int z = -50;
             while (z < 50) {
                 Block block = world.getHighestBlockAt(x, z);
-                highestBlocks.put(new int[] {x, z}, block.getY());
+                highestBlocks.put(new int[]{x, z}, block.getY());
                 z++;
             }
             x++;

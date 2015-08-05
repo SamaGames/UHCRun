@@ -4,7 +4,6 @@ import net.samagames.api.SamaGamesAPI;
 import net.samagames.tools.Titles;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -23,23 +22,9 @@ public class SoloGame extends Game {
 
 
     public SoloGame() {
-        super(SamaGamesAPI.get().getGameManager().getGameProperties().getMinSlots());
+        super(SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots());
     }
 
-
-    @Override
-    public void postInit(World world) {
-        super.postInit(world);
-
-        for (int i = 0; i < plugin.getAPI().getGameManager().getGameProperties().getMaxSlots(); i++) {
-            final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
-            for (int y = 0; y < 16; y++) {
-                world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
-            }
-
-            spawnPoints.add(randomLocation);
-        }
-    }
 
     @Override
     public void checkStump(Player player) {

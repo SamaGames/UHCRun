@@ -1,17 +1,17 @@
 package net.samagames.uhcrun.task;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
+import net.samagames.tools.scoreboards.ObjectiveSign;
+import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.game.UHCPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import net.samagames.tools.scoreboards.ObjectiveSign;
-import net.samagames.uhcrun.UHCRun;
-import net.samagames.uhcrun.game.Game;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -136,12 +136,11 @@ public class GameLoop implements Runnable {
                 objective.setLine(2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getInGamePlayers().size());
                 objective.setLine(3, ChatColor.GRAY + "  ");
                 int lastLine = 2;
-                /*if(game instanceof TeamGame) {
-                    objective.setLine(3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame)this.parent).getTeams().size());
+                if (game instanceof TeamGame) {
+                    objective.setLine(3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame) game).getTeams().size());
                     objective.setLine(4, ChatColor.RED + "   ");
                     lastLine = 4;
                 }
-                else */
                 if (this.nextEvent != null) {
                     objective.setLine(lastLine + 1, this.nextEvent.string);
                     objective.setLine(lastLine + 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));

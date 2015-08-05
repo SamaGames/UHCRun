@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 
-
-
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.

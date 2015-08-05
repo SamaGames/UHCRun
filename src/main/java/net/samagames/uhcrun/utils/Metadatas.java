@@ -1,11 +1,11 @@
 package net.samagames.uhcrun.utils;
 
-import java.util.List;
-
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 /**
  * This file is a part of the SamaGames Project CodeBase

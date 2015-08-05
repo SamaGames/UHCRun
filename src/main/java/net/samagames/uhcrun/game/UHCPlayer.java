@@ -16,6 +16,10 @@ public class UHCPlayer extends GamePlayer {
         super(player);
     }
 
+    public static void setGame(Game game) {
+        UHCPlayer.game = game;
+    }
+
     @Override
     public void handleLogin(boolean reconnect) {
         super.handleLogin(reconnect);
@@ -60,10 +64,6 @@ public class UHCPlayer extends GamePlayer {
                 game.getCoherenceMachine().getMessageManager().writePlayerQuited(player);
             }
         }
-    }
-
-    public static void setGame(Game game) {
-        UHCPlayer.game = game;
     }
 
     public UHCPlayer addKill() {
