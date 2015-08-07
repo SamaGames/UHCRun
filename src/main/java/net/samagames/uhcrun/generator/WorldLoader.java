@@ -7,12 +7,12 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 
 public class WorldLoader {
-    private static Map<int[], Integer> highestBlocks = new TreeMap<>();
+    private static Map<int[], Integer> highestBlocks = new HashMap<>();
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;
