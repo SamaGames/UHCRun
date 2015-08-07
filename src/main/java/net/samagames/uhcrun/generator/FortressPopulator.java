@@ -55,7 +55,7 @@ public class FortressPopulator extends BlockPopulator {
         }
 
         final int i = random.nextInt(1000);
-        if (i > 0 && i < 5) {
+        if (i > 0 && i < 10) {
             int xFortress = chunk.getX() * 16 + random.nextInt(15);
             int zFortress = chunk.getZ() * 16 + random.nextInt(15);
             generateBlazeFortress(world, xFortress, zFortress);
@@ -66,7 +66,7 @@ public class FortressPopulator extends BlockPopulator {
         if (!plugin.isWorldLoaded()) {
             return;
         }
-        logger.fine("Generating fortress at " + x + "; " + z);
+        logger.info("Generating fortress at " + x + "; " + z);
 
         EditSession es;
         if (file.exists()) {
@@ -100,7 +100,7 @@ public class FortressPopulator extends BlockPopulator {
                 es = new EditSession(bukkitWorld, 2000000);
                 es.setFastMode(true);
 
-                cuboidClipboard.place(es, v, false);
+                cuboidClipboard.paste(es, v, false);
 
                 int bx = x;
                 while (bx < x + 35) {
