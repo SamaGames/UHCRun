@@ -97,7 +97,7 @@ public class FortressPopulator extends BlockPopulator {
                 world.getChunkAt(chunkX, chunkZ - 1).load(true);
 
 
-                es = new EditSession(bukkitWorld, -1);
+                es = new EditSession(bukkitWorld, 2000000);
                 es.setFastMode(true);
 
                 cuboidClipboard.place(es, v, false);
