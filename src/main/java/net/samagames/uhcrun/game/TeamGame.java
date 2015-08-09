@@ -159,7 +159,7 @@ public class TeamGame extends Game {
                 }
             }
 
-            // Check de sécurité
+            // Security check
             for (Team t : teams) {
                 int players1 = 0;
                 if (!t.isEmpty()) {

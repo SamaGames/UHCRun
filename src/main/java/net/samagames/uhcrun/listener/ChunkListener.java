@@ -60,6 +60,7 @@ public class ChunkListener implements Runnable, Listener {
 
             for (Entity entity : chunk.getEntities()) {
                 if (!(entity instanceof Item || entity instanceof HumanEntity)) {
+                    Bukkit.getLogger().info("Removing " + entity);
                     entity.remove();
                 }
             }
