@@ -110,12 +110,12 @@ public class GuiSelectTeam extends Gui {
                                 game.getPlayerTeam(player.getUniqueId()).remove(player.getUniqueId());
                             }
                             team.join(player.getUniqueId());
-                            player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.YELLOW + "Vous êtes entré dans l'équipe " + team.getChatColor() + team.getTeamName() + ChatColor.YELLOW + " !");
+                            player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.YELLOW + "Vous êtes entré dans l'équipe " + team.getChatColor() + team.getTeamName() + ChatColor.YELLOW + " !");
                         } else {
-                            player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "L'équipe choisie est pleine.");
+                            player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "L'équipe choisie est pleine.");
                         }
                     } else {
-                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "L'équipe choisie est fermée !");
+                        player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "L'équipe choisie est fermée !");
                     }
 
                     break;
@@ -150,31 +150,31 @@ public class GuiSelectTeam extends Gui {
                         }
                     }, 1L);
                 } else {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
                 }
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
             }
         } else if ("openclose".equals(action)) {
             if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamlock")) {
                 if (game.getPlayerTeam(player.getUniqueId()) != null) {
                     if (game.getPlayerTeam(player.getUniqueId()).isLocked()) {
                         game.getPlayerTeam(player.getUniqueId()).setLocked(false);
-                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Votre équipe est maintenant ouverte !");
+                        player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.GREEN + "Votre équipe est maintenant ouverte !");
                     } else {
                         game.getPlayerTeam(player.getUniqueId()).setLocked(true);
-                        player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Votre équipe est maintenant fermée !");
+                        player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Votre équipe est maintenant fermée !");
                     }
                 } else {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
                 }
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
             }
         } else if ("invit".equals(action)) {
             if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teaminvite")) {
                 if (game.getPlayerTeam(player.getUniqueId()) != null) {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.YELLOW + "Vous pouvez inviter les joueurs suivants :");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.YELLOW + "Vous pouvez inviter les joueurs suivants :");
 
                     Iterator<UUID> iter = game.getInGamePlayers().keySet().iterator();
                     while (iter.hasNext()) {
@@ -192,17 +192,17 @@ public class GuiSelectTeam extends Gui {
                         }
                     }
                 } else {
-                    player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                    player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
                 }
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
             }
         } else if ("leave".equals(action)) {
             if (game.getPlayerTeam(player.getUniqueId()) != null) {
                 game.getPlayerTeam(player.getUniqueId()).remove(player.getUniqueId());
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Vous avez quitté l'équipe !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.GREEN + "Vous avez quitté l'équipe !");
             } else {
-                player.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
+                player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
             }
         }
     }

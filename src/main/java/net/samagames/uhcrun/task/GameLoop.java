@@ -35,7 +35,7 @@ public class GameLoop implements Runnable {
         this.plugin = plugin;
         this.server = server;
         this.world = server.getWorld("world");
-        this.nextEvent = new GameLoop.TimedEvent(1, 0, ChatColor.GOLD + "Dégats actifs", ChatColor.GOLD) {
+        this.nextEvent = new GameLoop.TimedEvent(1, 0, ChatColor.GOLD + " " + "Dégats actifs", ChatColor.GOLD) {
             @Override
             public void run() {
                 server.broadcastMessage(ChatColor.GOLD + "Les dégats sont désormais actifs.");
@@ -170,7 +170,7 @@ public class GameLoop implements Runnable {
         }
 
         if (this.nextEvent.seconds == 0 && 0 == this.nextEvent.minutes) {
-            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " maintenant !");
+            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + " " + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " maintenant !");
         }
 
         this.nextEvent.decrement();

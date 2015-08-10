@@ -179,9 +179,9 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
             if (logout) {
                 messageManager.writePlayerQuited(player);
             } else if (killer != null) {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + " " + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
             } else {
-                server.broadcastMessage(this.coherenceMachine.getGameTag() + player.getDisplayName() + ChatColor.GOLD + " est mort.");
+                server.broadcastMessage(this.coherenceMachine.getGameTag() + " " + player.getDisplayName() + ChatColor.GOLD + " est mort.");
             }
 
             this.checkStump(player);

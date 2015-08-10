@@ -1,5 +1,6 @@
 package net.samagames.uhcrun;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.server.v1_8_R3.*;
 import net.samagames.api.SamaGamesAPI;
@@ -67,8 +68,6 @@ public class UHCRun extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-
-
         /*try {
             this.patchBlocks();
         } catch (ReflectiveOperationException e) {
@@ -228,30 +227,33 @@ public class UHCRun extends JavaPlugin implements Listener {
     private void patchBiomes() throws ReflectiveOperationException {
         BiomeBase[] biomes = BiomeBase.getBiomes();
         Map<String, BiomeBase> biomesMap = BiomeBase.o;
-        BiomeForest defaultBiome = new BiomeForest(0, 0);
+        BiomeBase defaultBiome = BiomeBase.FOREST;
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
         Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
 
         // FIXME: more modular system
         biomesMap.remove("Ocean");
+        biomesMap.remove("Beach");
         biomesMap.remove("FrozenOcean");
-        biomesMap.remove("FrozenRiver");
-        biomesMap.remove("TaigaHills");
         biomesMap.remove("Deep Ocean");
         biomesMap.remove("Cold Beach");
-        biomesMap.remove("Cold Taiga");
-        biomesMap.remove("Cold Taiga Hills");
-        biomesMap.remove("Mega Taiga");
-        biomesMap.remove("Mega Taiga Hills");
+        biomesMap.remove("Extreme Hills");
         biomesMap.remove("Extreme Hills+");
-        biomesMap.remove("Mesa");
-        biomesMap.remove("Mesa Plateau F");
-        biomesMap.remove("Mesa Plateau");
+
+        JsonElement blacklistedBiomes =  samaGamesAPI.getGameManager().getGameProperties().getOption("blacklistedBiomes", null);
+        if (blacklistedBiomes != null) {
+            for (JsonElement biome : blacklistedBiomes.getAsJsonArray()) {
+                biomesMap.remove(biome.getAsString());
+            }
+        }
+
+
+
 
         for (int i = 0; i < biomes.length; i++) {
             if (biomes[i] != null && !biomesMap.containsKey(biomes[i].ah)) {
-                biomes[i] = null;
+                biomes[i] = defaultBiome;
             }
         }
 

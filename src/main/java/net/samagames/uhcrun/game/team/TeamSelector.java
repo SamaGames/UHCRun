@@ -83,10 +83,10 @@ public class TeamSelector implements Listener {
 
             if (!name.isEmpty()) {
                 team.setTeamName(name);
-                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.GREEN + "Le nom de votre équipe est désormais : " + team.getChatColor() + team.getTeamName());
+                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.GREEN + "Le nom de votre équipe est désormais : " + team.getChatColor() + team.getTeamName());
                 this.openGui(event.getPlayer(), new GuiSelectTeam());
             } else {
-                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.RED + "Le nom de l'équipe ne peut être vide.");
+                event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Le nom de l'équipe ne peut être vide.");
                 this.openGui(event.getPlayer(), new GuiSelectTeam());
             }
         }

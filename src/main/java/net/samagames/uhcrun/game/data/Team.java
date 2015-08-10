@@ -46,7 +46,7 @@ public class Team {
             for (UUID member : players) {
                 Player user = Bukkit.getPlayer(member);
                 if (user != null) {
-                    user.sendMessage(game.getCoherenceMachine().getGameTag() + ChatColor.AQUA + newJoiner.getName() + ChatColor.YELLOW + " a rejoint l'équipe.");
+                    user.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.AQUA + newJoiner.getName() + ChatColor.YELLOW + " a rejoint l'équipe.");
                 }
 
             }
