@@ -1,7 +1,6 @@
 package net.samagames.uhcrun.game.data;
 
 import net.samagames.tools.chat.FancyMessage;
-import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.TeamGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,7 +17,7 @@ public class Team {
 
     private static int maxSize = -1;
     private final ArrayList<UUID> players;
-    private final Game game;
+    private final TeamGame game;
     private final ItemStack icon;
     private final DyeColor color;
     private final ChatColor chatColor;
@@ -127,5 +126,9 @@ public class Team {
 
     public boolean canJoin() {
         return !this.isLocked() && players.size() < maxSize;
+    }
+
+    public boolean isFull() {
+        return players.size() == game.getPersonsPerTeam();
     }
 }

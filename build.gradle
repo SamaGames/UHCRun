@@ -23,6 +23,13 @@ repositories {
     mavenCentral()
     maven { url "http://repo.md-5.net/content/groups/public/" }
     maven {
+        url "http://maven.samagames.net/developpers/"
+        credentials {
+            username sguser
+            password sgpass
+        }
+    }
+    maven {
         url "http://maven.samagames.net/public/"
         credentials {
             username sguser

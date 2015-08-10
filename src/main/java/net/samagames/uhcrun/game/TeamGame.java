@@ -1,10 +1,12 @@
 package net.samagames.uhcrun.game;
 
+import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.tools.Titles;
 import net.samagames.uhcrun.game.data.Team;
 import net.samagames.uhcrun.game.data.TeamList;
 import net.samagames.uhcrun.game.team.TeamSelector;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -25,7 +27,8 @@ public class TeamGame extends Game {
 
 
     public TeamGame(int nbByTeam) {
-        super(12);
+        // FIXME: Caclulate the apropriate amount of tp points
+        super(SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots());
 
         this.personsPerTeam = nbByTeam;
         try {
@@ -53,6 +56,31 @@ public class TeamGame extends Game {
 
     protected void registerTeam(String name, ChatColor chatColor, DyeColor color) {
         teams.add(new Team(this, name, color, chatColor));
+    }
+
+    public void startGame() {
+        Iterator<UUID> playerIterator = this.getInGamePlayers().keySet().iterator();
+        while (playerIterator.hasNext()) {
+            UUID id = playerIterator.next();
+            Player player = Bukkit.getPlayer(id);
+            if (player == null) {
+                continue;
+            }
+
+            if (getPlayerTeam(id) == null) {
+                for (Team team : teams) {
+                    if (!team.isFull() && !team.isLocked()) {
+                        team.join(id);
+                        break;
+                    }
+                }
+
+                if (getPlayerTeam(id) == null) {
+                    player.kickPlayer(ChatColor.RED + "Aucune team était apte à vous reçevoir, vous avez été réenvoyé dans le lobby.");
+                }
+            }
+        }
+        super.startGame();
     }
 
     @Override
@@ -85,6 +113,10 @@ public class TeamGame extends Game {
             }
         }
         teams.removeAll(toRemove);
+        // FIXME: Better handling single team
+        if (teams.size() <= 1) {
+            this.handleGameEnd();
+        }
         toRemove.clear();
     }
 
