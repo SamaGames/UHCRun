@@ -180,7 +180,6 @@ public class GameListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
                 event.setCancelled(true);
             }
-            System.out.printf("Target: %s, Item: %s\n", event.getPlayer().getItemInHand(), event.getClickedBlock());
         }
     }
 

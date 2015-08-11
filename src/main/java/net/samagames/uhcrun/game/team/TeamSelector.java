@@ -2,7 +2,6 @@ package net.samagames.uhcrun.game.team;
 
 import net.samagames.api.games.Status;
 import net.samagames.uhcrun.game.TeamGame;
-import net.samagames.uhcrun.game.data.Team;
 import net.samagames.uhcrun.gui.Gui;
 import net.samagames.uhcrun.gui.GuiSelectTeam;
 import org.bukkit.ChatColor;

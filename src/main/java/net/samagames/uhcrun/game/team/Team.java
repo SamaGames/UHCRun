@@ -1,4 +1,4 @@
-package net.samagames.uhcrun.game.data;
+package net.samagames.uhcrun.game.team;
 
 import net.samagames.tools.chat.FancyMessage;
 import net.samagames.uhcrun.game.TeamGame;

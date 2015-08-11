@@ -5,7 +5,7 @@ import net.minecraft.server.v1_8_R3.TileEntitySign;
 import net.samagames.tools.chat.FancyMessage;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.TeamGame;
-import net.samagames.uhcrun.game.data.Team;
+import net.samagames.uhcrun.game.team.Team;
 import net.samagames.uhcrun.game.team.TeamSelector;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -179,7 +179,7 @@ public class GuiSelectTeam extends Gui {
                     Iterator<UUID> iter = game.getInGamePlayers().keySet().iterator();
                     while (iter.hasNext()) {
                         UUID aInvite = iter.next();
-                        System.out.println(aInvite);
+                        // FIXME: ASK TO FIX NMS ON API
                         if (game.getPlayerTeam(aInvite) == null) {
                             if (Bukkit.getPlayer(aInvite) != null) {
                                 new FancyMessage(" - " + Bukkit.getPlayer(aInvite).getName() + " ")

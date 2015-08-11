@@ -6,8 +6,6 @@ import net.samagames.api.games.themachine.messages.IMessageManager;
 import net.samagames.tools.Titles;
 import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
-import net.samagames.uhcrun.game.data.SavedPlayer;
-import net.samagames.uhcrun.game.data.StoredGame;
 import net.samagames.uhcrun.listener.ChunkListener;
 import net.samagames.uhcrun.task.GameLoop;
 import net.samagames.uhcrun.utils.Colors;
@@ -44,7 +42,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     protected final TreeMap<UUID, UHCPlayer> prevInGame;
     private final int maxSpawnLocations;
     private final int minPlayers;
-    private final StoredGame storedGame;
     private GameLoop gameLoop;
     private GameLoop.TimedEvent nextEvent;
     private IMessageManager messageManager;
@@ -60,7 +57,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         this.rand = new Random();
         this.maxSpawnLocations = maxLocations;
         this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
-        this.storedGame = new StoredGame(plugin.getAPI().getServerName(), System.currentTimeMillis(), this.getClass().getSimpleName());
         this.spawnPoints = new ArrayList<>();
         this.prevInGame = new TreeMap<>();
         UHCPlayer.setGame(this);
@@ -163,14 +159,11 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         if (this.status == Status.IN_GAME) {
             Object lastDamager = Metadatas.getMetadata(plugin, player, "lastDamager");
             Player killer = null;
-            SavedPlayer e;
             if (lastDamager != null && lastDamager instanceof Player) {
                 killer = (Player) lastDamager;
                 if (killer.isOnline() && this.isInGame(killer.getUniqueId())) {
                     this.creditKillCoins(getPlayer(killer.getUniqueId()).addKill());
                     this.increaseStat(killer.getUniqueId(), "kills", 1);
-                    e = this.storedGame.getPlayer(killer.getUniqueId(), killer.getName());
-                    e.kill(player);
                     killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
                 } else {
                     killer = null;
@@ -188,7 +181,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
             this.checkStump(player);
 
             try {
-                e = this.storedGame.getPlayer(player.getUniqueId(), player.getName());
                 String killedBy;
                 if (logout) {
                     killedBy = "Déconnexion";
@@ -198,8 +190,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
                     EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
                     killedBy = getDamageCause(cause);
                 }
-
-                e.die(getInGamePlayers().size(), killedBy, System.currentTimeMillis() - this.storedGame.getStartTime());
             } catch (Exception var9) {
                 var9.printStackTrace();
             }
