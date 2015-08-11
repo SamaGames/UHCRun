@@ -8,6 +8,7 @@ import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.data.SavedPlayer;
 import net.samagames.uhcrun.game.data.StoredGame;
+import net.samagames.uhcrun.listener.ChunkListener;
 import net.samagames.uhcrun.task.GameLoop;
 import net.samagames.uhcrun.utils.Colors;
 import net.samagames.uhcrun.utils.Metadatas;
@@ -141,7 +142,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
             sign.addReceiver(player);
             gameLoop.addPlayer(player.getUniqueId(), sign);
         }
-
+        server.getPluginManager().registerEvents(new ChunkListener(plugin), plugin);
     }
 
     public void rejoin(Player thePlayer) {

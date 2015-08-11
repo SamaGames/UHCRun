@@ -109,8 +109,6 @@ public class UHCRun extends JavaPlugin implements Listener {
         samaGamesAPI.getGameManager().setMaxReconnectTime(game.getReductionTime());
 
         pluginManager.registerEvents(this, this);
-
-        pluginManager.registerEvents(new ChunkListener(this), this);
         pluginManager.registerEvents(new SpectatorListener(game), this);
         pluginManager.registerEvents(new GameListener(game), this);
         pluginManager.registerEvents(new CompassTargeter(this), this);

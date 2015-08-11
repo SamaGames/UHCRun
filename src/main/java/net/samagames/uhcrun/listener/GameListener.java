@@ -8,6 +8,7 @@ import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -150,30 +151,37 @@ public class GameListener implements Listener {
 
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onChestOpen(PlayerInteractEvent event) {
-        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.CHEST)) {
-            Chest chest = (Chest) event.getClickedBlock().getState();
-            int slot = 0;
-            while (slot < chest.getInventory().getSize()) {
-                ItemStack stack = chest.getInventory().getItem(slot);
-                if (stack == null) {
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            if (event.getClickedBlock().getType().equals(Material.CHEST)) {
+                Chest chest = (Chest) event.getClickedBlock().getState();
+                int slot = 0;
+                while (slot < chest.getInventory().getSize()) {
+                    ItemStack stack = chest.getInventory().getItem(slot);
+                    if (stack == null) {
+                        slot++;
+                        continue;
+                    }
+
+                    if (stack.getType() == Material.DIAMOND) {
+                        String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+                        ItemMeta meta = stack.getItemMeta();
+                        ArrayList<String> customLore = new ArrayList<>();
+                        customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
+                        customLore.add(checkline);
+                        meta.setLore(customLore);
+                        stack.setItemMeta(meta);
+
+                        chest.getInventory().setItem(slot, stack);
+                    }
                     slot++;
-                    continue;
                 }
-
-                if (stack.getType() == Material.DIAMOND) {
-                    String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-                    ItemMeta meta = stack.getItemMeta();
-                    ArrayList<String> customLore = new ArrayList<>();
-                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
-                    customLore.add(checkline);
-                    meta.setLore(customLore);
-                    stack.setItemMeta(meta);
-
-                    chest.getInventory().setItem(slot, stack);
-                }
-                slot++;
+            } else if (event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == (Material.LAVA_BUCKET) && !game.isPvpEnabled())
+            {
+                event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
+                event.setCancelled(true);
             }
+            System.out.printf("Target: %s, Item: %s\n", event.getPlayer().getItemInHand(), event.getClickedBlock());
         }
     }
 
@@ -293,10 +301,6 @@ public class GameListener implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (!game.isPvpEnabled() && (event.getBlockPlaced().getType() == Material.LAVA || event.getBlockPlaced().getType() == Material.STATIONARY_LAVA)) {
-            event.setCancelled(true);
-            event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
-        }
 
         int x = event.getBlockPlaced().getX();
         int y = event.getBlockPlaced().getY();

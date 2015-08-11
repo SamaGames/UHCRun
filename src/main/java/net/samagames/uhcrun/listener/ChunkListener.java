@@ -2,6 +2,7 @@ package net.samagames.uhcrun.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -59,7 +60,7 @@ public class ChunkListener implements Runnable, Listener {
 
 
             for (Entity entity : chunk.getEntities()) {
-                if (!(entity instanceof Item || entity instanceof HumanEntity)) {
+                if (!(entity instanceof Item || entity instanceof HumanEntity || entity instanceof Animals)) {
                     Bukkit.getLogger().info("Removing " + entity);
                     entity.remove();
                 }

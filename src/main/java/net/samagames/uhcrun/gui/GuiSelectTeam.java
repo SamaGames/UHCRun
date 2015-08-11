@@ -179,6 +179,7 @@ public class GuiSelectTeam extends Gui {
                     Iterator<UUID> iter = game.getInGamePlayers().keySet().iterator();
                     while (iter.hasNext()) {
                         UUID aInvite = iter.next();
+                        System.out.println(aInvite);
                         if (game.getPlayerTeam(aInvite) == null) {
                             if (Bukkit.getPlayer(aInvite) != null) {
                                 new FancyMessage(" - " + Bukkit.getPlayer(aInvite).getName() + " ")
