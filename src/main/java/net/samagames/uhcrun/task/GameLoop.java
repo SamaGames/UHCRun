@@ -132,14 +132,14 @@ public class GameLoop implements Runnable {
                 server.getLogger().info("Player null :  " + player);
                 this.objectives.remove(player);
             } else {
-                objective.setLine(1, ChatColor.BLUE + " ");
-                objective.setLine(2, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getInGamePlayers().size());
-                objective.setLine(3, ChatColor.GRAY + "  ");
-                int lastLine = 2;
+                objective.setLine(0, ChatColor.BLUE + " ");
+                objective.setLine(1, ChatColor.GRAY + "Joueurs : " + ChatColor.WHITE + game.getInGamePlayers().size());
+                objective.setLine(2, ChatColor.GRAY + "  ");
+                int lastLine = 1;
                 if (game instanceof TeamGame) {
-                    objective.setLine(3, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame) game).getTeams().size());
-                    objective.setLine(4, ChatColor.RED + "   ");
-                    lastLine = 4;
+                    objective.setLine(2, ChatColor.GRAY + "Équipes : " + ChatColor.WHITE + ((TeamGame) game).getTeams().size());
+                    objective.setLine(3, ChatColor.RED + "   ");
+                    lastLine = 3;
                 }
                 if (this.nextEvent != null) {
                     objective.setLine(lastLine + 1, this.nextEvent.string);
