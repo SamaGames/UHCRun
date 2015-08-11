@@ -45,7 +45,7 @@ public class TeamSelector implements Listener {
         if (game.getStatus().equals(Status.IN_GAME)) {
             event.getHandlers().unregister(this);
             return;
-        } else if (event.getItem().getType() == Material.NETHER_STAR) {
+        } else if (event.getItem() != null && event.getItem().getType() == Material.NETHER_STAR) {
             this.openGui(event.getPlayer(), new GuiSelectTeam());
         }
     }

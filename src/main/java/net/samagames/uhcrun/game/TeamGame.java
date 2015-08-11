@@ -59,6 +59,9 @@ public class TeamGame extends Game {
     }
 
     public void startGame() {
+        if (this.getInGamePlayers().size() <= personsPerTeam) {
+            return;
+        }
         Iterator<UUID> playerIterator = this.getInGamePlayers().keySet().iterator();
         while (playerIterator.hasNext()) {
             UUID id = playerIterator.next();
@@ -113,10 +116,6 @@ public class TeamGame extends Game {
             }
         }
         teams.removeAll(toRemove);
-        // FIXME: Better handling single team
-        if (teams.size() <= 1) {
-            this.handleGameEnd();
-        }
         toRemove.clear();
     }
 

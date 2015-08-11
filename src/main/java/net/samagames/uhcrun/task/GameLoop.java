@@ -153,7 +153,7 @@ public class GameLoop implements Runnable {
                 if (kills > 0) {
                     objective.setLine(lastLine + 1, ChatColor.GRAY + "Joueurs tués : " + ChatColor.WHITE + "" + kills);
                     objective.setLine(lastLine + 2, ChatColor.AQUA + "      ");
-                    lastLine -= 2;
+                    lastLine += 2;
                 }
 
                 objective.setLine(lastLine + 1, ChatColor.GRAY + "Bordure :");
