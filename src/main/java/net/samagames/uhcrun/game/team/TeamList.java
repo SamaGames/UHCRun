@@ -2,6 +2,14 @@ package net.samagames.uhcrun.game.team;
 
 import java.util.*;
 
+
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public class TeamList implements List<Team> {
 
     private final ArrayList<Team> internalList;
@@ -132,7 +140,6 @@ public class TeamList implements List<Team> {
                 return team;
             }
         }
-
         return null;
     }
 }

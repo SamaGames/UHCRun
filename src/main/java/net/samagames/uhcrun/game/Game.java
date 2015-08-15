@@ -180,20 +180,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
 
             this.checkStump(player);
 
-            try {
-                String killedBy;
-                if (logout) {
-                    killedBy = "Déconnexion";
-                } else if (killer != null) {
-                    killedBy = killer.getDisplayName();
-                } else {
-                    EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
-                    killedBy = getDamageCause(cause);
-                }
-            } catch (Exception var9) {
-                var9.printStackTrace();
-            }
-
             player.setGameMode(GameMode.SPECTATOR);
             player.setHealth(20.0D);
             if (!logout) {

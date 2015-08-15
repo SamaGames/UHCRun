@@ -37,8 +37,8 @@ public class GuiSelectTeam extends Gui {
 
     public GuiSelectTeam() {
         if (game == null || selector == null) {
-            this.game = (TeamGame) UHCRun.getInstance().getGame();
-            this.selector = TeamSelector.getInstance();
+            game = (TeamGame) UHCRun.getInstance().getGame();
+            selector = TeamSelector.getInstance();
         }
     }
 
@@ -51,9 +51,9 @@ public class GuiSelectTeam extends Gui {
             this.signField.setAccessible(true);
             this.isEditable = TileEntitySign.class.getDeclaredField("isEditable");
             this.isEditable.setAccessible(true);
-            this.getHandle = CraftPlayer.class.getDeclaredMethod("getHandle", new Class[0]);
-            this.openSign = EntityHuman.class.getDeclaredMethod("openSign", new Class[]{TileEntitySign.class});
-            this.setEditor = TileEntitySign.class.getDeclaredMethod("a", new Class[]{EntityHuman.class});
+            this.getHandle = CraftPlayer.class.getDeclaredMethod("getHandle");
+            this.openSign = EntityHuman.class.getDeclaredMethod("openSign", TileEntitySign.class);
+            this.setEditor = TileEntitySign.class.getDeclaredMethod("a", EntityHuman.class);
         } catch (NoSuchFieldException | SecurityException | NoSuchMethodException ex) {
             ex.printStackTrace();
         }
@@ -135,11 +135,11 @@ public class GuiSelectTeam extends Gui {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(game.getPlugin(), () -> {
                         try {
                             final Object signTile = signField.get(block.getState());
-                            final Object entityPlayer = getHandle.invoke(player, new Object[0]);
+                            final Object entityPlayer = getHandle.invoke(player);
                             Bukkit.getScheduler().scheduleSyncDelayedTask(game.getPlugin(), () -> {
                                 try {
-                                    openSign.invoke(entityPlayer, new Object[]{signTile});
-                                    setEditor.invoke(signTile, new Object[]{entityPlayer});
+                                    openSign.invoke(entityPlayer, signTile);
+                                    setEditor.invoke(signTile, entityPlayer);
                                     isEditable.set(signTile, true);
                                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
                                     ex.printStackTrace();
