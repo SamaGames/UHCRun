@@ -94,7 +94,7 @@ public class BlockListener implements Listener
                             }
                             bList.remove(block);
                         }
-                        if (bList.size() == 0)
+                        if (bList.isEmpty())
                         {
                             cancel();
                         }
