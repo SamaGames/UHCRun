@@ -14,16 +14,21 @@ import java.util.List;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public final class Metadatas {
+public final class Metadatas
+{
 
-    private Metadatas() {
+    private Metadatas()
+    {
 
     }
 
-    public static Object getMetadata(JavaPlugin plugin, Metadatable object, String key) {
+    public static Object getMetadata(JavaPlugin plugin, Metadatable object, String key)
+    {
         List<MetadataValue> values = object.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().equals(plugin)) {
+        for (MetadataValue value : values)
+        {
+            if (value.getOwningPlugin().equals(plugin))
+            {
                 return value.value();
             }
         }
@@ -31,7 +36,8 @@ public final class Metadatas {
         return null;
     }
 
-    public static void setMetadata(JavaPlugin plugin, Metadatable object, String key, Object value) {
+    public static void setMetadata(JavaPlugin plugin, Metadatable object, String key, Object value)
+    {
         object.setMetadata(key, new FixedMetadataValue(plugin, value));
     }
 }

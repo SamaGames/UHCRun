@@ -31,7 +31,6 @@
     <module name="RedundantModifier"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
-    <module name="LeftCurly"/>
     <module name="ParenPad"/>
     <module name="TypecastParenPad">
       <property name="tokens" value="RPAREN,TYPECAST"/>

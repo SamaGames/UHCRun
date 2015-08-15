@@ -27,44 +27,57 @@ import java.util.Random;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class BlockListener implements Listener {
+public class BlockListener implements Listener
+{
     @EventHandler
-    public void onBeginBreak(BlockDamageEvent event) {
+    public void onBeginBreak(BlockDamageEvent event)
+    {
         event.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
-        if (event.getBlock().getType() == Material.OBSIDIAN) {
+        if (event.getBlock().getType() == Material.OBSIDIAN)
+        {
             event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 20000, 2, true, true));
-        } else {
+        } else
+        {
             event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
         }
     }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent event) {
+    public void onBreak(BlockBreakEvent event)
+    {
         Material mat = event.getBlock().getType();
         event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
 
-        switch (mat) {
+        switch (mat)
+        {
             case LOG:
             case LOG_2:
                 final List<Block> bList = new ArrayList<>();
                 checkLeaves(event.getBlock());
                 bList.add(event.getBlock());
-                new BukkitRunnable() {
+                new BukkitRunnable()
+                {
                     @Override
-                    public void run() {
-                        for (int i = 0; i < bList.size(); i++) {
+                    public void run()
+                    {
+                        for (int i = 0; i < bList.size(); i++)
+                        {
                             Block block = bList.get(i);
-                            if (block.getType() == Material.LOG || block.getType() == Material.LOG_2) {
+                            if (block.getType() == Material.LOG || block.getType() == Material.LOG_2)
+                            {
                                 block.breakNaturally();
                             }
-                            for (BlockFace face : BlockFace.values()) {
-                                if (block.getRelative(face).getType() == Material.LOG || block.getRelative(face).getType() == Material.LOG_2) {
+                            for (BlockFace face : BlockFace.values())
+                            {
+                                if (block.getRelative(face).getType() == Material.LOG || block.getRelative(face).getType() == Material.LOG_2)
+                                {
                                     bList.add(block.getRelative(face));
                                 }
                             }
                             bList.remove(block);
                         }
-                        if (bList.size() == 0) {
+                        if (bList.isEmpty())
+                        {
                             cancel();
                         }
                     }
@@ -83,7 +96,8 @@ public class BlockListener implements Listener {
         event.getPlayer().giveExp(event.getExpToDrop() * 2);
     }
 
-    private void checkLeaves(Block block) {
+    private void checkLeaves(Block block)
+    {
         Location loc = block.getLocation();
         final World world = loc.getWorld();
         final int x = loc.getBlockX();
@@ -92,15 +106,20 @@ public class BlockListener implements Listener {
         final int range = 4;
         final int off = range + 1;
 
-        if (!validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off)) {
+        if (!validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off))
+        {
             return;
         }
 
         Bukkit.getServer().getScheduler().runTask(UHCRun.getInstance(), () -> {
-            for (int offX = -range; offX <= range; offX++) {
-                for (int offY = -range; offY <= range; offY++) {
-                    for (int offZ = -range; offZ <= range; offZ++) {
-                        if (world.getBlockAt(x + offX, y + offY, z + offZ).getType() == Material.LEAVES || world.getBlockAt(x + offX, y + offY, z + offZ).getType() == Material.LEAVES_2) {
+            for (int offX = -range; offX <= range; offX++)
+            {
+                for (int offY = -range; offY <= range; offY++)
+                {
+                    for (int offZ = -range; offZ <= range; offZ++)
+                    {
+                        if (world.getBlockAt(x + offX, y + offY, z + offZ).getType() == Material.LEAVES || world.getBlockAt(x + offX, y + offY, z + offZ).getType() == Material.LEAVES_2)
+                        {
                             breakLeaf(world, x + offX, y + offY, z + offZ);
                         }
                     }
@@ -111,7 +130,8 @@ public class BlockListener implements Listener {
 
     //TODO: Rewrite this
     @Deprecated
-    private void breakLeaf(World world, int x, int y, int z) {
+    private void breakLeaf(World world, int x, int y, int z)
+    {
         Block block = world.getBlockAt(x, y, z);
 
         byte range = 4;
@@ -123,46 +143,61 @@ public class BlockListener implements Listener {
 
 
         // Compute leaf
-        if (validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off)) {
+        if (validChunk(world, x - off, y - off, z - off, x + off, y + off, z + off))
+        {
             int offX;
             int offY;
             int offZ;
 
-            for (offX = -range; offX <= range; offX++) {
-                for (offY = -range; offY <= range; offY++) {
-                    for (offZ = -range; offZ <= range; offZ++) {
+            for (offX = -range; offX <= range; offX++)
+            {
+                for (offY = -range; offY <= range; offY++)
+                {
+                    for (offZ = -range; offZ <= range; offZ++)
+                    {
                         Material mat = world.getBlockAt(x + offX, y + offY, z + offZ).getType();
                         blocks[(offX + div) * mul + (offY + div) * max + offZ + div] = mat == Material.LOG || mat == Material.LOG_2 ? 0 : mat == Material.LEAVES || mat == Material.LEAVES_2 ? -2 : -1;
                     }
                 }
             }
 
-            for (offX = 1; offX <= 4; offX++) {
-                for (offY = -range; offY <= range; offY++) {
-                    for (offZ = -range; offZ <= range; offZ++) {
-                        for (int i = -range; i <= range; i++) {
-                            if (blocks[(offY + div) * mul + (offZ + div) * max + i + div] == offX - 1) {
-                                if (blocks[(offY + div - 1) * mul + (offZ + div) * max + i + div] == -2) {
+            for (offX = 1; offX <= 4; offX++)
+            {
+                for (offY = -range; offY <= range; offY++)
+                {
+                    for (offZ = -range; offZ <= range; offZ++)
+                    {
+                        for (int i = -range; i <= range; i++)
+                        {
+                            if (blocks[(offY + div) * mul + (offZ + div) * max + i + div] == offX - 1)
+                            {
+                                if (blocks[(offY + div - 1) * mul + (offZ + div) * max + i + div] == -2)
+                                {
                                     blocks[(offY + div - 1) * mul + (offZ + div) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div + 1) * mul + (offZ + div) * max + i + div] == -2) {
+                                if (blocks[(offY + div + 1) * mul + (offZ + div) * max + i + div] == -2)
+                                {
                                     blocks[(offY + div + 1) * mul + (offZ + div) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div - 1) * max + i + div] == -2) {
+                                if (blocks[(offY + div) * mul + (offZ + div - 1) * max + i + div] == -2)
+                                {
                                     blocks[(offY + div) * mul + (offZ + div - 1) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div + 1) * max + i + div] == -2) {
+                                if (blocks[(offY + div) * mul + (offZ + div + 1) * max + i + div] == -2)
+                                {
                                     blocks[(offY + div) * mul + (offZ + div + 1) * max + i + div] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div) * max + (i + div - 1)] == -2) {
+                                if (blocks[(offY + div) * mul + (offZ + div) * max + (i + div - 1)] == -2)
+                                {
                                     blocks[(offY + div) * mul + (offZ + div) * max + (i + div - 1)] = offX;
                                 }
 
-                                if (blocks[(offY + div) * mul + (offZ + div) * max + i + div + 1] == -2) {
+                                if (blocks[(offY + div) * mul + (offZ + div) * max + i + div + 1] == -2)
+                                {
                                     blocks[(offY + div) * mul + (offZ + div) * max + i + div + 1] = offX;
                                 }
                             }
@@ -172,32 +207,40 @@ public class BlockListener implements Listener {
             }
         }
 
-        if (blocks[div * mul + div * max + div] < 0) {
+        if (blocks[div * mul + div * max + div] < 0)
+        {
             LeavesDecayEvent event = new LeavesDecayEvent(block);
             Bukkit.getServer().getPluginManager().callEvent(event);
 
-            if (event.isCancelled()) {
+            if (event.isCancelled())
+            {
                 return;
             }
 
             block.breakNaturally();
 
-            if (10 > new Random().nextInt(100)) {
+            if (10 > new Random().nextInt(100))
+            {
                 world.playEffect(block.getLocation(), Effect.STEP_SOUND, Material.LEAVES);
             }
         }
     }
 
-    private boolean validChunk(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        if (maxY >= 0 && minY < world.getMaxHeight()) {
+    private boolean validChunk(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    {
+        if (maxY >= 0 && minY < world.getMaxHeight())
+        {
             minX >>= 4;
             minZ >>= 4;
             maxX >>= 4;
             maxZ >>= 4;
 
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    if (!world.isChunkLoaded(x, z)) {
+            for (int x = minX; x <= maxX; x++)
+            {
+                for (int z = minZ; z <= maxZ; z++)
+                {
+                    if (!world.isChunkLoaded(x, z))
+                    {
                         return false;
                     }
                 }

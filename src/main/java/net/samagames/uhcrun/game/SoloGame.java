@@ -18,22 +18,27 @@ import java.util.UUID;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class SoloGame extends Game {
+public class SoloGame extends Game
+{
 
 
-    public SoloGame() {
+    public SoloGame()
+    {
         super(SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots());
     }
 
 
     @Override
-    public void checkStump(Player player) {
+    public void checkStump(Player player)
+    {
         UHCPlayer playerData = getPlayer(player.getUniqueId());
-        if (getInGamePlayers().size() == 3) {
+        if (getInGamePlayers().size() == 3)
+        {
             playerData.addCoins(20, "Troisième au classement !");
         }
 
-        if (getInGamePlayers().size() == 2) {
+        if (getInGamePlayers().size() == 2)
+        {
             playerData.addCoins(50, "Second au classement !");
             playerData.addStars(1, "Second au classement !");
 
@@ -43,33 +48,40 @@ public class SoloGame extends Game {
             this.gamePlayers.put(playerData.getUUID(), playerData);
 
             Player winner = server.getPlayer(winnerId);
-            if (winner == null) {
-                System.out.println("TEST");
+            if (winner == null)
+            {
                 this.handleGameEnd();
-            } else {
+            } else
+            {
                 this.win(winner);
             }
-        } else if (getInGamePlayers().size() == 1) {
+        } else if (getInGamePlayers().size() == 1)
+        {
             this.handleGameEnd();
-        } else {
+        } else
+        {
             server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + getInGamePlayers().size() + ChatColor.YELLOW + " joueur(s) en vie.");
         }
 
     }
 
-    public void win(final Player player) {
+    public void win(final Player player)
+    {
         final UHCPlayer playerData = this.getPlayer(player.getUniqueId());
         playerData.addStars(2, "Victoire !");
         playerData.addCoins(100, "Victoire ! ");
 
-        try {
+        try
+        {
             this.increaseStat(player.getUniqueId(), "victories", 1);
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
         }
 
         server.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
 
-        for (Player user : server.getOnlinePlayers()) {
+        for (Player user : server.getOnlinePlayers())
+        {
             Titles.sendTitle(user, 5, 70, 5, ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
         }
 
@@ -78,17 +90,21 @@ public class SoloGame extends Game {
     }
 
     @Override
-    protected void teleport() {
+    protected void teleport()
+    {
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.getInGamePlayers().keySet()) {
+        for (UUID uuid : this.getInGamePlayers().keySet())
+        {
             Player player = server.getPlayer(uuid);
-            if (player == null) {
+            if (player == null)
+            {
                 gamePlayers.remove(uuid);
                 continue;
             }
 
-            if (!locationIterator.hasNext()) {
+            if (!locationIterator.hasNext())
+            {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                 gamePlayers.remove(uuid);
                 continue;
@@ -101,18 +117,22 @@ public class SoloGame extends Game {
     }
 
     @Override
-    public void teleportDeathMatch() {
+    public void teleportDeathMatch()
+    {
         Collections.shuffle(this.spawnPoints);
         Iterator<Location> locationIterator = this.spawnPoints.iterator();
 
-        for (UUID uuid : this.getInGamePlayers().keySet()) {
+        for (UUID uuid : this.getInGamePlayers().keySet())
+        {
             Player player = server.getPlayer(uuid);
-            if (player == null) {
+            if (player == null)
+            {
                 gamePlayers.remove(uuid);
                 continue;
             }
 
-            if (!locationIterator.hasNext()) {
+            if (!locationIterator.hasNext())
+            {
                 player.kickPlayer(ChatColor.RED + "Plus de place dans la partie.");
                 gamePlayers.remove(uuid);
                 continue;

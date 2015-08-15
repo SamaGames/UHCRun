@@ -22,10 +22,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.UUID;
 
-public class GuiSelectTeam extends Gui {
+public class GuiSelectTeam extends Gui
+{
     private static TeamGame game;
     private static TeamSelector selector;
     private Field signField;
@@ -35,18 +35,22 @@ public class GuiSelectTeam extends Gui {
     private Method getHandle;
 
 
-    public GuiSelectTeam() {
-        if (game == null || selector == null) {
+    public GuiSelectTeam()
+    {
+        if (game == null || selector == null)
+        {
             game = (TeamGame) UHCRun.getInstance().getGame();
             selector = TeamSelector.getInstance();
         }
     }
 
     @Override
-    public void display(Player player) {
+    public void display(Player player)
+    {
         this.inventory = Bukkit.getServer().createInventory(null, 54, "Sélection d'équipe");
 
-        try {
+        try
+        {
             this.signField = CraftSign.class.getDeclaredField("sign");
             this.signField.setAccessible(true);
             this.isEditable = TileEntitySign.class.getDeclaredField("isEditable");
@@ -54,35 +58,43 @@ public class GuiSelectTeam extends Gui {
             this.getHandle = CraftPlayer.class.getDeclaredMethod("getHandle");
             this.openSign = EntityHuman.class.getDeclaredMethod("openSign", TileEntitySign.class);
             this.setEditor = TileEntitySign.class.getDeclaredMethod("a", EntityHuman.class);
-        } catch (NoSuchFieldException | SecurityException | NoSuchMethodException ex) {
+        } catch (NoSuchFieldException | SecurityException | NoSuchMethodException ex)
+        {
             ex.printStackTrace();
         }
 
         int last = 10;
 
-        for (Team team : game.getTeams()) {
+        for (Team team : game.getTeams())
+        {
             String name = team.getChatColor() + "Equipe " + team.getTeamName() + " [" + team.getPlayersUUID().size() + "/" + game.getPersonsPerTeam() + "]";
 
             ArrayList<String> lores = new ArrayList<>();
 
-            if (team.isLocked()) {
+            if (team.isLocked())
+            {
                 lores.add(ChatColor.RED + "L'équipe est fermée !");
                 lores.add("");
             }
 
-            for (UUID uuid : team.getPlayersUUID()) {
-                if (game.getPlugin().getServer().getPlayer(uuid) != null) {
+            for (UUID uuid : team.getPlayersUUID())
+            {
+                if (game.getPlugin().getServer().getPlayer(uuid) != null)
+                {
                     lores.add(team.getChatColor() + " - " + Bukkit.getPlayer(uuid).getName());
-                } else {
+                } else
+                {
                     team.remove(uuid);
                 }
             }
 
             setSlotData(name, team.getIcon(), last, lores.toArray(new String[lores.size()]), "team_" + team.getChatColor());
 
-            if (last == 16) {
+            if (last == 16)
+            {
                 last = 19;
-            } else {
+            } else
+            {
                 last++;
             }
         }
@@ -99,22 +111,31 @@ public class GuiSelectTeam extends Gui {
     }
 
     @Override
-    public void onClick(final Player player, ItemStack stack, String action) {
+    public void onClick(final Player player, ItemStack stack, String action)
+    {
 
-        if (action.startsWith("team_")) {
-            for (Team team : game.getTeams()) {
-                if (action.equals("team_" + team.getChatColor())) {
-                    if (!team.isLocked()) {
-                        if (team.canJoin()) {
-                            if (game.getPlayerTeam(player.getUniqueId()) != null) {
+        if (action.startsWith("team_"))
+        {
+            for (Team team : game.getTeams())
+            {
+                if (action.equals("team_" + team.getChatColor()))
+                {
+                    if (!team.isLocked())
+                    {
+                        if (team.canJoin())
+                        {
+                            if (game.getPlayerTeam(player.getUniqueId()) != null)
+                            {
                                 game.getPlayerTeam(player.getUniqueId()).remove(player.getUniqueId());
                             }
                             team.join(player.getUniqueId());
                             player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.YELLOW + "Vous êtes entré dans l'équipe " + team.getChatColor() + team.getTeamName() + ChatColor.YELLOW + " !");
-                        } else {
+                        } else
+                        {
                             player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "L'équipe choisie est pleine.");
                         }
-                    } else {
+                    } else
+                    {
                         player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "L'équipe choisie est fermée !");
                     }
 
@@ -123,9 +144,12 @@ public class GuiSelectTeam extends Gui {
             }
 
             selector.openGui(player, new GuiSelectTeam());
-        } else if ("teamname".equals(action)) {
-            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamname")) {
-                if (game.getPlayerTeam(player.getUniqueId()) != null) {
+        } else if ("teamname".equals(action))
+        {
+            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamname"))
+            {
+                if (game.getPlayerTeam(player.getUniqueId()) != null)
+                {
                     final Block block = player.getWorld().getBlockAt(0, 250, 150);
                     block.setTypeIdAndData(Material.SIGN_POST.getId(), (byte) 2, false);
                     Sign sign = (Sign) block.getState();
@@ -133,83 +157,97 @@ public class GuiSelectTeam extends Gui {
                     sign.update(true);
 
                     Bukkit.getScheduler().scheduleSyncDelayedTask(game.getPlugin(), () -> {
-                        try {
+                        try
+                        {
                             final Object signTile = signField.get(block.getState());
                             final Object entityPlayer = getHandle.invoke(player);
                             Bukkit.getScheduler().scheduleSyncDelayedTask(game.getPlugin(), () -> {
-                                try {
+                                try
+                                {
                                     openSign.invoke(entityPlayer, signTile);
                                     setEditor.invoke(signTile, entityPlayer);
                                     isEditable.set(signTile, true);
-                                } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
+                                } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex)
+                                {
                                     ex.printStackTrace();
                                 }
                             }, 5L);
-                        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
+                        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException ex)
+                        {
                             ex.printStackTrace();
                         }
                     }, 1L);
-                } else {
+                } else
+                {
                     player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
                 }
-            } else {
+            } else
+            {
                 player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
             }
-        } else if ("openclose".equals(action)) {
-            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamlock")) {
-                if (game.getPlayerTeam(player.getUniqueId()) != null) {
-                    if (game.getPlayerTeam(player.getUniqueId()).isLocked()) {
+        } else if ("openclose".equals(action))
+        {
+            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamlock"))
+            {
+                if (game.getPlayerTeam(player.getUniqueId()) != null)
+                {
+                    if (game.getPlayerTeam(player.getUniqueId()).isLocked())
+                    {
                         game.getPlayerTeam(player.getUniqueId()).setLocked(false);
                         player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.GREEN + "Votre équipe est maintenant ouverte !");
-                    } else {
+                    } else
+                    {
                         game.getPlayerTeam(player.getUniqueId()).setLocked(true);
                         player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Votre équipe est maintenant fermée !");
                     }
-                } else {
+                } else
+                {
                     player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
                 }
-            } else {
+            } else
+            {
                 player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
             }
-        } else if ("invit".equals(action)) {
-            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teaminvite")) {
-                if (game.getPlayerTeam(player.getUniqueId()) != null) {
+        } else if ("invit".equals(action))
+        {
+            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teaminvite"))
+            {
+                if (game.getPlayerTeam(player.getUniqueId()) != null)
+                {
                     player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.YELLOW + "Vous pouvez inviter les joueurs suivants :");
 
-                    Iterator<UUID> iter = game.getInGamePlayers().keySet().iterator();
-                    while (iter.hasNext()) {
-                        UUID aInvite = iter.next();
-                        // FIXME: ASK TO FIX NMS ON API
-                        if (game.getPlayerTeam(aInvite) == null) {
-                            if (Bukkit.getPlayer(aInvite) != null) {
-                                new FancyMessage(" - " + Bukkit.getPlayer(aInvite).getName() + " ")
-                                        .color(ChatColor.GRAY)
-                                        .then("[Inviter]")
-                                        .color(ChatColor.GREEN)
-                                        .style(ChatColor.BOLD)
-                                        .command("/uhc invite " + Bukkit.getPlayer(aInvite).getName())
-                                        .send(player);
-                            }
-                        }
-                    }
-                } else {
+                    // FIXME: ASK TO FIX NMS ON API
+                    game.getInGamePlayers().keySet().stream().filter(aInvite -> game.getPlayerTeam(aInvite) == null).filter(aInvite -> Bukkit.getPlayer(aInvite) != null).forEach(aInvite -> new FancyMessage(" - " + Bukkit.getPlayer(aInvite).getName() + " ")
+                            .color(ChatColor.GRAY)
+                            .then("[Inviter]")
+                            .color(ChatColor.GREEN)
+                            .style(ChatColor.BOLD)
+                            .command("/uhc invite " + Bukkit.getPlayer(aInvite).getName())
+                            .send(player));
+                } else
+                {
                     player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
                 }
-            } else {
+            } else
+            {
                 player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez être VIP pour pouvoir utiliser cette fonction !");
             }
-        } else if ("leave".equals(action)) {
-            if (game.getPlayerTeam(player.getUniqueId()) != null) {
+        } else if ("leave".equals(action))
+        {
+            if (game.getPlayerTeam(player.getUniqueId()) != null)
+            {
                 game.getPlayerTeam(player.getUniqueId()).remove(player.getUniqueId());
                 player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.GREEN + "Vous avez quitté l'équipe !");
-            } else {
+            } else
+            {
                 player.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Vous devez avoir une équipe pour pouvoir utiliser cette fonction !");
             }
         }
     }
 
     @Override
-    public Inventory getInventory() {
+    public Inventory getInventory()
+    {
         return this.inventory;
     }
 }

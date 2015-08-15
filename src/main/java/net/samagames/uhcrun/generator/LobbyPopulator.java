@@ -22,21 +22,26 @@ import java.util.logging.Logger;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class LobbyPopulator {
+public class LobbyPopulator
+{
     private final Logger logger;
     private final File file;
     private EditSession es;
 
-    public LobbyPopulator(Logger logger, File file) {
+    public LobbyPopulator(Logger logger, File file)
+    {
         this.logger = logger;
         this.file = new File(file, "/lobby.schematic");
     }
 
-    public void generate() {
+    public void generate()
+    {
         logger.info("Generating Looby...");
 
-        if (file.exists()) {
-            try {
+        if (file.exists())
+        {
+            try
+            {
                 Vector v = new Vector(0, 200, 0);
                 World worldf = Bukkit.getWorld("world");
                 worldf.loadChunk(0, 0);
@@ -45,18 +50,21 @@ public class LobbyPopulator {
                 this.es.setFastMode(true);
                 CuboidClipboard c1 = SchematicFormat.MCEDIT.load(file);
                 c1.paste(this.es, v, true);
-            } catch (MaxChangedBlocksException | IOException | DataException ex) {
+            } catch (MaxChangedBlocksException | IOException | DataException ex)
+            {
                 ex.printStackTrace();
             }
 
-        } else {
+        } else
+        {
             logger.severe("File does not exist. Abort...");
         }
 
         logger.info("Done.");
     }
 
-    public void remove() {
+    public void remove()
+    {
         this.es.undo(this.es);
     }
 }

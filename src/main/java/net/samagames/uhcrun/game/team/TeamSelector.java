@@ -20,14 +20,17 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-public class TeamSelector implements Listener {
+public class TeamSelector implements Listener
+{
 
     private static TeamSelector instance;
     private final TeamGame game;
     private Map<UUID, Gui> playersGui;
 
-    public TeamSelector(TeamGame game) throws IllegalAccessException {
-        if (instance != null) {
+    public TeamSelector(TeamGame game) throws IllegalAccessException
+    {
+        if (instance != null)
+        {
             throw new IllegalAccessException("Instance already defined!");
         }
         instance = this;
@@ -35,31 +38,38 @@ public class TeamSelector implements Listener {
         this.playersGui = new TreeMap<>();
     }
 
-    public static TeamSelector getInstance() {
+    public static TeamSelector getInstance()
+    {
         return instance;
     }
 
     @EventHandler
-    public void playerInteractEvent(PlayerInteractEvent event) {
-        if (game.getStatus().equals(Status.IN_GAME)) {
+    public void playerInteractEvent(PlayerInteractEvent event)
+    {
+        if (game.getStatus().equals(Status.IN_GAME))
+        {
             event.getHandlers().unregister(this);
-            return;
-        } else if (event.getItem() != null && event.getItem().getType() == Material.NETHER_STAR) {
+        } else if (event.getItem() != null && event.getItem().getType() == Material.NETHER_STAR)
+        {
             this.openGui(event.getPlayer(), new GuiSelectTeam());
         }
     }
 
 
     @EventHandler
-    public void clickEvent(InventoryClickEvent event) {
-        if (game.getStatus().equals(Status.IN_GAME)) {
+    public void clickEvent(InventoryClickEvent event)
+    {
+        if (game.getStatus().equals(Status.IN_GAME))
+        {
             event.getHandlers().unregister(this);
-            return;
-        } else if (event.getCurrentItem() != null && event.getCurrentItem().getItemMeta() != null && event.getView().getType() != InventoryType.PLAYER) {
+        } else if (event.getCurrentItem() != null && event.getCurrentItem().getItemMeta() != null && event.getView().getType() != InventoryType.PLAYER)
+        {
             Gui gui = this.playersGui.get(event.getWhoClicked().getUniqueId());
-            if (gui != null) {
+            if (gui != null)
+            {
                 String action = gui.getAction(event.getSlot());
-                if (action != null) {
+                if (action != null)
+                {
                     gui.onClick((Player) event.getWhoClicked(), event.getCurrentItem(), action, event.getClick());
                 }
                 event.setCancelled(true);
@@ -68,31 +78,38 @@ public class TeamSelector implements Listener {
     }
 
     @EventHandler
-    public void onSignChange(SignChangeEvent event) {
-        if (game.getStatus().equals(Status.IN_GAME)) {
+    public void onSignChange(SignChangeEvent event)
+    {
+        if (game.getStatus().equals(Status.IN_GAME))
+        {
             event.getHandlers().unregister(this);
             return;
         }
 
-        if (!game.getStatus().equals(Status.IN_GAME)) {
+        if (!game.getStatus().equals(Status.IN_GAME))
+        {
             event.getBlock().setType(Material.AIR);
             Team team = game.getPlayerTeam(event.getPlayer().getUniqueId());
             String name = event.getLine(0);
             name = name.trim();
 
-            if (!name.isEmpty()) {
+            if (!name.isEmpty())
+            {
                 team.setTeamName(name);
                 event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.GREEN + "Le nom de votre équipe est désormais : " + team.getChatColor() + team.getTeamName());
                 this.openGui(event.getPlayer(), new GuiSelectTeam());
-            } else {
+            } else
+            {
                 event.getPlayer().sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.RED + "Le nom de l'équipe ne peut être vide.");
                 this.openGui(event.getPlayer(), new GuiSelectTeam());
             }
         }
     }
 
-    public void openGui(Player player, Gui gui) {
-        if (this.playersGui.containsKey(player.getUniqueId())) {
+    public void openGui(Player player, Gui gui)
+    {
+        if (this.playersGui.containsKey(player.getUniqueId()))
+        {
             player.closeInventory();
             this.playersGui.remove(player.getUniqueId());
         }
@@ -102,26 +119,34 @@ public class TeamSelector implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onChat(AsyncPlayerChatEvent event) {
+    public void onChat(AsyncPlayerChatEvent event)
+    {
 
-        if (!game.getStatus().equals(Status.IN_GAME)) {
+        if (!game.getStatus().equals(Status.IN_GAME))
+        {
             return;
         }
 
-        if (event.getMessage().startsWith("!")) {
+        if (event.getMessage().startsWith("!"))
+        {
             String message = event.getMessage().substring(1);
             Team team = game.getPlayerTeam(event.getPlayer().getUniqueId());
-            if (team != null) {
+            if (team != null)
+            {
                 event.setFormat(team.getChatColor() + "[" + team.getTeamName() + "] " + event.getPlayer().getName() + " : " + ChatColor.WHITE + message);
             }
-        } else {
+        } else
+        {
             Team team = game.getPlayerTeam(event.getPlayer().getUniqueId());
-            if (team != null) {
+            if (team != null)
+            {
                 event.setCancelled(true);
                 String message = team.getChatColor() + "(Equipe) " + event.getPlayer().getName() + " : " + ChatColor.GOLD + ChatColor.ITALIC + event.getMessage();
-                for (UUID id : team.getPlayersUUID()) {
+                for (UUID id : team.getPlayersUUID())
+                {
                     Player player = game.getPlugin().getServer().getPlayer(id);
-                    if (player != null) {
+                    if (player != null)
+                    {
                         player.sendMessage(message);
                     }
                 }

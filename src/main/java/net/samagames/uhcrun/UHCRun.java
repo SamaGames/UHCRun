@@ -99,8 +99,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         int nb = samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam", new JsonPrimitive(1)).getAsInt();
 
         if (nb > 1) {
-            int playersPerTeam = Integer.valueOf(nb);
-            this.game = new TeamGame(playersPerTeam);
+            this.game = new TeamGame(nb);
         } else {
             this.game = new SoloGame();
         }
@@ -169,6 +168,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 4, 0, 32, 6));
 
 
+        // TODO: Use game.json
         List<Double> spawnPos = (List<Double>) config.getList("spawnLocation", Arrays.asList(0.6, 152D, 0.6));
         spawnLocation = new Location(world, spawnPos.get(0), spawnPos.get(1), spawnPos.get(2));
 

@@ -23,57 +23,70 @@ import org.bukkit.event.weather.WeatherChangeEvent;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class SpectatorListener implements Listener {
+public class SpectatorListener implements Listener
+{
     private Game game;
 
-    public SpectatorListener(Game parent) {
+    public SpectatorListener(Game parent)
+    {
         this.game = parent;
     }
 
-    private boolean cancel(Player p) {
-        return game.getStatus() != Status.IN_GAME ? true : !game.isInGame(p.getUniqueId());
+    private boolean cancel(Player p)
+    {
+        return game.getStatus() != Status.IN_GAME || !game.isInGame(p.getUniqueId());
     }
 
     @EventHandler
-    public void onLoseFood(FoodLevelChangeEvent event) {
+    public void onLoseFood(FoodLevelChangeEvent event)
+    {
         event.setCancelled(cancel((Player) event.getEntity()));
     }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent e) {
+    public void onBreak(BlockBreakEvent e)
+    {
         e.setCancelled(cancel(e.getPlayer()));
     }
 
     @EventHandler
-    public void onRain(WeatherChangeEvent event) {
+    public void onRain(WeatherChangeEvent event)
+    {
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player) {
+    public void onDamage(EntityDamageEvent e)
+    {
+        if (e.getEntity() instanceof Player)
+        {
             e.setCancelled(cancel((Player) e.getEntity()));
         }
     }
 
     @EventHandler
-    public void pickup(PlayerPickupItemEvent e) {
+    public void pickup(PlayerPickupItemEvent e)
+    {
         e.setCancelled(cancel(e.getPlayer()));
     }
 
     @EventHandler
-    public void pickup(PlayerDropItemEvent e) {
+    public void pickup(PlayerDropItemEvent e)
+    {
         e.setCancelled(cancel(e.getPlayer()));
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEntityEvent e) {
+    public void onInteract(PlayerInteractEntityEvent e)
+    {
         e.setCancelled(cancel(e.getPlayer()));
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        if ((game.getStatus() == Status.STARTING || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125) {
+    public void onMove(PlayerMoveEvent event)
+    {
+        if ((game.getStatus() == Status.STARTING || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125)
+        {
             event.setCancelled(true);
             event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 162, 0));
             event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Mais où vous allez comme ça ?!");
@@ -81,18 +94,22 @@ public class SpectatorListener implements Listener {
     }
 
     @EventHandler
-    public void onBukket(PlayerBucketFillEvent e) {
+    public void onBukket(PlayerBucketFillEvent e)
+    {
         e.setCancelled(cancel(e.getPlayer()));
     }
 
     @EventHandler
-    public void onBukket(PlayerBucketEmptyEvent e) {
+    public void onBukket(PlayerBucketEmptyEvent e)
+    {
         e.setCancelled(cancel(e.getPlayer()));
     }
 
     @EventHandler
-    public void onHanging(HangingBreakByEntityEvent e) {
-        if (e.getEntity() instanceof Player) {
+    public void onHanging(HangingBreakByEntityEvent e)
+    {
+        if (e.getEntity() instanceof Player)
+        {
             e.setCancelled(cancel((Player) e.getEntity()));
         }
     }

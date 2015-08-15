@@ -29,7 +29,8 @@ import java.util.logging.Logger;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class FortressPopulator extends BlockPopulator {
+public class FortressPopulator extends BlockPopulator
+{
 
     private UHCRun plugin;
     private File file;
@@ -37,40 +38,50 @@ public class FortressPopulator extends BlockPopulator {
     private BukkitWorld bukkitWorld;
     private CuboidClipboard cuboidClipboard;
 
-    public FortressPopulator(UHCRun plugin) {
+    public FortressPopulator(UHCRun plugin)
+    {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "/nether.schematic");
         this.logger = Bukkit.getLogger();
-        try {
+        try
+        {
             this.cuboidClipboard = SchematicFormat.MCEDIT.load(file);
-        } catch (IOException | DataException e) {
+        } catch (IOException | DataException e)
+        {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void populate(World world, Random random, Chunk chunk) {
-        if (bukkitWorld == null) {
+    public void populate(World world, Random random, Chunk chunk)
+    {
+        if (bukkitWorld == null)
+        {
             this.bukkitWorld = new BukkitWorld(world);
         }
 
         final int i = random.nextInt(1000);
-        if (i > 0 && i < 10) {
+        if (i > 0 && i < 10)
+        {
             int xFortress = chunk.getX() * 16 + random.nextInt(15);
             int zFortress = chunk.getZ() * 16 + random.nextInt(15);
             generateBlazeFortress(world, xFortress, zFortress);
         }
     }
 
-    private void generateBlazeFortress(World world, int x, int z) {
-        if (!plugin.isWorldLoaded()) {
+    private void generateBlazeFortress(World world, int x, int z)
+    {
+        if (!plugin.isWorldLoaded())
+        {
             return;
         }
         logger.info("Generating fortress at " + x + "; " + z);
 
         EditSession es;
-        if (file.exists()) {
-            try {
+        if (file.exists())
+        {
+            try
+            {
                 com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(x, 40, z);
                 Chunk chunk = world.getChunkAt(new org.bukkit.Location(world, x, 40, z));
                 int chunkX = chunk.getX();
@@ -78,9 +89,12 @@ public class FortressPopulator extends BlockPopulator {
                 chunk.load(true);
                 int cx = chunkX - 3;
                 int cz = chunkZ - 3;
-                while (cx < chunkX + 3) {
-                    while (cz < chunkZ + 3) {
-                        if (cx != chunkX || cz != chunkZ) {
+                while (cx < chunkX + 3)
+                {
+                    while (cz < chunkZ + 3)
+                    {
+                        if (cx != chunkX || cz != chunkZ)
+                        {
                             world.getChunkAt(cx, cz).load(true);
                         }
                         cz++;
@@ -103,13 +117,17 @@ public class FortressPopulator extends BlockPopulator {
                 cuboidClipboard.paste(es, v, false);
 
                 int bx = x;
-                while (bx < x + 35) {
+                while (bx < x + 35)
+                {
                     int bz = z;
-                    while (bz < z + 35) {
+                    while (bz < z + 35)
+                    {
                         int by = 40;
-                        while (by > 0) {
+                        while (by > 0)
+                        {
                             Block block = new org.bukkit.Location(world, bx, by, bz).getBlock();
-                            if (block.getType() == Material.MOB_SPAWNER) {
+                            if (block.getType() == Material.MOB_SPAWNER)
+                            {
                                 block.setType(Material.STONE);
                                 block.setType(Material.MOB_SPAWNER);
                                 CreatureSpawner spawner = (CreatureSpawner) block.getState();
@@ -125,10 +143,12 @@ public class FortressPopulator extends BlockPopulator {
                     }
                     bx++;
                 }
-            } catch (MaxChangedBlocksException ex) {
+            } catch (MaxChangedBlocksException ex)
+            {
                 ex.printStackTrace();
             }
-        } else {
+        } else
+        {
             logger.severe("File does not exist.");
         }
     }

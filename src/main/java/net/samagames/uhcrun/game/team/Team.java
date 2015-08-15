@@ -21,7 +21,8 @@ import java.util.UUID;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class Team {
+public class Team
+{
 
     private static int maxSize = -1;
     private final ArrayList<UUID> players;
@@ -34,7 +35,8 @@ public class Team {
     private boolean locked;
 
 
-    public Team(TeamGame game, String name, DyeColor color, ChatColor chatColor) {
+    public Team(TeamGame game, String name, DyeColor color, ChatColor chatColor)
+    {
         this.game = game;
         this.teamName = name;
         this.players = new ArrayList<>();
@@ -42,18 +44,23 @@ public class Team {
         this.chatColor = chatColor;
         this.icon = new ItemStack(Material.WOOL, 1, color.getData());
 
-        if (maxSize == -1) {
+        if (maxSize == -1)
+        {
             maxSize = game.getPersonsPerTeam();
         }
     }
 
-    public void join(UUID player) {
+    public void join(UUID player)
+    {
         Player newJoiner = Bukkit.getPlayer(player);
 
-        if (newJoiner != null) {
-            for (UUID member : players) {
+        if (newJoiner != null)
+        {
+            for (UUID member : players)
+            {
                 Player user = Bukkit.getPlayer(member);
-                if (user != null) {
+                if (user != null)
+                {
                     user.sendMessage(game.getCoherenceMachine().getGameTag() + " " + ChatColor.AQUA + newJoiner.getName() + ChatColor.YELLOW + " a rejoint l'équipe.");
                 }
 
@@ -63,25 +70,30 @@ public class Team {
         this.players.add(player);
     }
 
-    public boolean isLocked() {
+    public boolean isLocked()
+    {
         return locked;
     }
 
-    public void setLocked(boolean locked) {
+    public void setLocked(boolean locked)
+    {
         this.locked = locked;
     }
 
-    public void remove(UUID player) {
+    public void remove(UUID player)
+    {
         players.remove(player);
 
         this.lockCheck();
     }
 
-    public ItemStack getIcon() {
+    public ItemStack getIcon()
+    {
         return icon;
     }
 
-    public void invite(String inviter, UUID invited) {
+    public void invite(String inviter, UUID invited)
+    {
         this.invited.add(invited);
 
         new FancyMessage("Vous avez été invité dans l'équipe " + this.teamName + " par " + inviter + " ")
@@ -94,49 +106,60 @@ public class Team {
                 .send(Bukkit.getPlayer(invited));
     }
 
-    public boolean hasPlayer(UUID player) {
+    public boolean hasPlayer(UUID player)
+    {
         return players.contains(player);
     }
 
-    public ArrayList<UUID> getPlayersUUID() {
+    public ArrayList<UUID> getPlayersUUID()
+    {
         return players;
     }
 
-    public String getTeamName() {
+    public String getTeamName()
+    {
         return teamName;
     }
 
-    public void setTeamName(String teamName) {
+    public void setTeamName(String teamName)
+    {
         this.teamName = teamName;
     }
 
-    public ChatColor getChatColor() {
+    public ChatColor getChatColor()
+    {
         return chatColor;
     }
 
-    public boolean isEmpty() {
+    public boolean isEmpty()
+    {
         return players.isEmpty();
     }
 
-    public int removePlayer(UUID uniqueId) {
+    public int removePlayer(UUID uniqueId)
+    {
         players.remove(uniqueId);
         this.lockCheck();
         return players.size();
     }
 
-    private void lockCheck() {
+    private void lockCheck()
+    {
         int size = players.size();
-        if (size == 0 && isLocked()) {
+        if (size == 0 && isLocked())
+        {
             this.setLocked(false);
         }
 
     }
 
-    public boolean canJoin() {
+    public boolean canJoin()
+    {
         return !this.isLocked() && players.size() < maxSize;
     }
 
-    public boolean isFull() {
+    public boolean isFull()
+    {
         return players.size() == game.getPersonsPerTeam();
     }
 }

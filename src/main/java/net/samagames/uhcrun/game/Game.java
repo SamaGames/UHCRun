@@ -33,7 +33,8 @@ import java.util.*;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
+public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
+{
 
     protected final UHCRun plugin;
     protected final Server server;
@@ -50,7 +51,8 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     private BukkitTask mainTask;
     private boolean damages;
 
-    public Game(int maxLocations) {
+    public Game(int maxLocations)
+    {
         super("UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
         this.plugin = UHCRun.getInstance();
         this.server = plugin.getServer();
@@ -62,17 +64,21 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         UHCPlayer.setGame(this);
     }
 
-    public void postInit(World world) {
+    public void postInit(World world)
+    {
         this.scoreboard = server.getScoreboardManager().getMainScoreboard();
         this.gameLoop = new GameLoop(this, plugin, server);
         this.disableDamages();
         this.computeSpawnLocations(world);
     }
 
-    private void computeSpawnLocations(World world) {
-        for (int i = 0; i < maxSpawnLocations; i++) {
+    private void computeSpawnLocations(World world)
+    {
+        for (int i = 0; i < maxSpawnLocations; i++)
+        {
             final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
-            for (int y = 0; y < 16; y++) {
+            for (int y = 0; y < 16; y++)
+            {
                 world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
             }
 
@@ -84,28 +90,29 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     }
 
     @Override
-    public void handlePostRegistration() {
+    public void handlePostRegistration()
+    {
         super.handlePostRegistration();
         this.messageManager = coherenceMachine.getMessageManager();
     }
 
-    protected void removeFromGame(UUID uuid) {
+    protected void removeFromGame(UUID uuid)
+    {
         UHCPlayer player = this.gamePlayers.get(uuid);
-        if (player != null) {
+        if (player != null)
+        {
             player.setSpectator();
         }
     }
 
-    @Override
-    public void handleGameEnd() {
-        super.handleGameEnd();
-    }
-
-    public UHCRun getPlugin() {
+    public UHCRun getPlugin()
+    {
         return plugin;
     }
 
-    public void startGame() {
+    @Override
+    public void startGame()
+    {
         super.startGame();
         plugin.removeSpawn();
 
@@ -119,9 +126,11 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         this.mainTask = server.getScheduler().runTaskTimer(plugin, gameLoop, 20, 20);
         teleport();
 
-        for (UUID uuid : getInGamePlayers().keySet()) {
+        for (UUID uuid : getInGamePlayers().keySet())
+        {
             Player player = server.getPlayer(uuid);
-            if (player == null) {
+            if (player == null)
+            {
                 gamePlayers.remove(uuid);
                 continue;
             }
@@ -141,8 +150,10 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         server.getPluginManager().registerEvents(new ChunkListener(plugin), plugin);
     }
 
-    public void rejoin(Player thePlayer) {
-        if (thePlayer != null) {
+    public void rejoin(Player thePlayer)
+    {
+        if (thePlayer != null)
+        {
             server.getScheduler().runTaskLater(plugin, () -> {
 
                 thePlayer.setScoreboard(this.scoreboard);
@@ -155,26 +166,34 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         }
     }
 
-    public void stumpPlayer(Player player, boolean logout) {
-        if (this.status == Status.IN_GAME) {
+    public void stumpPlayer(Player player, boolean logout)
+    {
+        if (this.status == Status.IN_GAME)
+        {
             Object lastDamager = Metadatas.getMetadata(plugin, player, "lastDamager");
             Player killer = null;
-            if (lastDamager != null && lastDamager instanceof Player) {
+            if (lastDamager != null && lastDamager instanceof Player)
+            {
                 killer = (Player) lastDamager;
-                if (killer.isOnline() && this.isInGame(killer.getUniqueId())) {
+                if (killer.isOnline() && this.isInGame(killer.getUniqueId()))
+                {
                     this.creditKillCoins(getPlayer(killer.getUniqueId()).addKill());
                     this.increaseStat(killer.getUniqueId(), "kills", 1);
                     killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
-                } else {
+                } else
+                {
                     killer = null;
                 }
             }
 
-            if (logout) {
+            if (logout)
+            {
                 messageManager.writePlayerQuited(player);
-            } else if (killer != null) {
+            } else if (killer != null)
+            {
                 server.broadcastMessage(this.coherenceMachine.getGameTag() + " " + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
-            } else {
+            } else
+            {
                 server.broadcastMessage(this.coherenceMachine.getGameTag() + " " + player.getDisplayName() + ChatColor.GOLD + " est mort.");
             }
 
@@ -182,7 +201,8 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
 
             player.setGameMode(GameMode.SPECTATOR);
             player.setHealth(20.0D);
-            if (!logout) {
+            if (!logout)
+            {
                 this.increaseStat(player.getUniqueId(), "stumps", 1);
                 Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
             }
@@ -190,16 +210,20 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
         }
     }
 
-    protected void creditKillCoins(UHCPlayer player) {
+    protected void creditKillCoins(UHCPlayer player)
+    {
         player.addCoins(20, "Un joueur tué !");
     }
 
-    public boolean isInGame(UUID uniqueId) {
+    public boolean isInGame(UUID uniqueId)
+    {
         return this.gamePlayers.containsKey(uniqueId) && !this.gamePlayers.get(uniqueId).isSpectator();
     }
 
-    private String getDamageCause(EntityDamageEvent.DamageCause cause) {
-        switch (cause) {
+    private String getDamageCause(EntityDamageEvent.DamageCause cause)
+    {
+        switch (cause)
+        {
             case SUFFOCATION:
                 return "Suffocation";
             case FALL:
@@ -234,80 +258,101 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
     public abstract void teleportDeathMatch();
 
     // FIXME: more modular system
-    public int getPreparingTime() {
+    public int getPreparingTime()
+    {
         return 20;
     }
 
-    public int getDeathMatchSize() {
+    public int getDeathMatchSize()
+    {
         return 400;
     }
 
-    public int getReductionTime() {
+    public int getReductionTime()
+    {
         return 10;
     }
 
 
-    public void disablePVP() {
+    public void disablePVP()
+    {
         this.pvpEnabled = false;
     }
 
-    public void enablePVP() {
+    public void enablePVP()
+    {
         this.pvpEnabled = true;
     }
 
-    public boolean isPvpEnabled() {
+    public boolean isPvpEnabled()
+    {
         return pvpEnabled;
     }
 
-    public void enableDamages() {
+    public void enableDamages()
+    {
         this.damages = true;
     }
 
-    public void disableDamages() {
+    public void disableDamages()
+    {
         this.damages = false;
     }
 
 
-    public boolean isDamagesEnabled() {
+    public boolean isDamagesEnabled()
+    {
         return damages;
     }
 
-    public GameLoop getGameLoop() {
+    public GameLoop getGameLoop()
+    {
         return gameLoop;
     }
 
-    public ICoherenceMachine getCoherenceMachine() {
+    public ICoherenceMachine getCoherenceMachine()
+    {
         return coherenceMachine;
     }
 
-    public void effectsOnWinner(Player player) {
-        server.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+    public void effectsOnWinner(Player player)
+    {
+        server.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
+        {
             int timer = 0;
 
-            public void run() {
-                if (this.timer < 20) {
+            @Override
+            public void run()
+            {
+                if (this.timer < 20)
+                {
                     Firework fw = (Firework) player.getWorld().spawnEntity(player.getPlayer().getLocation(), EntityType.FIREWORK);
                     FireworkMeta fwm = fw.getFireworkMeta();
                     Random r = new Random();
                     int rt = r.nextInt(4) + 1;
                     FireworkEffect.Type type = FireworkEffect.Type.BALL;
-                    if (rt == 1) {
+                    if (rt == 1)
+                    {
                         type = FireworkEffect.Type.BALL;
                     }
 
-                    if (rt == 2) {
+                    if (rt == 2)
+                    {
                         type = FireworkEffect.Type.BALL_LARGE;
                     }
 
-                    if (rt == 3) {
+                    if (rt == 3)
+                    {
                         type = FireworkEffect.Type.BURST;
                     }
 
-                    if (rt == 4) {
+                    if (rt == 4)
+                    {
                         type = FireworkEffect.Type.CREEPER;
                     }
 
-                    if (rt == 5) {
+                    if (rt == 5)
+                    {
                         type = FireworkEffect.Type.STAR;
                     }
 
@@ -324,5 +369,22 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer> {
                 }
             }
         }, 5L, 5L);
+    }
+
+    @Override
+    public void handleGameEnd()
+    {
+        this.interrupt();
+        super.handleGameEnd();
+    }
+
+    public void interrupt()
+    {
+        this.mainTask.cancel();
+    }
+
+    public void resume()
+    {
+        this.mainTask = server.getScheduler().runTaskTimer(plugin, gameLoop, 20, 20);
     }
 }
