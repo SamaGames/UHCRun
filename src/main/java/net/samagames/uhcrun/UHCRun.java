@@ -142,7 +142,7 @@ public class UHCRun extends JavaPlugin implements Listener {
         loobyPopulator = new LobbyPopulator(this.getLogger(), this.getDataFolder());
         loobyPopulator.generate();
         pluginManager.registerEvents(new CraftListener(), this);
-        pluginManager.registerEvents(new BlockListener(), this);
+        pluginManager.registerEvents(new BlockListener(40), this);
 
         game.postInit(world);
 

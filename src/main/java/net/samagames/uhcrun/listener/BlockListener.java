@@ -29,6 +29,12 @@ import java.util.Random;
  */
 public class BlockListener implements Listener
 {
+    private int maxLogBreaking;
+
+    public BlockListener(int maxLogBreaking)
+    {
+        this.maxLogBreaking = maxLogBreaking;
+    }
     @EventHandler
     public void onBeginBreak(BlockDamageEvent event)
     {
@@ -55,17 +61,29 @@ public class BlockListener implements Listener
                 final List<Block> bList = new ArrayList<>();
                 checkLeaves(event.getBlock());
                 bList.add(event.getBlock());
+                int max = bList.size();
+                if (max > maxLogBreaking)
+                {
+                    max = maxLogBreaking;
+                }
+                final int finalMax = max;
                 new BukkitRunnable()
                 {
                     @Override
                     public void run()
                     {
-                        for (int i = 0; i < bList.size(); i++)
+                        for (int i = 0; i < finalMax; i++)
                         {
                             Block block = bList.get(i);
                             if (block.getType() == Material.LOG || block.getType() == Material.LOG_2)
                             {
-                                block.breakNaturally();
+                                for (ItemStack item : block.getDrops())
+                                {
+                                    block.getWorld().dropItemNaturally(block.getLocation(), item);
+                                }
+
+                                block.setType(Material.AIR);
+                                checkLeaves(block);
                             }
                             for (BlockFace face : BlockFace.values())
                             {
@@ -76,7 +94,7 @@ public class BlockListener implements Listener
                             }
                             bList.remove(block);
                         }
-                        if (bList.isEmpty())
+                        if (bList.size() == 0)
                         {
                             cancel();
                         }
