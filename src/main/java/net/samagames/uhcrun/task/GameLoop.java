@@ -76,7 +76,7 @@ public class GameLoop implements Runnable
 
     private void createReductionEvent()
     {
-        this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, ChatColor.RED + "Téléportation", ChatColor.RED)
+        this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, ChatColor.RED + " Téléportation", ChatColor.RED)
         {
             @Override
             public void run()
