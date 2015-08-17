@@ -2,13 +2,16 @@ package net.samagames.uhcrun.listener;
 
 
 import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -35,6 +38,17 @@ public class BlockListener implements Listener
     {
         this.maxLogBreaking = maxLogBreaking;
     }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockPlace(BlockPlaceEvent event)
+    {
+        Block block = event.getBlock();
+        if (block.getType().equals(Material.LOG) || block.getType().equals(Material.LOG_2))
+        {
+            Metadatas.setMetadata(UHCRun.getInstance(), block, "placed", new Integer(1));
+        }
+    }
+
     @EventHandler
     public void onBeginBreak(BlockDamageEvent event)
     {
@@ -75,6 +89,14 @@ public class BlockListener implements Listener
                         for (int i = 0; i < finalMax; i++)
                         {
                             Block block = bList.get(i);
+
+                            // Is it tagged by the system?
+                            if (Metadatas.getMetadata(UHCRun.getInstance(), block, "placed") != null)
+                            {
+                                // Ignore this block
+                                bList.remove(block);
+                                continue;
+                            }
                             if (block.getType() == Material.LOG || block.getType() == Material.LOG_2)
                             {
                                 for (ItemStack item : block.getDrops())
