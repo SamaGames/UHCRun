@@ -150,7 +150,13 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
         server.getPluginManager().registerEvents(new ChunkListener(plugin), plugin);
     }
 
-    public void rejoin(Player thePlayer)
+    @Override
+    public void handleModeratorLogin(Player player) {
+        super.handleModeratorLogin(player);
+        this.rejoin(player, true);
+    }
+
+    public void rejoin(Player thePlayer, boolean isModerator)
     {
         if (thePlayer != null)
         {
@@ -160,7 +166,8 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
                 ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
                 sign.addReceiver(thePlayer);
                 this.gameLoop.addPlayer(thePlayer.getUniqueId(), sign);
-                messageManager.writePlayerReconnected(thePlayer);
+                if (!isModerator)
+                    messageManager.writePlayerReconnected(thePlayer);
             }, 10L);
 
         }

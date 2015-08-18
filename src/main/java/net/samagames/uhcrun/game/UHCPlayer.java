@@ -46,7 +46,7 @@ public class UHCPlayer extends GamePlayer
             }
         } else
         {
-            game.rejoin(player);
+            game.rejoin(player, false);
         }
 
     }
