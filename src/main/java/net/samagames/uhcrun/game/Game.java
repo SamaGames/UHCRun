@@ -167,7 +167,9 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
                 sign.addReceiver(thePlayer);
                 this.gameLoop.addPlayer(thePlayer.getUniqueId(), sign);
                 if (!isModerator)
+                {
                     messageManager.writePlayerReconnected(thePlayer);
+                }
             }, 10L);
 
         }

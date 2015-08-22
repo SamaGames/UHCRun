@@ -21,7 +21,6 @@ checkstyle {
 
 repositories {
     mavenCentral()
-    maven { url "http://repo.md-5.net/content/groups/public/" }
     maven {
         url "http://maven.samagames.net/developpers/"
         credentials {
