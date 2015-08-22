@@ -163,7 +163,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
             server.getScheduler().runTaskLater(plugin, () -> {
 
                 thePlayer.setScoreboard(this.scoreboard);
-                ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "? UHCRun ?");
+                ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "= UHCRun =");
                 sign.addReceiver(thePlayer);
                 this.gameLoop.addPlayer(thePlayer.getUniqueId(), sign);
                 if (!isModerator)
