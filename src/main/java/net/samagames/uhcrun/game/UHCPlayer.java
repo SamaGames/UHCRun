@@ -55,6 +55,10 @@ public class UHCPlayer extends GamePlayer
     public void handleLogout()
     {
         super.handleLogout();
+        if (spectator)
+        {
+            return;
+        }
         Player player = getPlayerIfOnline();
         if (game.getStatus() == Status.IN_GAME)
         {
