@@ -65,7 +65,6 @@ public class UHCPlayer extends GamePlayer
             game.getGameLoop().removePlayer(player.getUniqueId());
             if (game.isPvpEnabled())
             {
-                System.out.println(player);
                 game.stumpPlayer(player, true);
                 Location time = player.getLocation();
                 World w = time.getWorld();
