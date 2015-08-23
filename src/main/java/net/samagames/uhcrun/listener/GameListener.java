@@ -3,6 +3,7 @@ package net.samagames.uhcrun.listener;
 import net.samagames.api.games.Status;
 import net.samagames.tools.GameUtils;
 import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.ChatColor;
@@ -59,7 +60,7 @@ public class GameListener implements Listener
 
             if (damager instanceof Player)
             {
-                if (!game.isPvpEnabled())
+                if (!game.isPvpEnabled() || (game instanceof TeamGame && ((TeamGame) game).getPlayerTeam(damager.getUniqueId()).hasPlayer(damaged.getUniqueId())))
                 {
                     event.setCancelled(true);
                     return;
@@ -76,7 +77,7 @@ public class GameListener implements Listener
                 Entity shooter = (Entity) arrow.getShooter();
                 if (shooter instanceof Player)
                 {
-                    if (!game.isPvpEnabled())
+                    if (!game.isPvpEnabled() || (game instanceof TeamGame && ((TeamGame) game).getPlayerTeam(shooter.getUniqueId()).hasPlayer(damaged.getUniqueId())))
                     {
                         event.setCancelled(true);
                         return;
