@@ -60,7 +60,7 @@ public class SoloGame extends Game
             this.handleGameEnd();
         } else
         {
-            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + getInGamePlayers().size() + ChatColor.YELLOW + " joueur(s) en vie.");
+            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + (getInGamePlayers().size() - 1) + ChatColor.YELLOW + " joueur(s) en vie.");
         }
 
     }

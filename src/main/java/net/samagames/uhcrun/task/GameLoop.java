@@ -37,7 +37,7 @@ public class GameLoop implements Runnable
         this.plugin = plugin;
         this.server = server;
         this.world = server.getWorld("world");
-        this.nextEvent = new GameLoop.TimedEvent(1, 0, ChatColor.GOLD + " " + "Dégats actifs", ChatColor.GOLD)
+        this.nextEvent = new GameLoop.TimedEvent(1, 0, ChatColor.GOLD + "Dégats actifs", ChatColor.GOLD)
         {
             @Override
             public void run()
@@ -76,7 +76,7 @@ public class GameLoop implements Runnable
 
     private void createReductionEvent()
     {
-        this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, ChatColor.RED + " Téléportation", ChatColor.RED)
+        this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, ChatColor.RED + "Téléportation", ChatColor.RED)
         {
             @Override
             public void run()
@@ -137,7 +137,7 @@ public class GameLoop implements Runnable
         };
     }
 
-    private String time(int minutes, int seconds)
+    private String toString(int minutes, int seconds)
     {
         return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
     }
@@ -175,7 +175,7 @@ public class GameLoop implements Runnable
                 if (this.nextEvent != null)
                 {
                     objective.setLine(lastLine + 1, this.nextEvent.string);
-                    objective.setLine(lastLine + 2, this.nextEvent.color + "dans " + this.time(this.nextEvent.minutes, this.nextEvent.seconds));
+                    objective.setLine(lastLine + 2, this.nextEvent.color + "dans " + this.toString(this.nextEvent.minutes, this.nextEvent.seconds));
                     objective.setLine(lastLine + 3, ChatColor.GOLD + "     ");
                     lastLine += 3;
                 }
@@ -192,7 +192,7 @@ public class GameLoop implements Runnable
                 objective.setLine(lastLine + 1, ChatColor.GRAY + "Bordure :");
                 objective.setLine(lastLine + 2, ChatColor.WHITE + "-" + (int) world.getWorldBorder().getSize() / 2 + " +" + (int) world.getWorldBorder().getSize() / 2);
                 objective.setLine(lastLine + 3, ChatColor.RED + "              ");
-                objective.setLine(lastLine + 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.time(this.minutes, this.seconds));
+                objective.setLine(lastLine + 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.toString(this.minutes, this.seconds));
                 objective.updateLines();
                 server.getScheduler().runTaskAsynchronously(plugin, objective::updateLines);
             }
@@ -200,12 +200,12 @@ public class GameLoop implements Runnable
 
         if (this.nextEvent.seconds == 0 && this.nextEvent.minutes <= 3 && this.nextEvent.minutes > 0 || this.nextEvent.minutes == 0 && (this.nextEvent.seconds < 6 || this.nextEvent.seconds == 10 || this.nextEvent.seconds == 30))
         {
-            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " dans " + (this.nextEvent.minutes != 0 ? this.nextEvent.minutes + "min" : this.nextEvent.seconds + " sec"));
+            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + " " + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " dans " + (this.nextEvent.minutes != 0 ? this.nextEvent.minutes + "min" : this.nextEvent.seconds + " sec"));
         }
 
         if (this.nextEvent.seconds == 0 && 0 == this.nextEvent.minutes)
         {
-            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + " " + ChatColor.GOLD + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " maintenant !");
+            server.broadcastMessage(this.game.getCoherenceMachine().getGameTag() + " " + ChatColor.GOLD + this.nextEvent.string + ChatColor.GOLD + " maintenant !");
         }
 
         this.nextEvent.decrement();
