@@ -205,6 +205,10 @@ public class GameListener implements Listener
             {
                 event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
                 event.setCancelled(true);
+            } else if (event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == (Material.MINECART))
+            {
+                event.getPlayer().sendMessage(ChatColor.RED + "L'utilisation de Minecart est strictement interdit.");
+                event.setCancelled(true);
             }
         }
     }
