@@ -247,10 +247,10 @@ public class TeamGame extends Game
                     toRemvove.add(t);
 
                     left = teams.size();
-                    if (left == 1)
+                    if (left == 2)
                     {
                         win(teams.get(0));
-                    } else if (left < 1)
+                    } else if (left < 2)
                     {
                         handleGameEnd();
                     } else
@@ -308,7 +308,7 @@ public class TeamGame extends Game
     @Override
     public void stumpPlayer(Player player, boolean logout)
     {
-        if (logout && !getStatus().equals(Status.IN_GAME))
+        if (logout && !this.getStatus().equals(Status.IN_GAME))
         {
             Team team = teams.getTeam(player.getUniqueId());
             if (team != null)
