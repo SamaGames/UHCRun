@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.uhcrun.GameAdaptator;
+import net.samagames.uhcrun.compatibility.GameAdaptator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

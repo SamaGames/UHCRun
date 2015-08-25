@@ -5,7 +5,7 @@ import net.samagames.api.games.themachine.ICoherenceMachine;
 import net.samagames.api.games.themachine.messages.IMessageManager;
 import net.samagames.tools.Titles;
 import net.samagames.tools.scoreboards.ObjectiveSign;
-import net.samagames.uhcrun.GameAdaptator;
+import net.samagames.uhcrun.compatibility.GameAdaptator;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.listener.ChunkListener;
 import net.samagames.uhcrun.task.GameLoop;

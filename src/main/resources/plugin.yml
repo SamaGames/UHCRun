@@ -1,7 +1,8 @@
 name: UHCRun
 main: net.samagames.uhcrun.UHCRun
 version: 2.0
-softdepend: [SamaGamesAPI, WorldEdit]
+depend: [WorldEdit]
+softdepend: [SamaGamesAPI]
 load: STARTUP
 commands:
    start:

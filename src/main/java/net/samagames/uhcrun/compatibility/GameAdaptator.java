@@ -1,8 +1,9 @@
-package net.samagames.uhcrun;
+package net.samagames.uhcrun.compatibility;
 
 import com.google.gson.JsonPrimitive;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
+import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.commands.CommandNextEvent;
 import net.samagames.uhcrun.game.Game;
 import net.samagames.uhcrun.game.SoloGame;

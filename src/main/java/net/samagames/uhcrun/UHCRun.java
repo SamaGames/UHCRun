@@ -1,5 +1,6 @@
 package net.samagames.uhcrun;
 
+import net.samagames.uhcrun.compatibility.GameAdaptator;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.generator.WorldLoader;
