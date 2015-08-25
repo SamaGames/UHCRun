@@ -1,42 +1,22 @@
 package net.samagames.uhcrun;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import net.minecraft.server.v1_8_R3.*;
-import net.samagames.api.SamaGamesAPI;
-import net.samagames.api.games.Status;
-import net.samagames.tools.Reflection;
-import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.Game;
-import net.samagames.uhcrun.game.SoloGame;
-import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.FortressPopulator;
-import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.generator.WorldLoader;
-import net.samagames.uhcrun.hook.BlockNewLog;
-import net.samagames.uhcrun.hook.BlockOldLog;
-import net.samagames.uhcrun.listener.*;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldBorder;
+import net.samagames.uhcrun.hook.NMSPatcher;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -47,7 +27,8 @@ import java.util.logging.Logger;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class UHCRun extends JavaPlugin implements Listener {
+public class UHCRun extends JavaPlugin implements Listener
+{
 
     private static UHCRun instance;
     private Location spawnLocation;
@@ -55,19 +36,22 @@ public class UHCRun extends JavaPlugin implements Listener {
     private Logger logger;
     private BukkitTask startTimer;
     private OrePopulator populator;
-    private Game game;
+
     private boolean worldLoaded;
-    private LobbyPopulator loobyPopulator;
     private PluginManager pluginManager;
     private WorldLoader worldLoader;
-    private SamaGamesAPI samaGamesAPI;
+    private GameAdaptator adaptator;
 
-    public static UHCRun getInstance() {
+
+    public static UHCRun getInstance()
+    {
         return instance;
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable()
+    {
+
         /*try {
             this.patchBlocks();
         } catch (ReflectiveOperationException e) {
@@ -80,7 +64,9 @@ public class UHCRun extends JavaPlugin implements Listener {
         pluginManager = getServer().getPluginManager();
         config = this.getConfig();
         logger = this.getLogger();
-        samaGamesAPI = SamaGamesAPI.get();
+
+        // World Loader
+        pluginManager.registerEvents(this, this);
 
 
         // Copy schematics
@@ -90,71 +76,68 @@ public class UHCRun extends JavaPlugin implements Listener {
 
         File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
         logger.info("Checking wether world exists at : " + conf.getAbsolutePath());
-        if (!conf.exists()) {
-            logger.info("No world exists. Will be generated.");
-        } else {
+        if (!conf.exists())
+        {
+            logger.warning("No world exists. Will be generated.");
+        } else
+        {
             logger.info("World found!");
         }
 
-        int nb = samaGamesAPI.getGameManager().getGameProperties().getOption("playersPerTeam", new JsonPrimitive(1)).getAsInt();
-
-        if (nb > 1) {
-            this.game = new TeamGame(nb);
-        } else {
-            this.game = new SoloGame();
+        if (pluginManager.isPluginEnabled("SamaGamesAPI"))
+        {
+            this.adaptator = new GameAdaptator(this);
+            this.adaptator.onEnable();
         }
-
-        samaGamesAPI.getGameManager().registerGame(game);
-        samaGamesAPI.getGameManager().setMaxReconnectTime(game.getReductionTime());
-
-        pluginManager.registerEvents(this, this);
-        pluginManager.registerEvents(new SpectatorListener(game), this);
-        pluginManager.registerEvents(new GameListener(game), this);
-        pluginManager.registerEvents(new CompassTargeter(this), this);
 
         this.startTimer = getServer().getScheduler().runTaskTimer(this, this::postInit, 20L, 20L);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onWorldInit(final WorldInitEvent event) {
+    public void onWorldInit(final WorldInitEvent event)
+    {
         World world = event.getWorld();
-        if (world.getEnvironment() == World.Environment.NORMAL) {
+        if (world.getEnvironment() == World.Environment.NORMAL)
+        {
             this.setupNormalWorld(world);
         }
     }
 
     @Override
-    public void onDisable() {
-        if (loobyPopulator != null) {
-            loobyPopulator.remove();
+    public void onDisable()
+    {
+        if (adaptator != null)
+        {
+            adaptator.removeSpawn();
         }
     }
 
-    private void postInit() {
+    private void postInit()
+    {
         World world = getServer().getWorld("world");
-        getCommand("nextevent").setExecutor(new CommandNextEvent(game));
-        game.setStatus(Status.STARTING);
         this.startTimer.cancel();
 
         this.worldLoaded = true;
 
-        // Add the lobby
-        loobyPopulator = new LobbyPopulator(this.getLogger(), this.getDataFolder());
-        loobyPopulator.generate();
-        pluginManager.registerEvents(new CraftListener(), this);
-        pluginManager.registerEvents(new BlockListener(40), this);
-
-        game.postInit(world);
+        if (pluginManager.isPluginEnabled("SamaGamesAPI"))
+        {
+            this.adaptator.postInit(world);
+        }
 
         worldLoader = new WorldLoader();
         worldLoader.begin(world);
 
     }
 
-    private void setupNormalWorld(World world) {
-        try {
-            this.patchBiomes();
-        } catch (ReflectiveOperationException e) {
+    private void setupNormalWorld(World world)
+    {
+        NMSPatcher patcher = new NMSPatcher();
+        try
+        {
+            patcher.patchBiomes();
+            patcher.patchPotions();
+        } catch (ReflectiveOperationException e)
+        {
             e.printStackTrace();
         }
         // Init custom ore populator
@@ -194,88 +177,37 @@ public class UHCRun extends JavaPlugin implements Listener {
         world.getPopulators().add(new FortressPopulator(this));
     }
 
-    private void patchBlocks() throws ReflectiveOperationException {
-        this.overrideBlock(17, "log", "LOG", new BlockOldLog().c("log"));
-        this.overrideBlock(162, "log2", "LOG2", new BlockNewLog().c("log"));
-    }
-
-    public boolean isWorldLoaded() {
+    /*    private void patchBlocks() throws ReflectiveOperationException {
+            this.overrideBlock(17, "log", "LOG", new BlockOldLog().c("log"));
+            this.overrideBlock(162, "log2", "LOG2", new BlockNewLog().c("log"));
+        }
+    */
+    public boolean isWorldLoaded()
+    {
         return worldLoaded;
     }
 
-    @EventHandler
-    public void onPreJoin(PlayerJoinEvent event) {
-        if (game == null || game.getStatus() == Status.WAITING_FOR_PLAYERS) {
-            event.getPlayer().teleport(spawnLocation);
-        }
-    }
 
-    public Location getSpawnLocation() {
+
+    public Location getSpawnLocation()
+    {
         return spawnLocation;
     }
 
-    public void removeSpawn() {
-        loobyPopulator.remove();
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    private void patchBiomes() throws ReflectiveOperationException {
-        BiomeBase[] biomes = BiomeBase.getBiomes();
-        Map<String, BiomeBase> biomesMap = BiomeBase.o;
-        BiomeBase defaultBiome = BiomeBase.FOREST;
-
-        Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
-        Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
-
-        // FIXME: more modular system
-        biomesMap.remove("Ocean");
-        biomesMap.remove("Beach");
-        biomesMap.remove("FrozenOcean");
-        biomesMap.remove("Deep Ocean");
-        biomesMap.remove("Cold Beach");
-        biomesMap.remove("Extreme Hills");
-        biomesMap.remove("Extreme Hills+");
-
-        JsonElement blacklistedBiomes =  samaGamesAPI.getGameManager().getGameProperties().getOption("blacklistedBiomes", null);
-        if (blacklistedBiomes != null) {
-            for (JsonElement biome : blacklistedBiomes.getAsJsonArray()) {
-                biomesMap.remove(biome.getAsString());
-            }
+    public void finishGeneration(long time)
+    {
+        logger.info("Ready in " + time + "ms");
+        if (adaptator != null)
+        {
+            adaptator.loadEnd();
+        } else
+        {
+            Bukkit.shutdown();
         }
-
-
-
-
-        for (int i = 0; i < biomes.length; i++) {
-            if (biomes[i] != null && !biomesMap.containsKey(biomes[i].ah)) {
-                biomes[i] = defaultBiome;
-            }
-        }
-
-        Reflection.setFinalStatic(BiomeBase.class.getDeclaredField("biomes"), biomes);
     }
 
-    private void overrideBlock(int id, String registryKey, String fieldName, Block newBlock) throws ReflectiveOperationException {
-        Block.REGISTRY.a(id, new MinecraftKey(registryKey), newBlock); //Update block register
-
-        Reflection.setFinalStatic(Blocks.class.getDeclaredField(fieldName), Block.REGISTRY.get(new MinecraftKey(registryKey))); //Update block reference
-
-        Block.d.a(newBlock.getBlockData(), Block.REGISTRY.b(newBlock) << 4 | newBlock.toLegacyData(newBlock.getBlockData())); //Update correct key
-
-        invokeMethod(Item.class, "c", new Class[]{Block.class}, newBlock); //Update item register
-    }
-
-    private void invokeMethod(Class clazz, String methodName, Class[] parameters, Object... args) throws ReflectiveOperationException {
-        @SuppressWarnings("unchecked")
-        Method method = clazz.getDeclaredMethod(methodName, parameters);
-        method.setAccessible(true);
-        method.invoke(null, args);
-    }
-
-    public SamaGamesAPI getAPI() {
-        return samaGamesAPI;
+    public GameAdaptator getAdaptator()
+    {
+        return adaptator;
     }
 }

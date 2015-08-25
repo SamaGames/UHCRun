@@ -9,7 +9,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 import java.util.TreeMap;
-
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public abstract class Gui
 {
     protected TreeMap<Integer, String> actions = new TreeMap<>();

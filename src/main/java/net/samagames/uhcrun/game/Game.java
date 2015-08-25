@@ -5,6 +5,7 @@ import net.samagames.api.games.themachine.ICoherenceMachine;
 import net.samagames.api.games.themachine.messages.IMessageManager;
 import net.samagames.tools.Titles;
 import net.samagames.tools.scoreboards.ObjectiveSign;
+import net.samagames.uhcrun.GameAdaptator;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.listener.ChunkListener;
 import net.samagames.uhcrun.task.GameLoop;
@@ -37,6 +38,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
 {
 
     protected final UHCRun plugin;
+    protected final GameAdaptator adaptator;
     protected final Server server;
     protected final Random rand;
     protected final List<Location> spawnPoints;
@@ -55,10 +57,11 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
     {
         super("UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
         this.plugin = UHCRun.getInstance();
+        this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
         this.rand = new Random();
         this.maxSpawnLocations = maxLocations;
-        this.minPlayers = plugin.getAPI().getGameManager().getGameProperties().getMinSlots();
+        this.minPlayers = adaptator.getAPI().getGameManager().getGameProperties().getMinSlots();
         this.spawnPoints = new ArrayList<>();
         this.prevInGame = new TreeMap<>();
         UHCPlayer.setGame(this);
@@ -110,11 +113,16 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
         return plugin;
     }
 
+    public GameAdaptator getAdaptator()
+    {
+        return adaptator;
+    }
+
     @Override
     public void startGame()
     {
         super.startGame();
-        plugin.removeSpawn();
+        adaptator.removeSpawn();
 
         Objective displayNameLife = scoreboard.registerNewObjective("vie", "health");
         Objective playerListLife = scoreboard.registerNewObjective("vieb", "health");

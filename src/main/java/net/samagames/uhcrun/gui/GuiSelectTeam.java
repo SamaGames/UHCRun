@@ -24,6 +24,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public class GuiSelectTeam extends Gui
 {
     private static TeamGame game;
@@ -39,7 +46,7 @@ public class GuiSelectTeam extends Gui
     {
         if (game == null || selector == null)
         {
-            game = (TeamGame) UHCRun.getInstance().getGame();
+            game = (TeamGame) UHCRun.getInstance().getAdaptator().getGame();
             selector = TeamSelector.getInstance();
         }
     }
@@ -146,7 +153,7 @@ public class GuiSelectTeam extends Gui
             selector.openGui(player, new GuiSelectTeam());
         } else if ("teamname".equals(action))
         {
-            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamname"))
+            if (game.getAdaptator().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamname"))
             {
                 if (game.getPlayerTeam(player.getUniqueId()) != null)
                 {
@@ -187,7 +194,7 @@ public class GuiSelectTeam extends Gui
             }
         } else if ("openclose".equals(action))
         {
-            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamlock"))
+            if (game.getAdaptator().getAPI().getPermissionsManager().hasPermission(player, "uhc.teamlock"))
             {
                 if (game.getPlayerTeam(player.getUniqueId()) != null)
                 {
@@ -210,7 +217,7 @@ public class GuiSelectTeam extends Gui
             }
         } else if ("invit".equals(action))
         {
-            if (game.getPlugin().getAPI().getPermissionsManager().hasPermission(player, "uhc.teaminvite"))
+            if (game.getAdaptator().getAPI().getPermissionsManager().hasPermission(player, "uhc.teaminvite"))
             {
                 if (game.getPlayerTeam(player.getUniqueId()) != null)
                 {

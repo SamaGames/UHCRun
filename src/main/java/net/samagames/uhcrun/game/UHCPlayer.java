@@ -8,6 +8,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public class UHCPlayer extends GamePlayer
 {
     private static Game game;

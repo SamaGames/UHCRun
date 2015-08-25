@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.GameAdaptator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,12 +25,12 @@ import java.util.UUID;
  */
 public class CompassTargeter implements Listener
 {
-    private UHCRun plugin;
+    private GameAdaptator adapator;
     private TreeMap<UUID, BukkitTask> tasks = new TreeMap<>();
 
-    public CompassTargeter(UHCRun plugin)
+    public CompassTargeter(GameAdaptator adapator)
     {
-        this.plugin = plugin;
+        this.adapator = adapator;
     }
 
     @EventHandler
@@ -52,7 +52,7 @@ public class CompassTargeter implements Listener
                     if (e instanceof Player)
                     {
                         Player current = (Player) e;
-                        if (!plugin.getGame().isInGame(current.getUniqueId()))
+                        if (!adapator.getGame().isInGame(current.getUniqueId()))
                         {
                             continue;
                         }
@@ -89,7 +89,7 @@ public class CompassTargeter implements Listener
 
     private void targetPlayer(final Player player, final Player target)
     {
-        BukkitTask sched = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        BukkitTask sched = Bukkit.getScheduler().runTaskTimer(adapator.getPlugin(), () -> {
             if (target.isOnline())
             {
                 player.setCompassTarget(target.getLocation());

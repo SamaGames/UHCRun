@@ -1,6 +1,5 @@
 package net.samagames.uhcrun.generator;
 
-import net.samagames.api.games.Status;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -10,7 +9,13 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public class WorldLoader
 {
     private static Map<int[], Integer> highestBlocks = new HashMap<>();
@@ -77,8 +82,7 @@ public class WorldLoader
                     if (x >= 600)
                     {
                         task.cancel();
-                        plugin.getGame().setStatus(Status.WAITING_FOR_PLAYERS);
-                        plugin.getLogger().info("Ready in " + (System.currentTimeMillis() - startTime) + "ms");
+                        plugin.finishGeneration(System.currentTimeMillis() - startTime);
                         return;
                     }
 

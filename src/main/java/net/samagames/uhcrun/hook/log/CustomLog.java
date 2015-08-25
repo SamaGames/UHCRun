@@ -1,7 +1,14 @@
-package net.samagames.uhcrun.hook;
+package net.samagames.uhcrun.hook.log;
 
 import net.minecraft.server.v1_8_R3.*;
 
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public interface CustomLog
 {
 

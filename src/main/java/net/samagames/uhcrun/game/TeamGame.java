@@ -18,7 +18,13 @@ import java.util.List;
 import java.util.UUID;
 
 
-// TODO: TEAM GUI
+/**
+ * This file is a part of the SamaGames Project CodeBase
+ * This code is absolutely confidential.
+ * Created by Thog
+ * (C) Copyright Elydra Network 2014 & 2015
+ * All rights reserved.
+ */
 public class TeamGame extends Game
 {
 
