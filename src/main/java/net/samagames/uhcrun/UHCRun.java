@@ -23,7 +23,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -172,24 +171,15 @@ public class UHCRun extends JavaPlugin implements Listener
         // Init custom ore populator
         populator = new OrePopulator();
 
-        // FIXME: more modular system
-
         if (properties.getOptions().containsKey("ores"))
         {
             List<Map> ores = (List<Map>) properties.getOptions().get("ores");
             for (Map ore : ores)
             {
-
-                populator.addRule(new OrePopulator.Rule((String) ore.get("type"), ((Double) ore.get("round")).intValue(), ((Double) ore.get("minY")).intValue(), ((Double) ore.get("maxY")).intValue(), ((Double) ore.get("size")).intValue()));
+                populator.addRule(new OrePopulator.Rule((String) ore.get("id"), ((Double) ore.get("round")).intValue(), ((Double) ore.get("minY")).intValue(), ((Double) ore.get("maxY")).intValue(), ((Double) ore.get("size")).intValue()));
             }
         }
 
-
-        // TODO: Use game.json
-        List<Double> spawnPos = (List<Double>) config.getList("spawnLocation", Arrays.asList(0.6, 152D, 0.6));
-        spawnLocation = new Location(world, spawnPos.get(0), spawnPos.get(1), spawnPos.get(2));
-
-        world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
         final WorldBorder border = world.getWorldBorder();
 
         // Overworld settings
@@ -242,5 +232,10 @@ public class UHCRun extends JavaPlugin implements Listener
     public GameAdaptator getAdaptator()
     {
         return adaptator;
+    }
+
+    public void setSpawnLocation(Location spawnLocation)
+    {
+        this.spawnLocation = spawnLocation;
     }
 }

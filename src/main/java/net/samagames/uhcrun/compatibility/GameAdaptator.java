@@ -1,5 +1,6 @@
 package net.samagames.uhcrun.compatibility;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
@@ -11,6 +12,7 @@ import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.listener.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -59,6 +61,16 @@ public class GameAdaptator implements Listener
 
     public void postInit(World world)
     {
+        JsonArray defaults = new JsonArray();
+        defaults.add(new JsonPrimitive(0.6));
+        defaults.add(new JsonPrimitive(152D));
+        defaults.add(new JsonPrimitive(0.6));
+        JsonArray spawnPos =  samaGamesAPI.getGameManager().getGameProperties().getOption("spawnPos", defaults).getAsJsonArray();
+
+        Location spawnLocation = new Location(world, spawnPos.get(0).getAsDouble(), spawnPos.get(1).getAsDouble(), spawnPos.get(2).getAsDouble());
+        plugin.setSpawnLocation(spawnLocation);
+        world.setSpawnLocation(spawnLocation.getBlockX(), spawnLocation.getBlockY(), spawnLocation.getBlockZ());
+
         game.setStatus(Status.STARTING);
         // Add the lobby
         loobyPopulator = new LobbyPopulator(plugin.getLogger(), plugin.getDataFolder());

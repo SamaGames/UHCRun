@@ -26,6 +26,10 @@ public class OrePopulator extends BlockPopulator
 
     private List<Rule> rules = new java.util.ArrayList<>();
 
+    private int randInt(Random rand, int min, int max)
+    {
+        return rand.nextInt((max - min) + 1) + min;
+    }
 
     public void addRule(Rule rule)
     {
@@ -45,10 +49,11 @@ public class OrePopulator extends BlockPopulator
 
         // Gen more caves
         CraftWorld handle = (CraftWorld) world;
-        if (random.nextInt(1000) <= 750)
+        int xr = randInt(random, -100, 100);
+        if (xr >= 50)
         {
             new WorldGenCaves().a(handle.getHandle().chunkProviderServer, handle.getHandle(), chunk.getX(), chunk.getZ(), new ChunkSnapshot());
-        } else if (random.nextInt(1000) <= 1000)
+        } else if (xr <= -50)
         {
             new WorldGenCanyon().a(handle.getHandle().chunkProviderServer, handle.getHandle(), chunk.getX(), chunk.getZ(), new ChunkSnapshot());
         }
