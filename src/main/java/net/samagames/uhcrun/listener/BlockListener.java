@@ -168,8 +168,6 @@ public class BlockListener implements Listener
         });
     }
 
-    //TODO: Rewrite this
-    @Deprecated
     private void breakLeaf(World world, int x, int y, int z)
     {
         Block block = world.getBlockAt(x, y, z);

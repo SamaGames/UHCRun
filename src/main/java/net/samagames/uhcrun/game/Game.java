@@ -1,12 +1,14 @@
 package net.samagames.uhcrun.game;
 
+import com.google.gson.JsonPrimitive;
+import net.samagames.api.games.IGameProperties;
 import net.samagames.api.games.Status;
 import net.samagames.api.games.themachine.ICoherenceMachine;
 import net.samagames.api.games.themachine.messages.IMessageManager;
 import net.samagames.tools.Titles;
 import net.samagames.tools.scoreboards.ObjectiveSign;
-import net.samagames.uhcrun.compatibility.GameAdaptator;
 import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.compatibility.GameAdaptator;
 import net.samagames.uhcrun.listener.ChunkListener;
 import net.samagames.uhcrun.task.GameLoop;
 import net.samagames.uhcrun.utils.Colors;
@@ -52,6 +54,9 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
     private boolean pvpEnabled;
     private BukkitTask mainTask;
     private boolean damages;
+    private final int preparingTime;
+    private final int deathMatchSize;
+    private final int reductionTime;
 
     public Game(int maxLocations)
     {
@@ -61,10 +66,15 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
         this.server = plugin.getServer();
         this.rand = new Random();
         this.maxSpawnLocations = maxLocations;
-        this.minPlayers = adaptator.getAPI().getGameManager().getGameProperties().getMinSlots();
         this.spawnPoints = new ArrayList<>();
         this.prevInGame = new TreeMap<>();
         UHCPlayer.setGame(this);
+
+        IGameProperties gameManager = adaptator.getAPI().getGameManager().getGameProperties();
+        this.preparingTime = gameManager.getOption("preparingTime", new JsonPrimitive(20)).getAsInt();
+        this.deathMatchSize = gameManager.getOption("deathMatchSize", new JsonPrimitive(400)).getAsInt();
+        this.reductionTime = gameManager.getOption("reductionTime", new JsonPrimitive(10)).getAsInt();
+        this.minPlayers = gameManager.getMinSlots();
     }
 
     public void postInit(World world)
@@ -274,20 +284,19 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
 
     public abstract void teleportDeathMatch();
 
-    // FIXME: more modular system
     public int getPreparingTime()
     {
-        return 20;
+        return preparingTime;
     }
 
     public int getDeathMatchSize()
     {
-        return 400;
+        return deathMatchSize;
     }
 
     public int getReductionTime()
     {
-        return 10;
+        return reductionTime;
     }
 
 
