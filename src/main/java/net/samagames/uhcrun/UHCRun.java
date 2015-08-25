@@ -1,11 +1,16 @@
 package net.samagames.uhcrun;
 
+import com.google.gson.Gson;
 import net.samagames.uhcrun.compatibility.GameAdaptator;
+import net.samagames.uhcrun.compatibility.GameProperties;
 import net.samagames.uhcrun.generator.FortressPopulator;
 import net.samagames.uhcrun.generator.OrePopulator;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.hook.NMSPatcher;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,8 +21,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -132,24 +140,49 @@ public class UHCRun extends JavaPlugin implements Listener
 
     private void setupNormalWorld(World world)
     {
-        NMSPatcher patcher = new NMSPatcher();
+
+        GameProperties properties = new GameProperties();
+
+        File gameJson = new File(UHCRun.getInstance().getDataFolder().getParentFile().getParentFile(), "game.json");
+
+        if (gameJson.exists())
+        {
+            try
+            {
+                properties = new Gson().fromJson(new FileReader(gameJson), GameProperties.class);
+            } catch (FileNotFoundException e)
+            {
+                logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
+            }
+        } else
+        {
+            logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
+        }
+
         try
         {
+            NMSPatcher patcher = new NMSPatcher(properties);
             patcher.patchBiomes();
             patcher.patchPotions();
         } catch (ReflectiveOperationException e)
         {
             e.printStackTrace();
         }
+
         // Init custom ore populator
         populator = new OrePopulator();
 
         // FIXME: more modular system
-        populator.addRule(new OrePopulator.Rule(Material.DIAMOND_ORE, 4, 0, 64, 5));
-        populator.addRule(new OrePopulator.Rule(Material.IRON_ORE, 2, 0, 64, 15));
-        populator.addRule(new OrePopulator.Rule(Material.GOLD_ORE, 2, 0, 64, 8));
-        populator.addRule(new OrePopulator.Rule(Material.LAPIS_ORE, 3, 0, 64, 4));
-        populator.addRule(new OrePopulator.Rule(Material.OBSIDIAN, 4, 0, 32, 6));
+
+        if (properties.getOptions().containsKey("ores"))
+        {
+            List<Map> ores = (List<Map>) properties.getOptions().get("ores");
+            for (Map ore : ores)
+            {
+
+                populator.addRule(new OrePopulator.Rule((String) ore.get("type"), ((Double) ore.get("round")).intValue(), ((Double) ore.get("minY")).intValue(), ((Double) ore.get("maxY")).intValue(), ((Double) ore.get("size")).intValue()));
+            }
+        }
 
 
         // TODO: Use game.json
@@ -187,7 +220,6 @@ public class UHCRun extends JavaPlugin implements Listener
     {
         return worldLoaded;
     }
-
 
 
     public Location getSpawnLocation()

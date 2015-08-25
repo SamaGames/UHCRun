@@ -1,5 +1,6 @@
 package net.samagames.uhcrun.compatibility;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Map;
  */
 public class GameProperties
 {
-    private Map<String, Object> options;
+    private Map<String, Object> options = new HashMap<>();
 
     public Map<String, Object> getOptions()
     {

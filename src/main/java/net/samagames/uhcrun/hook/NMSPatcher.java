@@ -1,20 +1,15 @@
 package net.samagames.uhcrun.hook;
 
-import com.google.gson.Gson;
 import net.minecraft.server.v1_8_R3.BiomeBase;
 import net.minecraft.server.v1_8_R3.GenericAttributes;
 import net.minecraft.server.v1_8_R3.MinecraftKey;
 import net.minecraft.server.v1_8_R3.MobEffectList;
-import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.compatibility.GameProperties;
 import net.samagames.uhcrun.hook.potions.PotionAttackDamageNerf;
 import net.samagames.uhcrun.utils.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffectType;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +25,11 @@ import java.util.logging.Logger;
 public class NMSPatcher
 {
     private final Logger logger;
+    private final GameProperties properties;
 
-    public NMSPatcher()
+    public NMSPatcher(GameProperties properties)
     {
+        this.properties = properties;
         this.logger = Bukkit.getLogger();
     }
 
@@ -45,24 +42,9 @@ public class NMSPatcher
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
         Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
 
-        File gameJson = new File(UHCRun.getInstance().getDataFolder().getParentFile().getParentFile(), "game.json");
-
-        if (gameJson.exists())
+        if (properties.getOptions().containsKey("blacklistedBiomes"))
         {
-            try
-            {
-                GameProperties properties = new Gson().fromJson(new FileReader(gameJson), GameProperties.class);
-                if (properties.getOptions().containsKey("blacklistedBiomes"))
-                {
-                    ((List<String>) properties.getOptions().get("blacklistedBiomes")).forEach(biomesMap::remove);
-                }
-            } catch (FileNotFoundException e)
-            {
-                logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
-            }
-        } else
-        {
-            logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
+            ((List<String>) properties.getOptions().get("blacklistedBiomes")).forEach(biomesMap::remove);
         }
 
         for (int i = 0; i < biomes.length; i++)

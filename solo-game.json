@@ -1,0 +1,54 @@
+{
+  "map-name": "Solo",
+  "min-slots": 10,
+  "max-slots": 24,
+  "options": {
+    "playersPerTeam": 1,
+    "blacklistedBiomes": [
+      "Ocean",
+      "Beach",
+      "FrozenOcean",
+      "Deep Ocean",
+      "Cold Beach",
+      "Extreme Hills",
+      "Extreme Hills+"
+    ],
+    "ores": [
+      {
+        id: "DIAMOND_ORE",
+        round: 4,
+        minY: 0,
+        maxY: 64,
+        size: 5
+      },
+      {
+        id: "IRON_ORE",
+        round: 2,
+        minY: 0,
+        maxY: 64,
+        size: 15
+      },
+      {
+        id: "GOLD_ORE",
+        round: 2,
+        minY: 0,
+        maxY: 64,
+        size: 8
+      },
+      {
+        id: "LAPIS_ORE",
+        round: 3,
+        minY: 0,
+        maxY: 64,
+        size: 4
+      },
+      {
+        id: "OBSIDIAN",
+        round: 4,
+        minY: 0,
+        maxY: 32,
+        size: 6
+      }
+    ]
+  }
+}

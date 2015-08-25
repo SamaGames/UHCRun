@@ -45,10 +45,10 @@ public class OrePopulator extends BlockPopulator
 
         // Gen more caves
         CraftWorld handle = (CraftWorld) world;
-        if (random.nextInt(1000) <= 850)
+        if (random.nextInt(1000) <= 750)
         {
             new WorldGenCaves().a(handle.getHandle().chunkProviderServer, handle.getHandle(), chunk.getX(), chunk.getZ(), new ChunkSnapshot());
-        } else if (random.nextInt(1000) <= 750)
+        } else if (random.nextInt(1000) <= 1000)
         {
             new WorldGenCanyon().a(handle.getHandle().chunkProviderServer, handle.getHandle(), chunk.getX(), chunk.getZ(), new ChunkSnapshot());
         }
@@ -62,9 +62,7 @@ public class OrePopulator extends BlockPopulator
                 int x = chunk.getX() * 16 + random.nextInt(16);
                 int y = bloc.minY + random.nextInt(bloc.maxY - bloc.minY);
                 int z = chunk.getZ() * 16 + random.nextInt(16);
-
                 generate(world, random, x, y, z, bloc.size, bloc);
-
             }
         }
 
@@ -111,7 +109,7 @@ public class OrePopulator extends BlockPopulator
                                     Block block = getBlock(world, ix, iy, iz);
                                     if (block != null && block.getType() == Material.STONE)
                                     {
-                                        block.setType(material.id);
+                                        block.setType(Material.getMaterial(material.id));
                                     }
                                 }
                             }
@@ -145,13 +143,13 @@ public class OrePopulator extends BlockPopulator
     public static class Rule
     {
 
-        public Material id;
+        public String id;
         public int round;
         public int minY;
         public int maxY;
         public int size;
 
-        public Rule(Material type, int round, int minY, int maxY, int size)
+        public Rule(String type, int round, int minY, int maxY, int size)
         {
             this.id = type;
             this.round = round;
