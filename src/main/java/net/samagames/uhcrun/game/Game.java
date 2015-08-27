@@ -28,7 +28,6 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
-
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.
@@ -38,7 +37,6 @@ import java.util.*;
  */
 public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
 {
-
     protected final UHCRun plugin;
     protected final GameAdaptator adaptator;
     protected final Server server;
@@ -60,7 +58,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
 
     public Game(int maxLocations)
     {
-        super("UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
+        super("UHCRun", UHCRun.getInstance().getAdaptator().getAPI().getGameManager().getGameProperties().getMapName(), UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
         this.plugin = UHCRun.getInstance();
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
