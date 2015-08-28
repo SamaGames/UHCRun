@@ -254,7 +254,7 @@ public class GameListener implements Listener
     public void onDeath(EntityDeathEvent event)
     {
         LivingEntity entity = event.getEntity();
-        if (entity instanceof Cow)
+        if (entity instanceof Cow && entity instanceof Horse)
         {
             List<ItemStack> newDrops = new ArrayList<>();
             for (ItemStack stack : event.getDrops())
@@ -296,59 +296,57 @@ public class GameListener implements Listener
             List<ItemStack> newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.RABBIT).map(stack -> new ItemStack(Material.COOKED_RABBIT, stack.getAmount() * 2)).collect(Collectors.toList());
             event.getDrops().clear();
             event.getDrops().addAll(newDrops);
-        } else
+        } else if (entity instanceof Chicken)
         {
-            if (entity instanceof Chicken)
+            List<ItemStack> newDrops = new ArrayList<>();
+            for (ItemStack stack : event.getDrops())
             {
-                List<ItemStack> newDrops = new ArrayList<>();
-                for (ItemStack stack : event.getDrops())
+                if (stack.getType() == Material.RAW_CHICKEN)
                 {
-                    if (stack.getType() == Material.RAW_CHICKEN)
-                    {
-                        newDrops.add(new ItemStack(Material.COOKED_CHICKEN, stack.getAmount() * 2));
-                    } else if (stack.getType() == Material.FEATHER)
-                    {
-                        ItemStack loot = new ItemStack(Material.ARROW, stack.getAmount());
-                        ItemMeta meta = loot.getItemMeta();
-                        String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-                        ArrayList<String> customLore = new ArrayList<>();
-                        customLore.add(ChatColor.GRAY + "Aperture™ Companion Arrow");
-                        customLore.add(checkline);
-                        meta.setLore(customLore);
-                        loot.setItemMeta(meta);
-                        newDrops.add(loot);
-                    }
-                }
-                event.getDrops().clear();
-                event.getDrops().addAll(newDrops);
-            } else if (entity instanceof Squid)
-            {
-                List<ItemStack> newDrops = new ArrayList<>();
-                if (random.nextInt(32) >= 8)
+                    newDrops.add(new ItemStack(Material.COOKED_CHICKEN, stack.getAmount() * 2));
+                } else if (stack.getType() == Material.FEATHER)
                 {
-                    newDrops.add(new ItemStack(Material.COOKED_FISH, random.nextInt(5) + 1));
+                    ItemStack loot = new ItemStack(Material.ARROW, stack.getAmount());
+                    ItemMeta meta = loot.getItemMeta();
+                    String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
+                    ArrayList<String> customLore = new ArrayList<>();
+                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Arrow");
+                    customLore.add(checkline);
+                    meta.setLore(customLore);
+                    loot.setItemMeta(meta);
+                    newDrops.add(loot);
                 }
-                event.getDrops().clear();
-                event.getDrops().addAll(newDrops);
-            } else if (entity instanceof Skeleton)
-            {
-                List<ItemStack> newDrops = new ArrayList<>();
-                for (ItemStack stack : event.getDrops())
-                {
-                    if (stack.getType() == Material.ARROW)
-                    {
-                        newDrops.add(new ItemStack(Material.ARROW, stack.getAmount() * 2));
-                    }
-                    if (stack.getType() == Material.BOW)
-                    {
-                        stack.setDurability((short) 0);
-                        newDrops.add(stack);
-                    }
-                }
-                event.getDrops().clear();
-                event.getDrops().addAll(newDrops);
             }
+            event.getDrops().clear();
+            event.getDrops().addAll(newDrops);
+        } else if (entity instanceof Squid)
+        {
+            List<ItemStack> newDrops = new ArrayList<>();
+            if (random.nextInt(32) >= 8)
+            {
+                newDrops.add(new ItemStack(Material.COOKED_FISH, random.nextInt(5) + 1));
+            }
+            event.getDrops().clear();
+            event.getDrops().addAll(newDrops);
+        } else if (entity instanceof Skeleton)
+        {
+            List<ItemStack> newDrops = new ArrayList<>();
+            for (ItemStack stack : event.getDrops())
+            {
+                if (stack.getType() == Material.ARROW)
+                {
+                    newDrops.add(new ItemStack(Material.ARROW, stack.getAmount() * 2));
+                }
+                if (stack.getType() == Material.BOW)
+                {
+                    stack.setDurability((short) 0);
+                    newDrops.add(stack);
+                }
+            }
+            event.getDrops().clear();
+            event.getDrops().addAll(newDrops);
         }
+
         event.setDroppedExp(event.getDroppedExp() * 2);
     }
 

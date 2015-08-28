@@ -60,12 +60,6 @@ public class UHCRun extends JavaPlugin implements Listener
     public void onEnable()
     {
 
-        /*try {
-            this.patchBlocks();
-        } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
-        }*/
-
         // Define the instance
         instance = this;
 
