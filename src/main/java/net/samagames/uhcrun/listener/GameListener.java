@@ -254,7 +254,7 @@ public class GameListener implements Listener
     public void onDeath(EntityDeathEvent event)
     {
         LivingEntity entity = event.getEntity();
-        if (entity instanceof Cow && entity instanceof Horse)
+        if (entity instanceof Cow || entity instanceof Horse)
         {
             List<ItemStack> newDrops = new ArrayList<>();
             for (ItemStack stack : event.getDrops())
