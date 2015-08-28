@@ -121,7 +121,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
         this.worldLoaded = true;
 
-        if (pluginManager.isPluginEnabled("SamaGamesAPI"))
+        if (this.adaptator != null)
         {
             this.adaptator.postInit(world);
         }
