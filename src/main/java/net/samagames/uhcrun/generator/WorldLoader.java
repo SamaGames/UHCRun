@@ -39,18 +39,6 @@ public class WorldLoader
     public void begin(final World world)
     {
         long startTime = System.currentTimeMillis();
-        int x = -50;
-        while (x < 50)
-        {
-            int z = -50;
-            while (z < 50)
-            {
-                Block block = world.getHighestBlockAt(x, z);
-                highestBlocks.put(new int[]{x, z}, block.getY());
-                z++;
-            }
-            x++;
-        }
 
         task = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable()
         {
@@ -82,7 +70,7 @@ public class WorldLoader
                     if (x >= 600)
                     {
                         task.cancel();
-                        plugin.finishGeneration(System.currentTimeMillis() - startTime);
+                        plugin.finishGeneration(world, System.currentTimeMillis() - startTime);
                         return;
                     }
 
@@ -91,5 +79,21 @@ public class WorldLoader
                 }
             }
         }, 1L, 1L);
+    }
+
+    public void computeTop(World world)
+    {
+        int x = -50;
+        while (x < 50)
+        {
+            int z = -50;
+            while (z < 50)
+            {
+                Block block = world.getHighestBlockAt(x, z);
+                highestBlocks.put(new int[]{x, z}, block.getY());
+                z++;
+            }
+            x++;
+        }
     }
 }

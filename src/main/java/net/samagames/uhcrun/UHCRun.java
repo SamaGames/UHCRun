@@ -211,11 +211,12 @@ public class UHCRun extends JavaPlugin implements Listener
         return spawnLocation;
     }
 
-    public void finishGeneration(long time)
+    public void finishGeneration(World world, long time)
     {
         logger.info("Ready in " + time + "ms");
         if (adaptator != null)
         {
+            worldLoader.computeTop(world);
             adaptator.loadEnd();
         } else
         {
