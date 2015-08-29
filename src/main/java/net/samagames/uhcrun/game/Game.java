@@ -58,7 +58,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
 
     public Game(int maxLocations)
     {
-        super("UHCRun", UHCRun.getInstance().getAdaptator().getAPI().getGameManager().getGameProperties().getMapName(), UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
+        super(UHCRun.getInstance().getAdaptator().getAPI().getGameManager().getGameProperties().getMapName(), "UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
         this.plugin = UHCRun.getInstance();
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
