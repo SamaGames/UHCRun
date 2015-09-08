@@ -35,7 +35,7 @@ import java.util.*;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class Game extends net.samagames.api.games.Game<UHCPlayer, UHCRunSummary>
+public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
 {
     protected final UHCRun plugin;
     protected final GameAdaptator adaptator;
@@ -58,7 +58,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer, UHCRu
 
     public Game(int maxLocations)
     {
-        super(UHCRun.getInstance().getAdaptator().getAPI().getGameManager().getGameProperties().getMapName(), "UHCRun", UHCPlayer.class, UHCRunSummary.class);
+        super(UHCRun.getInstance().getAdaptator().getAPI().getGameManager().getGameProperties().getMapName(), "UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
         this.plugin = UHCRun.getInstance();
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
