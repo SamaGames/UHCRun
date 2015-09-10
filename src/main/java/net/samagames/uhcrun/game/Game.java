@@ -135,7 +135,7 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
         Objective displayNameLife = scoreboard.registerNewObjective("vie", "health");
         Objective playerListLife = scoreboard.registerNewObjective("vieb", "health");
 
-        playerListLife.setDisplayName("HP");
+        playerListLife.setDisplayName(ChatColor.RED + "♥");
         displayNameLife.setDisplayName("HP");
         displayNameLife.setDisplaySlot(DisplaySlot.BELOW_NAME);
         playerListLife.setDisplaySlot(DisplaySlot.PLAYER_LIST);
