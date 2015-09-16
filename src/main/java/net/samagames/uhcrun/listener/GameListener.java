@@ -21,7 +21,6 @@ import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -53,7 +52,6 @@ public class GameListener implements Listener
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(EntityDamageByEntityEvent event)
     {
-        System.out.println(event.getDamager() + " : " + event.getDamage());
         if (event.getEntity() instanceof Player)
         {
             Player damaged = (Player) event.getEntity();
@@ -117,15 +115,7 @@ public class GameListener implements Listener
             return;
         }
 
-        String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-
-        ArrayList<String> customLore = new ArrayList<>();
         Material mat = event.getEntity().getItemStack().getType();
-        ItemMeta me = event.getEntity().getItemStack().getItemMeta();
-        if (me != null && me.getLore() != null && me.getLore().contains(checkline))
-        {
-            return;
-        }
 
         switch (mat)
         {
@@ -140,11 +130,6 @@ public class GameListener implements Listener
                 if (random.nextDouble() < 0.75)
                 {
                     ItemStack loot = new ItemStack(Material.ARROW, 3);
-                    ItemMeta meta = loot.getItemMeta();
-                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Arrow");
-                    customLore.add(checkline);
-                    meta.setLore(customLore);
-                    loot.setItemMeta(meta);
                     event.getEntity().setItemStack(loot);
                 }
                 break;
@@ -156,11 +141,6 @@ public class GameListener implements Listener
                 break;
             case DIAMOND:
                 ItemStack loot = new ItemStack(Material.DIAMOND, event.getEntity().getItemStack().getAmount() * 2);
-                ItemMeta meta = loot.getItemMeta();
-                customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
-                customLore.add(checkline);
-                meta.setLore(customLore);
-                loot.setItemMeta(meta);
                 event.getEntity().setItemStack(loot);
                 break;
             case CACTUS:
@@ -186,19 +166,6 @@ public class GameListener implements Listener
                     {
                         slot++;
                         continue;
-                    }
-
-                    if (stack.getType() == Material.DIAMOND)
-                    {
-                        String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-                        ItemMeta meta = stack.getItemMeta();
-                        ArrayList<String> customLore = new ArrayList<>();
-                        customLore.add(ChatColor.GRAY + "Aperture™ Companion Diamond");
-                        customLore.add(checkline);
-                        meta.setLore(customLore);
-                        stack.setItemMeta(meta);
-
-                        chest.getInventory().setItem(slot, stack);
                     }
                     slot++;
                 }
@@ -307,15 +274,7 @@ public class GameListener implements Listener
                     newDrops.add(new ItemStack(Material.COOKED_CHICKEN, stack.getAmount() * 2));
                 } else if (stack.getType() == Material.FEATHER)
                 {
-                    ItemStack loot = new ItemStack(Material.ARROW, stack.getAmount());
-                    ItemMeta meta = loot.getItemMeta();
-                    String checkline = ChatColor.GRAY + "© Aperture Science - All rights reserved";
-                    ArrayList<String> customLore = new ArrayList<>();
-                    customLore.add(ChatColor.GRAY + "Aperture™ Companion Arrow");
-                    customLore.add(checkline);
-                    meta.setLore(customLore);
-                    loot.setItemMeta(meta);
-                    newDrops.add(loot);
+                    newDrops.add(new ItemStack(Material.ARROW, stack.getAmount()));
                 }
             }
             event.getDrops().clear();

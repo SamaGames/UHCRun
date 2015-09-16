@@ -1,7 +1,8 @@
 package net.samagames.uhcrun.listener;
 
-import org.bukkit.ChatColor;
+import net.samagames.uhcrun.game.Game;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -9,10 +10,6 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -25,28 +22,24 @@ import java.util.List;
 public class CraftListener implements Listener
 {
 
-    private List<String> diamondDesc;
-
-    public CraftListener()
+    public CraftListener(Game game)
     {
-        diamondDesc = new ArrayList<>();
-        diamondDesc.add(ChatColor.GRAY + "Aperture™ Uncrafted Companion Diamond");
-        diamondDesc.add(ChatColor.GRAY + "© Aperture Science - All rights reserved");
+
     }
 
     @EventHandler
     public void onCraft(CraftItemEvent event)
     {
-        this.onCraft(event.getRecipe(), event.getInventory());
+        this.onCraft(event.getRecipe(), event.getInventory(), event.getWhoClicked());
     }
 
     @EventHandler
     public void onCraft(PrepareItemCraftEvent event)
     {
-        this.onCraft(event.getRecipe(), event.getInventory());
+        this.onCraft(event.getRecipe(), event.getInventory(), null);
     }
 
-    private void onCraft(Recipe recipe, CraftingInventory inventory)
+    private void onCraft(Recipe recipe, CraftingInventory inventory, HumanEntity human)
     {
         if ((recipe.getResult().getType() == Material.GOLDEN_APPLE && recipe.getResult().getDurability() == 1) || (recipe.getResult().getType() == Material.FLINT_AND_STEEL) || (recipe.getResult().getType() == Material.BEACON))
         {
@@ -63,13 +56,6 @@ public class CraftListener implements Listener
         } else if (recipe.getResult().getType() == Material.WOOD_SPADE)
         {
             inventory.setResult(new ItemStack(Material.STONE_SPADE));
-        } else if (recipe.getResult().getType() == Material.DIAMOND)
-        {
-            ItemStack res = inventory.getResult();
-            ItemMeta meta = res.getItemMeta();
-            meta.setLore(diamondDesc);
-            res.setItemMeta(meta);
-            inventory.setResult(res);
         }
     }
 }

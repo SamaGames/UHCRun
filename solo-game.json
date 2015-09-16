@@ -49,6 +49,7 @@
         maxY: 32,
         size: 6
       }
-    ]
+    ],
+    "privateBlocks": ["ENCHANTMENT_TABLE", "BREWING_STAND", "ANVIL", "WORKBENCH"]
   }
 }

@@ -49,6 +49,7 @@ public class UHCRun extends JavaPlugin implements Listener
     private PluginManager pluginManager;
     private WorldLoader worldLoader;
     private GameAdaptator adaptator;
+    private GameProperties properties;
 
 
     public static UHCRun getInstance()
@@ -59,7 +60,6 @@ public class UHCRun extends JavaPlugin implements Listener
     @Override
     public void onEnable()
     {
-
         // Define the instance
         instance = this;
 
@@ -84,6 +84,24 @@ public class UHCRun extends JavaPlugin implements Listener
         } else
         {
             logger.info("World found!");
+        }
+
+        properties = new GameProperties();
+
+        File gameJson = new File(UHCRun.getInstance().getDataFolder().getParentFile().getParentFile(), "game.json");
+
+        if (gameJson.exists())
+        {
+            try
+            {
+                properties = new Gson().fromJson(new FileReader(gameJson), GameProperties.class);
+            } catch (FileNotFoundException e)
+            {
+                logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
+            }
+        } else
+        {
+            logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
         }
 
         if (pluginManager.isPluginEnabled("SamaGamesAPI"))
@@ -133,25 +151,6 @@ public class UHCRun extends JavaPlugin implements Listener
 
     private void setupNormalWorld(World world)
     {
-
-        GameProperties properties = new GameProperties();
-
-        File gameJson = new File(UHCRun.getInstance().getDataFolder().getParentFile().getParentFile(), "game.json");
-
-        if (gameJson.exists())
-        {
-            try
-            {
-                properties = new Gson().fromJson(new FileReader(gameJson), GameProperties.class);
-            } catch (FileNotFoundException e)
-            {
-                logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
-            }
-        } else
-        {
-            logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
-        }
-
         try
         {
             NMSPatcher patcher = new NMSPatcher(properties);
@@ -232,5 +231,10 @@ public class UHCRun extends JavaPlugin implements Listener
     public void setSpawnLocation(Location spawnLocation)
     {
         this.spawnLocation = spawnLocation;
+    }
+
+    public GameProperties getProperties()
+    {
+        return properties;
     }
 }

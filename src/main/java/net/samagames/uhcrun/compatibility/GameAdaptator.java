@@ -75,8 +75,8 @@ public class GameAdaptator implements Listener
         // Add the lobby
         loobyPopulator = new LobbyPopulator(plugin.getLogger(), plugin.getDataFolder());
         loobyPopulator.generate();
-        pluginManager.registerEvents(new CraftListener(), plugin);
-        pluginManager.registerEvents(new BlockListener(80), plugin);
+        pluginManager.registerEvents(new CraftListener(game), plugin);
+        pluginManager.registerEvents(new BlockListener(game, 80), plugin);
 
         game.postInit(world);
     }

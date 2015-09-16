@@ -2,10 +2,7 @@ package net.samagames.uhcrun.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -69,7 +66,7 @@ public class ChunkListener implements Runnable, Listener
 
             for (Entity entity : chunk.getEntities())
             {
-                if (!(entity instanceof Item || entity instanceof HumanEntity || entity instanceof Animals))
+                if (!(entity instanceof Item || entity instanceof HumanEntity || entity instanceof Animals || entity instanceof Minecart))
                 {
                     Bukkit.getLogger().info("Removing " + entity);
                     entity.remove();

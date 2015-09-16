@@ -2,6 +2,8 @@ package net.samagames.uhcrun.listener;
 
 
 import net.samagames.uhcrun.UHCRun;
+import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -18,9 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 /**
@@ -32,11 +32,16 @@ import java.util.Random;
  */
 public class BlockListener implements Listener
 {
+    private final Game game;
+    private final List<String> privateBlocks;
+    private final Map<Location, UUID> blocksOwner = new HashMap<>();
     private int maxLogBreaking;
 
-    public BlockListener(int maxLogBreaking)
+    public BlockListener(Game game, int maxLogBreaking)
     {
+        this.game = game;
         this.maxLogBreaking = maxLogBreaking;
+        this.privateBlocks = (List<String>) game.getPlugin().getProperties().getOptions().getOrDefault("privateBlocks", new ArrayList<>());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -46,6 +51,9 @@ public class BlockListener implements Listener
         if (block.getType().equals(Material.LOG) || block.getType().equals(Material.LOG_2))
         {
             Metadatas.setMetadata(UHCRun.getInstance(), block, "placed", new Integer(1));
+        } else if (privateBlocks.contains(event.getBlockPlaced().getType().name().toUpperCase()))
+        {
+            blocksOwner.put(event.getBlockPlaced().getLocation(), event.getPlayer().getUniqueId());
         }
     }
 
@@ -76,10 +84,6 @@ public class BlockListener implements Listener
                 checkLeaves(event.getBlock());
                 bList.add(event.getBlock());
                 int max = bList.size();
-                if (max > maxLogBreaking)
-                {
-                    max = maxLogBreaking;
-                }
                 final int finalMax = max;
                 new BukkitRunnable()
                 {
@@ -121,7 +125,7 @@ public class BlockListener implements Listener
                             cancel();
                         }
                     }
-                }.runTaskTimer(UHCRun.getInstance(), 1, 1);
+                }.runTaskTimer(UHCRun.getInstance(), 2, 1);
                 break;
             case DIAMOND_ORE:
             case LAPIS_ORE:
@@ -133,6 +137,20 @@ public class BlockListener implements Listener
                 event.setCancelled(true);
                 event.getBlock().breakNaturally(new ItemStack(Material.DIAMOND_PICKAXE));
         }
+
+        if (blocksOwner.containsKey(event.getBlock().getLocation()) && blocksOwner.get(event.getBlock().getLocation()) != event.getPlayer().getUniqueId())
+        {
+            UUID id = blocksOwner.get(event.getBlock().getLocation());
+            if (id == null || id.equals(event.getPlayer().getUniqueId()) || (game instanceof TeamGame && ((TeamGame) game).getPlayerTeam(id) == ((TeamGame) game).getPlayerTeam(event.getPlayer().getUniqueId())))
+            {
+                blocksOwner.remove(event.getBlock().getLocation());
+            } else if (!game.isPvpEnabled())
+            {
+                event.getPlayer().sendMessage(ChatColor.RED + "Ce block appartient à " + blocksOwner.get(event.getBlock().getLocation())  + ". Vous ne pouvez pas le casser durant la préparation !");
+                event.setCancelled(true);
+            }
+        }
+
         event.getPlayer().giveExp(event.getExpToDrop() * 2);
     }
 
