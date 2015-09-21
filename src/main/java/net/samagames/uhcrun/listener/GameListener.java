@@ -20,6 +20,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -108,6 +109,15 @@ public class GameListener implements Listener
     }
 
     @EventHandler
+    public void onItemConsume(PlayerItemConsumeEvent event)
+    {
+        if (event.getItem().getType() == Material.GOLDEN_APPLE)
+        {
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10 * 20, 1));
+        }
+    }
+
+    @EventHandler
     public void itemSpawn(ItemSpawnEvent event)
     {
         if (Metadatas.getMetadata(game.getPlugin(), event.getEntity(), "playerDrop") != null)
@@ -124,6 +134,15 @@ public class GameListener implements Listener
                 break;
             case SAND:
                 event.getEntity().setItemStack(new ItemStack(Material.GLASS, 1));
+                break;
+            case SAPLING:
+                if (new Random().nextDouble() < 0.1)
+                {
+                    event.getEntity().setItemStack(new ItemStack(Material.APPLE));
+                } else
+                {
+                    event.setCancelled(true);
+                }
                 break;
             case GRAVEL:
             case FLINT:
