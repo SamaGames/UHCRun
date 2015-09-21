@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.commands;
 
-import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.AbstractGame;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,9 +16,9 @@ import org.bukkit.command.CommandSender;
 public class CommandNextEvent implements CommandExecutor
 {
 
-    private Game game;
+    private AbstractGame game;
 
-    public CommandNextEvent(Game game)
+    public CommandNextEvent(AbstractGame game)
     {
         this.game = game;
     }

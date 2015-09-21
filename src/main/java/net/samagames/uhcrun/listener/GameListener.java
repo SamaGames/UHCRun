@@ -2,7 +2,7 @@ package net.samagames.uhcrun.listener;
 
 import net.samagames.api.games.Status;
 import net.samagames.tools.GameUtils;
-import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.AbstractGame;
 import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.WorldLoader;
 import net.samagames.uhcrun.utils.Metadatas;
@@ -41,10 +41,10 @@ import java.util.stream.Collectors;
 public class GameListener implements Listener
 {
 
-    private Game game;
+    private AbstractGame game;
     private Random random;
 
-    public GameListener(Game game)
+    public GameListener(AbstractGame game)
     {
         this.game = game;
         this.random = new Random();
@@ -136,7 +136,7 @@ public class GameListener implements Listener
                 event.getEntity().setItemStack(new ItemStack(Material.GLASS, 1));
                 break;
             case SAPLING:
-                if (new Random().nextDouble() < 0.1)
+                if (random.nextDouble() < 0.1)
                 {
                     event.getEntity().setItemStack(new ItemStack(Material.APPLE));
                 } else
@@ -164,6 +164,8 @@ public class GameListener implements Listener
                 break;
             case CACTUS:
                 event.getEntity().setItemStack(new ItemStack(Material.LOG, 2));
+                break;
+            default:
                 break;
         }
     }

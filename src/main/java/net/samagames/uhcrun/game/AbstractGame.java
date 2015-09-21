@@ -35,7 +35,7 @@ import java.util.*;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
+public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlayer>
 {
     protected final UHCRun plugin;
     protected final GameAdaptator adaptator;
@@ -46,7 +46,6 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
     private final int maxSpawnLocations;
     private final int minPlayers;
     private GameLoop gameLoop;
-    private GameLoop.TimedEvent nextEvent;
     private IMessageManager messageManager;
     private Scoreboard scoreboard;
     private boolean pvpEnabled;
@@ -56,23 +55,22 @@ public abstract class Game extends net.samagames.api.games.Game<UHCPlayer>
     private final int deathMatchSize;
     private final int reductionTime;
 
-    public Game(int maxLocations)
+    public AbstractGame(UHCRun plugin , IGameProperties properties)
     {
-        super(UHCRun.getInstance().getAdaptator().getAPI().getGameManager().getGameProperties().getMapName(), "UHCRun", UHCRun.getInstance().getConfig().getString("gameName", "UHCRun"), UHCPlayer.class);
-        this.plugin = UHCRun.getInstance();
+        super("UHCRun", "UHCRun", properties.getMapName(), UHCPlayer.class);
+        this.plugin = plugin;
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
         this.rand = new Random();
-        this.maxSpawnLocations = maxLocations;
+        this.maxSpawnLocations = properties.getMaxSlots();
         this.spawnPoints = new ArrayList<>();
         this.prevInGame = new TreeMap<>();
         UHCPlayer.setGame(this);
 
-        IGameProperties gameManager = adaptator.getAPI().getGameManager().getGameProperties();
-        this.preparingTime = gameManager.getOption("preparingTime", new JsonPrimitive(20)).getAsInt();
-        this.deathMatchSize = gameManager.getOption("deathMatchSize", new JsonPrimitive(400)).getAsInt();
-        this.reductionTime = gameManager.getOption("reductionTime", new JsonPrimitive(10)).getAsInt();
-        this.minPlayers = gameManager.getMinSlots();
+        this.preparingTime = properties.getOption("preparingTime", new JsonPrimitive(20)).getAsInt();
+        this.deathMatchSize = properties.getOption("deathMatchSize", new JsonPrimitive(400)).getAsInt();
+        this.reductionTime = properties.getOption("reductionTime", new JsonPrimitive(10)).getAsInt();
+        this.minPlayers = properties.getMinSlots();
     }
 
     public void postInit(World world)

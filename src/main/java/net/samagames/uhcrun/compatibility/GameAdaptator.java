@@ -6,7 +6,7 @@ import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.commands.CommandNextEvent;
-import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.AbstractGame;
 import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.LobbyPopulator;
@@ -27,7 +27,7 @@ public class GameAdaptator implements Listener
     private LobbyPopulator loobyPopulator;
     private final UHCRun plugin;
     private SamaGamesAPI samaGamesAPI;
-    private Game game;
+    private AbstractGame game;
     private PluginManager pluginManager;
 
     public GameAdaptator(UHCRun plugin)
@@ -43,10 +43,10 @@ public class GameAdaptator implements Listener
 
         if (nb > 1)
         {
-            this.game = new TeamGame(nb);
+            this.game = new TeamGame(plugin, nb);
         } else
         {
-            this.game = new SoloGame();
+            this.game = new SoloGame(plugin);
         }
 
         samaGamesAPI.getGameManager().registerGame(game);
@@ -75,8 +75,8 @@ public class GameAdaptator implements Listener
         // Add the lobby
         loobyPopulator = new LobbyPopulator(plugin.getLogger(), plugin.getDataFolder());
         loobyPopulator.generate();
-        pluginManager.registerEvents(new CraftListener(game), plugin);
-        pluginManager.registerEvents(new BlockListener(game, 80), plugin);
+        pluginManager.registerEvents(new CraftListener(), plugin);
+        pluginManager.registerEvents(new BlockListener(game), plugin);
 
         game.postInit(world);
     }
@@ -90,7 +90,7 @@ public class GameAdaptator implements Listener
         }
     }
 
-    public Game getGame()
+    public AbstractGame getGame()
     {
         return game;
     }

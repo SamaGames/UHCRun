@@ -50,9 +50,10 @@ public class ChunkListener implements Runnable, Listener
         final long currentTime = System.currentTimeMillis();
         final List<Chunk> toRemove = new ArrayList<>();
         // Clear entities
-        for (Chunk chunk : lastChunkCleanUp.keySet())
+        for (Map.Entry<Chunk, Long> entry : lastChunkCleanUp.entrySet())
         {
-            if (!chunk.isLoaded() || (currentTime - lastChunkCleanUp.get(chunk) <= 40000))
+            Chunk chunk = entry.getKey();
+            if (!chunk.isLoaded() || (currentTime - entry.getValue() <= 40000))
             {
                 continue;
             }
@@ -73,7 +74,7 @@ public class ChunkListener implements Runnable, Listener
                 }
             }
 
-            lastChunkCleanUp.remove(chunk);
+            toRemove.remove(chunk);
         }
 
         // Remove Chunks that contains players (don't need to be cleaned)

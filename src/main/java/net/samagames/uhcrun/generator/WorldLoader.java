@@ -22,7 +22,12 @@ public class WorldLoader
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;
-    private UHCRun plugin = UHCRun.getInstance();
+    private UHCRun plugin;
+
+    public WorldLoader(UHCRun plugin)
+    {
+        this.plugin = plugin;
+    }
 
     public static Integer getHighestNaturalBlockAt(int x, int z)
     {

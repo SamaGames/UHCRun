@@ -1,8 +1,6 @@
 package net.samagames.uhcrun.listener;
 
-
-import net.samagames.uhcrun.UHCRun;
-import net.samagames.uhcrun.game.Game;
+import net.samagames.uhcrun.game.AbstractGame;
 import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.*;
@@ -22,7 +20,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-
 /**
  * This file is a part of the SamaGames Project CodeBase
  * This code is absolutely confidential.
@@ -32,15 +29,13 @@ import java.util.*;
  */
 public class BlockListener implements Listener
 {
-    private final Game game;
+    private final AbstractGame game;
     private final List<String> privateBlocks;
     private final Map<Location, UUID> blocksOwner = new HashMap<>();
-    private int maxLogBreaking;
 
-    public BlockListener(Game game, int maxLogBreaking)
+    public BlockListener(AbstractGame game)
     {
         this.game = game;
-        this.maxLogBreaking = maxLogBreaking;
         this.privateBlocks = (List<String>) game.getPlugin().getProperties().getOptions().getOrDefault("privateBlocks", new ArrayList<>());
     }
 
@@ -50,7 +45,7 @@ public class BlockListener implements Listener
         Block block = event.getBlock();
         if (block.getType().equals(Material.LOG) || block.getType().equals(Material.LOG_2))
         {
-            Metadatas.setMetadata(UHCRun.getInstance(), block, "placed", new Integer(1));
+            Metadatas.setMetadata(game.getPlugin(), block, "placed", 1);
         } else if (privateBlocks.contains(event.getBlockPlaced().getType().name().toUpperCase()))
         {
             blocksOwner.put(event.getBlockPlaced().getLocation(), event.getPlayer().getUniqueId());
@@ -95,7 +90,7 @@ public class BlockListener implements Listener
                             Block block = bList.get(i);
 
                             // Is it tagged by the system?
-                            if (Metadatas.getMetadata(UHCRun.getInstance(), block, "placed") != null)
+                            if (Metadatas.getMetadata(game.getPlugin(), block, "placed") != null)
                             {
                                 // Ignore this block
                                 bList.remove(block);
@@ -125,7 +120,7 @@ public class BlockListener implements Listener
                             cancel();
                         }
                     }
-                }.runTaskTimer(UHCRun.getInstance(), 2, 1);
+                }.runTaskTimer(game.getPlugin(), 2, 1);
                 break;
             case DIAMOND_ORE:
             case LAPIS_ORE:
@@ -136,6 +131,9 @@ public class BlockListener implements Listener
             case QUARTZ_ORE:
                 event.setCancelled(true);
                 event.getBlock().breakNaturally(new ItemStack(Material.DIAMOND_PICKAXE));
+                break;
+            default:
+                break;
         }
 
         if (blocksOwner.containsKey(event.getBlock().getLocation()) && blocksOwner.get(event.getBlock().getLocation()) != event.getPlayer().getUniqueId())
@@ -169,7 +167,7 @@ public class BlockListener implements Listener
             return;
         }
 
-        Bukkit.getServer().getScheduler().runTask(UHCRun.getInstance(), () -> {
+        Bukkit.getServer().getScheduler().runTask(game.getPlugin(), () -> {
             for (int offX = -range; offX <= range; offX++)
             {
                 for (int offY = -range; offY <= range; offY++)

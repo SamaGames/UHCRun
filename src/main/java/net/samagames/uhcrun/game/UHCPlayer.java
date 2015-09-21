@@ -2,7 +2,6 @@ package net.samagames.uhcrun.game;
 
 import net.samagames.api.games.GamePlayer;
 import net.samagames.api.games.Status;
-import net.samagames.uhcrun.UHCRun;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class UHCPlayer extends GamePlayer
 {
-    private static Game game;
+    private static AbstractGame game;
     private int kills;
 
     public UHCPlayer(Player player)
@@ -25,7 +24,7 @@ public class UHCPlayer extends GamePlayer
         super(player);
     }
 
-    public static void setGame(Game game)
+    public static void setGame(AbstractGame game)
     {
         UHCPlayer.game = game;
     }
@@ -42,7 +41,7 @@ public class UHCPlayer extends GamePlayer
         if (!reconnect)
         {
             player.setGameMode(GameMode.ADVENTURE);
-            player.teleport(UHCRun.getInstance().getSpawnLocation());
+            player.teleport(game.getPlugin().getSpawnLocation());
             if (game instanceof TeamGame)
             {
                 ItemStack star = new ItemStack(Material.NETHER_STAR);

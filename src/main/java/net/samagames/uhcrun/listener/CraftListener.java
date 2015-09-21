@@ -1,6 +1,5 @@
 package net.samagames.uhcrun.listener;
 
-import net.samagames.uhcrun.game.Game;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
@@ -21,11 +20,6 @@ import org.bukkit.inventory.Recipe;
  */
 public class CraftListener implements Listener
 {
-
-    public CraftListener(Game game)
-    {
-
-    }
 
     @EventHandler
     public void onCraft(CraftItemEvent event)

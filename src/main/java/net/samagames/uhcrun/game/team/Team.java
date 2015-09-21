@@ -24,7 +24,7 @@ import java.util.UUID;
 public class Team
 {
 
-    private static int maxSize = -1;
+    private int maxSize = -1;
     private final ArrayList<UUID> players;
     private final TeamGame game;
     private final ItemStack icon;

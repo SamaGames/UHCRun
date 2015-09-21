@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,9 +19,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -40,7 +38,6 @@ public class UHCRun extends JavaPlugin implements Listener
 
     private static UHCRun instance;
     private Location spawnLocation;
-    private FileConfiguration config;
     private Logger logger;
     private BukkitTask startTimer;
     private OrePopulator populator;
@@ -54,17 +51,13 @@ public class UHCRun extends JavaPlugin implements Listener
 
     public static UHCRun getInstance()
     {
-        return instance;
+        return (UHCRun) Bukkit.getServer().getPluginManager().getPlugin("UHCRun");
     }
 
     @Override
     public void onEnable()
     {
-        // Define the instance
-        instance = this;
-
         pluginManager = getServer().getPluginManager();
-        config = this.getConfig();
         logger = this.getLogger();
 
         // World Loader
@@ -88,13 +81,13 @@ public class UHCRun extends JavaPlugin implements Listener
 
         properties = new GameProperties();
 
-        File gameJson = new File(UHCRun.getInstance().getDataFolder().getParentFile().getParentFile(), "game.json");
+        File gameJson = new File(this.getDataFolder().getParentFile().getParentFile(), "game.json");
 
         if (gameJson.exists())
         {
             try
             {
-                properties = new Gson().fromJson(new FileReader(gameJson), GameProperties.class);
+                properties = new Gson().fromJson(new InputStreamReader(new FileInputStream(gameJson), Charset.forName("UTF-8")), GameProperties.class);
             } catch (FileNotFoundException e)
             {
                 logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
@@ -144,7 +137,7 @@ public class UHCRun extends JavaPlugin implements Listener
             this.adaptator.postInit(world);
         }
 
-        worldLoader = new WorldLoader();
+        worldLoader = new WorldLoader(this);
         worldLoader.begin(world);
 
     }

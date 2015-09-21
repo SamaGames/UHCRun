@@ -1,8 +1,8 @@
 package net.samagames.uhcrun.game;
 
-import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.tools.Titles;
+import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.team.Team;
 import net.samagames.uhcrun.game.team.TeamList;
 import net.samagames.uhcrun.game.team.TeamSelector;
@@ -25,7 +25,7 @@ import java.util.UUID;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class TeamGame extends Game
+public class TeamGame extends AbstractGame
 {
 
     private final int personsPerTeam;
@@ -33,10 +33,9 @@ public class TeamGame extends Game
     private TeamSelector teamSelector;
 
 
-    public TeamGame(int nbByTeam)
+    public TeamGame(UHCRun plugin, int nbByTeam)
     {
-        // FIXME: Caclulate the apropriate amount of tp points
-        super(SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots());
+        super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties());
 
         this.personsPerTeam = nbByTeam;
         try

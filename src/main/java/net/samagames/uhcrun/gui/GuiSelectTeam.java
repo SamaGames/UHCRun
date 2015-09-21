@@ -33,23 +33,13 @@ import java.util.UUID;
  */
 public class GuiSelectTeam extends Gui
 {
-    private static TeamGame game;
-    private static TeamSelector selector;
+    private static TeamGame game = (TeamGame) UHCRun.getInstance().getAdaptator().getGame();
+    private static TeamSelector selector = TeamSelector.getInstance();
     private Field signField;
     private Field isEditable;
     private Method openSign;
     private Method setEditor;
     private Method getHandle;
-
-
-    public GuiSelectTeam()
-    {
-        if (game == null || selector == null)
-        {
-            game = (TeamGame) UHCRun.getInstance().getAdaptator().getGame();
-            selector = TeamSelector.getInstance();
-        }
-    }
 
     @Override
     public void display(Player player)

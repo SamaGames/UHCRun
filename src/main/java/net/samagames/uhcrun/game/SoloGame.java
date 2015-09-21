@@ -1,7 +1,7 @@
 package net.samagames.uhcrun.game;
 
-import net.samagames.api.SamaGamesAPI;
 import net.samagames.tools.Titles;
+import net.samagames.uhcrun.UHCRun;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,15 +18,13 @@ import java.util.UUID;
  * (C) Copyright Elydra Network 2014 & 2015
  * All rights reserved.
  */
-public class SoloGame extends Game
+public class SoloGame extends AbstractGame
 {
 
-
-    public SoloGame()
+    public SoloGame(UHCRun plugin)
     {
-        super(SamaGamesAPI.get().getGameManager().getGameProperties().getMaxSlots());
+        super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties());
     }
-
 
     @Override
     public void checkStump(Player player)
