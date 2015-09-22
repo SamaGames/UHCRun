@@ -71,7 +71,7 @@ public class SoloGame extends AbstractGame
 
         try
         {
-            this.increaseStat(player.getUniqueId(), "victories", 1);
+            this.increaseStat(player.getUniqueId(), "wins", 1);
         } catch (Exception ex)
         {
         }

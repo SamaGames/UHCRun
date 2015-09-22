@@ -148,7 +148,6 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
                 gamePlayers.remove(uuid);
                 continue;
             }
-            this.increaseStat(uuid, "played", 1);
             player.setGameMode(GameMode.SURVIVAL);
             player.setFoodLevel(20);
             player.setScoreboard(scoreboard);
@@ -226,7 +225,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
             player.setHealth(20.0D);
             if (!logout)
             {
-                this.increaseStat(player.getUniqueId(), "stumps", 1);
+                this.increaseStat(player.getUniqueId(), "deaths", 1);
                 Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
                 removeFromGame(player.getUniqueId());
             }

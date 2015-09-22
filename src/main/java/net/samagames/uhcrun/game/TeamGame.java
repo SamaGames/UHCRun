@@ -292,7 +292,7 @@ public class TeamGame extends AbstractGame
 
             try
             {
-                this.increaseStat(playerID, "victories", 1);
+                this.increaseStat(playerID, "wins", 1);
             } catch (Exception ignored)
             {
 
