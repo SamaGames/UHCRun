@@ -57,7 +57,8 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
 
     public AbstractGame(UHCRun plugin , IGameProperties properties)
     {
-        super("UHCRun", "UHCRun", properties.getMapName(), UHCPlayer.class);
+        super("UHCRun", "UHCRun", "", UHCPlayer.class);
+        this.status = Status.STARTING;
         this.plugin = plugin;
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();

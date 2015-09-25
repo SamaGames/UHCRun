@@ -78,14 +78,12 @@ public class BlockListener implements Listener
                 final List<Block> bList = new ArrayList<>();
                 checkLeaves(event.getBlock());
                 bList.add(event.getBlock());
-                int max = bList.size();
-                final int finalMax = max;
                 new BukkitRunnable()
                 {
                     @Override
                     public void run()
                     {
-                        for (int i = 0; i < finalMax; i++)
+                        for (int i = 0; i < bList.size(); i++)
                         {
                             Block block = bList.get(i);
 
