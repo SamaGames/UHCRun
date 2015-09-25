@@ -69,14 +69,23 @@ public class UHCRun extends JavaPlugin implements Listener
         this.saveResource("nether.schematic", false);
 
 
-        File conf = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
-        logger.info("Checking wether world exists at : " + conf.getAbsolutePath());
-        if (!conf.exists())
+        if (pluginManager.isPluginEnabled("SamaGamesAPI"))
+        {
+            this.adaptator = new GameAdaptator(this);
+        }
+
+        File worldDir = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
+        logger.info("Checking wether world exists at : " + worldDir.getAbsolutePath());
+        if (!worldDir.exists())
         {
             logger.warning("No world exists. Will be generated.");
         } else
         {
-            logger.info("World found!");
+            logger.info("World found... Checking for arena file...");
+            if (!this.adaptator.checkAndDownloadWorld(worldDir))
+            {
+                logger.severe("Error during map downloading. The world will be generated!");
+            }
         }
 
         properties = new GameProperties();
@@ -97,9 +106,8 @@ public class UHCRun extends JavaPlugin implements Listener
             logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
         }
 
-        if (pluginManager.isPluginEnabled("SamaGamesAPI"))
+        if (this.adaptator != null)
         {
-            this.adaptator = new GameAdaptator(this);
             this.adaptator.onEnable();
         }
 
