@@ -1,5 +1,8 @@
 package net.samagames.uhcrun.listener;
 
+import net.minecraft.server.v1_8_R3.EntityExperienceOrb;
+import net.minecraft.server.v1_8_R3.MathHelper;
+import net.minecraft.server.v1_8_R3.World;
 import net.samagames.api.games.Status;
 import net.samagames.tools.GameUtils;
 import net.samagames.uhcrun.game.AbstractGame;
@@ -10,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -159,14 +163,51 @@ public class GameListener implements Listener
                 event.getEntity().setItemStack(new ItemStack(Material.TORCH, 3));
                 break;
             case DIAMOND:
-                ItemStack loot = new ItemStack(Material.DIAMOND, event.getEntity().getItemStack().getAmount() * 2);
-                event.getEntity().setItemStack(loot);
+                event.getEntity().getItemStack().setAmount(event.getEntity().getItemStack().getAmount() * 2);
                 break;
             case CACTUS:
                 event.getEntity().setItemStack(new ItemStack(Material.LOG, 2));
                 break;
             default:
                 break;
+        }
+        spawnXPFromItemStack(event.getEntity(), event.getEntity().getItemStack().getType(), event.getEntity().getItemStack().getAmount());
+    }
+
+    private void spawnXPFromItemStack(Entity entity, Material ore, int amount)
+    {
+        World world = ((CraftEntity) entity).getHandle().getWorld();
+
+        int i = 0;
+        switch (ore)
+        {
+            case QUARTZ:
+            case INK_SACK:
+                i = MathHelper.nextInt(world.random, 2, 5);
+                break;
+            case EMERALD:
+            case DIAMOND:
+                i = MathHelper.nextInt(world.random, 3, 7);
+                break;
+            case COAL:
+            case GOLD_INGOT:
+            case IRON_INGOT:
+                i = MathHelper.nextInt(world.random, 0, 2);
+                break;
+            default:
+                break;
+
+        }
+        if (i == 0)
+        {
+            return;
+        }
+        int orbSize = 0;
+        while (i > 0)
+        {
+            orbSize = EntityExperienceOrb.getOrbValue(i);
+            i -= orbSize;
+            world.addEntity(new EntityExperienceOrb(world, entity.getLocation().getX(), entity.getLocation().getY(), entity.getLocation().getZ(), orbSize));
         }
     }
 

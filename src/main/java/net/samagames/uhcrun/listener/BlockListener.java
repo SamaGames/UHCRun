@@ -127,8 +127,9 @@ public class BlockListener implements Listener
             case IRON_ORE:
             case REDSTONE_ORE:
             case QUARTZ_ORE:
-                event.setCancelled(true);
+                event.setExpToDrop(0);
                 event.getBlock().breakNaturally(new ItemStack(Material.DIAMOND_PICKAXE));
+                event.setCancelled(true);
                 break;
             default:
                 break;
