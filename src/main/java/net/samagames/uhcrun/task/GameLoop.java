@@ -1,5 +1,6 @@
 package net.samagames.uhcrun.task;
 
+import net.samagames.tools.chat.ActionBarAPI;
 import net.samagames.tools.scoreboards.ObjectiveSign;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.AbstractGame;
@@ -174,10 +175,7 @@ public class GameLoop implements Runnable
                 }
                 if (this.nextEvent != null)
                 {
-                    objective.setLine(lastLine + 1, this.nextEvent.string);
-                    objective.setLine(lastLine + 2, this.nextEvent.color + "dans " + this.toString(this.nextEvent.minutes, this.nextEvent.seconds));
-                    objective.setLine(lastLine + 3, ChatColor.GOLD + "     ");
-                    lastLine += 3;
+                    ActionBarAPI.sendMessage(player, ChatColor.BOLD + this.nextEvent.string + this.nextEvent.color + " dans " + this.toString(this.nextEvent.minutes, this.nextEvent.seconds - 1));
                 }
 
                 UHCPlayer uhcPlayer = this.game.getPlayer(player);
@@ -189,10 +187,7 @@ public class GameLoop implements Runnable
                     lastLine += 2;
                 }
 
-                objective.setLine(lastLine + 1, ChatColor.GRAY + "Bordure :");
-                objective.setLine(lastLine + 2, ChatColor.WHITE + "-" + (int) world.getWorldBorder().getSize() / 2 + " +" + (int) world.getWorldBorder().getSize() / 2);
-                objective.setLine(lastLine + 3, ChatColor.RED + "              ");
-                objective.setLine(lastLine + 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.toString(this.minutes, this.seconds));
+                objective.setLine(lastLine + 1, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.toString(this.minutes, this.seconds));
                 objective.updateLines();
                 server.getScheduler().runTaskAsynchronously(plugin, objective::updateLines);
             }

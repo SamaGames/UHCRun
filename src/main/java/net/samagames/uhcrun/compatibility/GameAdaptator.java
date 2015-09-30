@@ -1,6 +1,7 @@
 package net.samagames.uhcrun.compatibility;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
@@ -131,7 +132,7 @@ public class GameAdaptator implements Listener
         samaGamesAPI.getGameManager().getGameProperties().reload();
 
         File worldZip = new File(worldDir.getParentFile(), "world.zip");
-        String worldStorage = samaGamesAPI.getGameManager().getGameProperties().getConfig("worldStorage", null).getAsString();
+        JsonElement worldStorage = samaGamesAPI.getGameManager().getGameProperties().getConfig("worldStorage", null);
         if (worldStorage == null)
         {
             plugin.getLogger().severe("worldStorage not defined");
@@ -143,7 +144,7 @@ public class GameAdaptator implements Listener
 
         try
         {
-            worldStorageURL = new URL(worldStorage + "get.php");
+            worldStorageURL = new URL(worldStorage.getAsString() + "get.php");
             BufferedReader in = new BufferedReader(new InputStreamReader(worldStorageURL.openStream()));
             mapID = in.readLine();
             in.close();
