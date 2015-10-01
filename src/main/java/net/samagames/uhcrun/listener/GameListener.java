@@ -23,6 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -218,31 +219,24 @@ public class GameListener implements Listener
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event)
     {
-        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
+        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.CHEST))
         {
-            if (event.getClickedBlock().getType().equals(Material.CHEST))
+            Chest chest = (Chest) event.getClickedBlock().getState();
+            int slot = 0;
+            while (slot < chest.getInventory().getSize())
             {
-                Chest chest = (Chest) event.getClickedBlock().getState();
-                int slot = 0;
-                while (slot < chest.getInventory().getSize())
+                ItemStack stack = chest.getInventory().getItem(slot);
+                if (stack == null)
                 {
-                    ItemStack stack = chest.getInventory().getItem(slot);
-                    if (stack == null)
-                    {
-                        slot++;
-                        continue;
-                    }
                     slot++;
+                    continue;
                 }
-            } else if (event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == (Material.LAVA_BUCKET) && !game.isPvpEnabled())
-            {
-                event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
-                event.setCancelled(true);
-            } else if (event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == (Material.MINECART))
-            {
-                event.getPlayer().sendMessage(ChatColor.RED + "L'utilisation de Minecart est strictement interdit.");
-                event.setCancelled(true);
+                slot++;
             }
+        } else if (event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == (Material.MINECART))
+        {
+            event.getPlayer().sendMessage(ChatColor.RED + "L'utilisation de Minecart est strictement interdit.");
+            event.setCancelled(true);
         }
     }
 
@@ -393,6 +387,21 @@ public class GameListener implements Listener
         {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + "Towers" + ChatColor.DARK_RED + "] " + ChatColor.RED + "Les Towers sont interdites en UHCRun.");
+        }
+    }
+
+
+    @EventHandler
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        if (event.getBucket().equals(Material.LAVA_BUCKET) && !game.isPvpEnabled())
+        {
+            event.getPlayer().sendMessage(ChatColor.RED + "Le PVP est désactivé, l'utilisation de sources de lave est interdite.");
+            // Force client update to avoid lava render when cancelled
+            event.getPlayer().getWorld().getBlockAt(event.getBlockClicked().getLocation().add(event.getBlockFace().getModX(), event.getBlockFace().getModY(), event.getBlockFace().getModZ())).setType(Material.AIR);
+
+            // Force client update to avoid sync problems when cancelled
+            event.getPlayer().getItemInHand().setType(Material.LAVA_BUCKET);
+            event.setCancelled(true);
         }
     }
 }
