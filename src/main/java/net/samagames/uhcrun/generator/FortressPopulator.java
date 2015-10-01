@@ -7,6 +7,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.world.DataException;
+import net.minecraft.server.v1_8_R3.StructurePieceTreasure;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -14,13 +15,20 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftChest;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * This file is a part of the SamaGames Project CodeBase
@@ -31,18 +39,20 @@ import java.util.logging.Logger;
  */
 public class FortressPopulator extends BlockPopulator
 {
-
+    private List<StructurePieceTreasure> chestLoots;
     private UHCRun plugin;
     private File file;
     private Logger logger;
     private BukkitWorld bukkitWorld;
     private CuboidClipboard cuboidClipboard;
+    private Random random;
 
-    public FortressPopulator(UHCRun plugin)
+    public FortressPopulator(UHCRun plugin, List<Map<String, Object>> netherChestLoots)
     {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "/nether.schematic");
         this.logger = Bukkit.getLogger();
+        this.chestLoots = new ArrayList<>();
         try
         {
             this.cuboidClipboard = SchematicFormat.MCEDIT.load(file);
@@ -50,6 +60,10 @@ public class FortressPopulator extends BlockPopulator
         {
             e.printStackTrace();
         }
+        chestLoots.addAll(netherChestLoots.stream().map(loot -> {
+            return new StructurePieceTreasure(CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial((String) loot.get("id")))), ((Double) loot.get("minimumChance")).intValue(), ((Double) loot.get("maximumChance")).intValue(), ((Double) loot.get("weight")).intValue());
+        }).collect(Collectors.toList()));
+        this.random = new Random();
     }
 
     @Override
@@ -136,6 +150,11 @@ public class FortressPopulator extends BlockPopulator
                                 spawner.update();
                                 logger.fine("Spawner configured at " + bx + " , " + by + " , " + bz);
                                 break;
+                            } else if (block.getType() == Material.CHEST)
+                            {
+                                CraftChest chest = (CraftChest) block.getState();
+                                chest.getBlockInventory().clear();
+                                StructurePieceTreasure.a(random, chestLoots, chest.getTileEntity(), 4);
                             }
                             by--;
                         }

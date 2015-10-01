@@ -19,8 +19,12 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -190,7 +194,7 @@ public class UHCRun extends JavaPlugin implements Listener
         world.getPopulators().add(populator);
 
         // Register Fortress Populator
-        world.getPopulators().add(new FortressPopulator(this));
+        world.getPopulators().add(new FortressPopulator(this, (List<Map<String, Object>>) this.properties.getOptions().getOrDefault("netherChestLoots", new ArrayList<>())));
     }
 
     /*    private void patchBlocks() throws ReflectiveOperationException {
