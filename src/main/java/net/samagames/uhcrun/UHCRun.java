@@ -35,8 +35,6 @@ import java.util.logging.Logger;
  */
 public class UHCRun extends JavaPlugin implements Listener
 {
-
-    private static UHCRun instance;
     private Location spawnLocation;
     private Logger logger;
     private BukkitTask startTimer;

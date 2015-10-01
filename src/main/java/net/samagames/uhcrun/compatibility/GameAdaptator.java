@@ -146,7 +146,7 @@ public class GameAdaptator implements Listener
         try
         {
             worldStorageURL = new URL(worldStorage.getAsString() + "get.php");
-            BufferedReader in = new BufferedReader(new InputStreamReader(worldStorageURL.openStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(worldStorageURL.openStream(), "UTF-8"));
             mapID = in.readLine();
             in.close();
             plugin.getLogger().info(mapID);
@@ -177,7 +177,11 @@ public class GameAdaptator implements Listener
         } else if (worldZip.exists())
         {
             plugin.getLogger().warning("world.zip already exist! Is that a Hydro managed server?");
-            worldZip.delete();
+            if (!worldZip.delete())
+            {
+                plugin.getLogger().severe("Cannot remove world.zip, this is a CRITICAL error!");
+                return false;
+            }
         }
 
 
@@ -223,10 +227,16 @@ public class GameAdaptator implements Listener
                 File entryDestination = new File(worldDir.getParent(), entry.getName());
                 if (entry.isDirectory())
                 {
-                    entryDestination.mkdirs();
+                    if (!entryDestination.mkdirs())
+                    {
+                        plugin.getLogger().warning("Cannot create directory " + entryDestination);
+                    }
                 } else
                 {
-                    entryDestination.getParentFile().mkdirs();
+                    if (!entryDestination.getParentFile().mkdirs())
+                    {
+                        plugin.getLogger().warning("Cannot create directory for file " + entryDestination);
+                    }
                     InputStream in = zipFile.getInputStream(entry);
                     OutputStream out = new FileOutputStream(entryDestination);
                     IOUtils.copy(in, out);
