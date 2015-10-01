@@ -1,9 +1,6 @@
 package net.samagames.uhcrun.hook;
 
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.GenericAttributes;
-import net.minecraft.server.v1_8_R3.MinecraftKey;
-import net.minecraft.server.v1_8_R3.MobEffectList;
+import net.minecraft.server.v1_8_R3.*;
 import net.samagames.uhcrun.compatibility.GameProperties;
 import net.samagames.uhcrun.hook.potions.PotionAttackDamageNerf;
 import net.samagames.uhcrun.utils.Reflection;
@@ -47,15 +44,27 @@ public class NMSPatcher
             ((List<String>) properties.getOptions().get("blacklistedBiomes")).forEach(biomesMap::remove);
         }
 
+        // Force enable reeds for beach biomes and fix racio
+        setReedsPerChunk(BiomeBase.BEACH, 10);
+        setReedsPerChunk(BiomeBase.STONE_BEACH, 10);
         for (int i = 0; i < biomes.length; i++)
         {
-            if (biomes[i] != null && !biomesMap.containsKey(biomes[i].ah))
+            if (biomes[i] != null)
             {
-                biomes[i] = defaultBiome;
+                if (!biomesMap.containsKey(biomes[i].ah))
+                {
+                    biomes[i] = defaultBiome;
+                }
+                setReedsPerChunk(biomes[i], (int) Reflection.getValue(biomes[i].as, BiomeDecorator.class, true, "F") * (Integer) (properties.getOptions().getOrDefault("reedsMultiplier", 2)));
             }
         }
 
         Reflection.setFinalStatic(BiomeBase.class.getDeclaredField("biomes"), biomes);
+    }
+
+    private void setReedsPerChunk(BiomeBase biome, int value) throws NoSuchFieldException, IllegalAccessException
+    {
+        Reflection.setValue(biome.as, BiomeDecorator.class, true, "F", value);
     }
 
     public void patchPotions() throws ReflectiveOperationException

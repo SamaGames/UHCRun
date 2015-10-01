@@ -69,7 +69,6 @@ public class ChunkListener implements Runnable, Listener
             {
                 if (!(entity instanceof Item || entity instanceof HumanEntity || entity instanceof Animals || entity instanceof Minecart))
                 {
-                    Bukkit.getLogger().info("Removing " + entity);
                     entity.remove();
                 }
             }
