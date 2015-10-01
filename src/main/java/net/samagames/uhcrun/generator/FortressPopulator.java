@@ -60,9 +60,7 @@ public class FortressPopulator extends BlockPopulator
         {
             e.printStackTrace();
         }
-        chestLoots.addAll(netherChestLoots.stream().map(loot -> {
-            return new StructurePieceTreasure(CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial((String) loot.get("id")))), ((Double) loot.get("minimumChance")).intValue(), ((Double) loot.get("maximumChance")).intValue(), ((Double) loot.get("weight")).intValue());
-        }).collect(Collectors.toList()));
+        chestLoots.addAll(netherChestLoots.stream().map(loot -> new StructurePieceTreasure(CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial((String) loot.get("id")))), ((Double) loot.get("minimumChance")).intValue(), ((Double) loot.get("maximumChance")).intValue(), ((Double) loot.get("weight")).intValue())).collect(Collectors.toList()));
         this.random = new Random();
     }
 
@@ -150,7 +148,7 @@ public class FortressPopulator extends BlockPopulator
                                 spawner.update();
                                 logger.fine("Spawner configured at " + bx + " , " + by + " , " + bz);
                                 break;
-                            } else if (block.getType() == Material.CHEST)
+                            } else if (block.getType() == Material.CHEST && !chestLoots.isEmpty())
                             {
                                 CraftChest chest = (CraftChest) block.getState();
                                 chest.getBlockInventory().clear();

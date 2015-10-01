@@ -102,6 +102,7 @@ public class UHCRun extends JavaPlugin implements Listener
             } catch (FileNotFoundException e)
             {
                 logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
+                Bukkit.shutdown();
             }
         } else
         {
@@ -222,6 +223,7 @@ public class UHCRun extends JavaPlugin implements Listener
             adaptator.loadEnd();
         } else
         {
+            logger.info("Adaptator is null, stopping server...");
             Bukkit.shutdown();
         }
     }
