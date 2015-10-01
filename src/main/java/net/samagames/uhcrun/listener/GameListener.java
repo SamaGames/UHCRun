@@ -12,6 +12,7 @@ import net.samagames.uhcrun.utils.Metadatas;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.TreeSpecies;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.*;
@@ -26,6 +27,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Tree;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -140,7 +142,8 @@ public class GameListener implements Listener
                 event.getEntity().setItemStack(new ItemStack(Material.GLASS, 1));
                 break;
             case SAPLING:
-                if (random.nextDouble() < 0.1)
+                double percent = ((Tree) event.getEntity().getItemStack().getData()).getSpecies().equals(TreeSpecies.GENERIC) ? 0.1 : 0.3;
+                if (random.nextDouble() <= percent)
                 {
                     event.getEntity().setItemStack(new ItemStack(Material.APPLE));
                 } else

@@ -175,7 +175,7 @@ public class GameLoop implements Runnable
                 }
                 if (this.nextEvent != null)
                 {
-                    ActionBarAPI.sendMessage(player, ChatColor.BOLD + this.nextEvent.string + this.nextEvent.color + " dans " + this.toString(this.nextEvent.minutes, this.nextEvent.seconds - 1));
+                    ActionBarAPI.sendMessage(player, ChatColor.BOLD + this.nextEvent.string + this.nextEvent.color + " dans " + this.toString(this.nextEvent.seconds == 0 ? this.nextEvent.minutes - 1 : this.nextEvent.minutes, this.nextEvent.seconds == 0 ? 59 : this.nextEvent.seconds - 1));
                 }
 
                 UHCPlayer uhcPlayer = this.game.getPlayer(player);

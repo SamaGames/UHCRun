@@ -65,6 +65,7 @@ public class GameAdaptator implements Listener
         pluginManager.registerEvents(new SpectatorListener(game), plugin);
         pluginManager.registerEvents(new GameListener(game), plugin);
         pluginManager.registerEvents(new CompassTargeter(this), plugin);
+        pluginManager.registerEvents(new StackListener(2), plugin);
         pluginManager.registerEvents(this, plugin);
 
         plugin.getCommand("nextevent").setExecutor(new CommandNextEvent(game));
