@@ -74,9 +74,9 @@ public class GameAdaptator implements Listener
     public void postInit(World world)
     {
         JsonArray defaults = new JsonArray();
-        defaults.add(new JsonPrimitive(0.6));
-        defaults.add(new JsonPrimitive(152D));
-        defaults.add(new JsonPrimitive(0.6));
+        defaults.add(new JsonPrimitive(6D));
+        defaults.add(new JsonPrimitive(199D));
+        defaults.add(new JsonPrimitive(7));
         JsonArray spawnPos = samaGamesAPI.getGameManager().getGameProperties().getOption("spawnPos", defaults).getAsJsonArray();
 
         Location spawnLocation = new Location(world, spawnPos.get(0).getAsDouble(), spawnPos.get(1).getAsDouble(), spawnPos.get(2).getAsDouble());

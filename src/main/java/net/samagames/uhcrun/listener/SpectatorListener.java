@@ -88,7 +88,7 @@ public class SpectatorListener implements Listener
         if ((game.getStatus() == Status.STARTING || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125)
         {
             event.setCancelled(true);
-            event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 162, 0));
+            event.getPlayer().teleport(game.getPlugin().getSpawnLocation());
             event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Mais où vous allez comme ça ?!");
         }
     }

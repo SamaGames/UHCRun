@@ -4,9 +4,11 @@ package net.samagames.uhcrun.generator;
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.world.DataException;
+import net.minecraft.server.v1_8_R3.MathHelper;
 import net.minecraft.server.v1_8_R3.StructurePieceTreasure;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
@@ -41,21 +43,21 @@ public class FortressPopulator extends BlockPopulator
 {
     private List<StructurePieceTreasure> chestLoots;
     private UHCRun plugin;
-    private File file;
     private Logger logger;
-    private BukkitWorld bukkitWorld;
-    private CuboidClipboard cuboidClipboard;
+    private com.sk89q.worldedit.world.World bukkitWorld;
+    private CuboidClipboard netherHouse, netherFortress;
     private Random random;
+    private EditSession es;
 
     public FortressPopulator(UHCRun plugin, List<Map<String, Object>> netherChestLoots)
     {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder(), "/nether.schematic");
         this.logger = Bukkit.getLogger();
         this.chestLoots = new ArrayList<>();
         try
         {
-            this.cuboidClipboard = SchematicFormat.MCEDIT.load(file);
+            this.netherHouse = SchematicFormat.MCEDIT.load(new File(plugin.getDataFolder(), "/nether_1.schematic"));
+            this.netherFortress = SchematicFormat.MCEDIT.load(new File(plugin.getDataFolder(), "/nether_2.schematic"));
         } catch (IOException | DataException e)
         {
             e.printStackTrace();
@@ -70,10 +72,11 @@ public class FortressPopulator extends BlockPopulator
         if (bukkitWorld == null)
         {
             this.bukkitWorld = new BukkitWorld(world);
+            es = WorldEdit.getInstance().getEditSessionFactory().getEditSession(bukkitWorld, -1);
+            es.setFastMode(true);
         }
 
-        final int i = random.nextInt(1000);
-        if (i > 0 && i < 10)
+        if (MathHelper.nextInt(random, 0, 100) == 0)
         {
             int xFortress = chunk.getX() * 16 + random.nextInt(15);
             int zFortress = chunk.getZ() * 16 + random.nextInt(15);
@@ -87,15 +90,21 @@ public class FortressPopulator extends BlockPopulator
         {
             return;
         }
-        logger.info("Generating fortress at " + x + "; " + z);
+        int i = MathHelper.nextInt(random, 0, 1);
+        CuboidClipboard clipboard = i == 0 ? netherHouse : netherFortress;
+        generateCuboid(clipboard, world, x, z);
 
-        EditSession es;
-        if (file.exists())
+    }
+
+    private void generateCuboid(CuboidClipboard cuboidClipboard, World world, int x, int z)
+    {
+        if (cuboidClipboard != null)
         {
+            logger.info("Generating fortress at " + x + "; " + z);
             try
             {
-                com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(x, 40, z);
-                Chunk chunk = world.getChunkAt(new org.bukkit.Location(world, x, 40, z));
+                com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(x, 21, z);
+                Chunk chunk = world.getChunkAt(new org.bukkit.Location(world, x, 21, z));
                 int chunkX = chunk.getX();
                 int chunkZ = chunk.getZ();
                 chunk.load(true);
@@ -123,18 +132,19 @@ public class FortressPopulator extends BlockPopulator
                 world.getChunkAt(chunkX, chunkZ - 1).load(true);
 
 
-                es = new EditSession(bukkitWorld, 2000000);
-                es.setFastMode(true);
+
 
                 cuboidClipboard.paste(es, v, false);
 
-                int bx = x;
-                while (bx < x + 35)
+                int bx = x - (cuboidClipboard.getWidth() / 2);
+                int maxX = x + (cuboidClipboard.getWidth() / 2) + 1;
+                while (bx < maxX)
                 {
-                    int bz = z;
-                    while (bz < z + 35)
+                    int bz = z - (cuboidClipboard.getLength() / 2);
+                    int maxZ = z + (cuboidClipboard.getWidth() / 2) + 1;
+                    while (bz < maxZ)
                     {
-                        int by = 40;
+                        int by = 21;
                         while (by > 0)
                         {
                             Block block = new org.bukkit.Location(world, bx, by, bz).getBlock();
@@ -164,9 +174,6 @@ public class FortressPopulator extends BlockPopulator
             {
                 ex.printStackTrace();
             }
-        } else
-        {
-            logger.severe("File does not exist.");
         }
     }
 }

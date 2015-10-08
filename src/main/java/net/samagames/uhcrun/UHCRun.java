@@ -67,8 +67,9 @@ public class UHCRun extends JavaPlugin implements Listener
 
 
         // Copy schematics
-        this.saveResource("lobby.schematic", false);
-        this.saveResource("nether.schematic", false);
+        this.saveResource("lobby.schematic", true);
+        this.saveResource("nether_1.schematic", true);
+        this.saveResource("nether_2.schematic", true);
 
 
         if (pluginManager.isPluginEnabled("SamaGamesAPI"))
