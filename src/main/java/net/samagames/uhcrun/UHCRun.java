@@ -79,7 +79,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
         File worldDir = new File(getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "world");
         logger.info("Checking wether world exists at : " + worldDir.getAbsolutePath());
-        if (!worldDir.exists() && this.adaptator != null)
+        if (!worldDir.exists() || this.adaptator != null)
         {
             logger.warning("No world exists. Will be generated.");
         } else
