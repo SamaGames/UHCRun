@@ -3,8 +3,6 @@ package net.samagames.uhcrun.listener;
 import net.md_5.bungee.api.ChatColor;
 import net.samagames.api.games.Status;
 import net.samagames.uhcrun.game.AbstractGame;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
