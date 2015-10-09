@@ -20,6 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
+import org.rauschig.jarchivelib.Archiver;
+import org.rauschig.jarchivelib.ArchiverFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -132,7 +134,7 @@ public class GameAdaptator implements Listener
         // Force reload
         samaGamesAPI.getGameManager().getGameProperties().reload();
 
-        File worldZip = new File(worldDir.getParentFile(), "world.zip");
+        File worldTar = new File(worldDir.getParentFile(), "world.tar.gz");
         JsonElement worldStorage = samaGamesAPI.getGameManager().getGameProperties().getConfig("worldStorage", null);
         if (worldStorage == null)
         {
@@ -158,10 +160,10 @@ public class GameAdaptator implements Listener
 
         if ("No file found".equals(mapID))
         {
-            if (worldZip.exists())
+            if (worldTar.exists())
             {
                 plugin.getLogger().warning("No map availaible but found world.zip in local, assuming to use it.");
-                boolean result = this.extractWorld(worldZip, worldDir);
+                boolean result = this.extractWorld(worldTar, worldDir);
                 try
                 {
                     worldStorageURL = new URL(worldStorage + "clean.php?name=" + mapID);
@@ -174,12 +176,12 @@ public class GameAdaptator implements Listener
                 return result;
             }
             return false;
-        } else if (worldZip.exists())
+        } else if (worldTar.exists())
         {
             plugin.getLogger().warning("world.zip already exist! Is that a Hydro managed server?");
-            if (!worldZip.delete())
+            if (!worldTar.delete())
             {
-                plugin.getLogger().severe("Cannot remove world.zip, this is a CRITICAL error!");
+                plugin.getLogger().severe("Cannot remove world.tar.gz, this is a CRITICAL error!");
                 return false;
             }
         }
@@ -189,7 +191,7 @@ public class GameAdaptator implements Listener
         {
             worldStorageURL = new URL(worldStorage + "download.php?name=" + mapID);
             ReadableByteChannel rbc = Channels.newChannel(worldStorageURL.openStream());
-            FileOutputStream fos = new FileOutputStream(worldZip);
+            FileOutputStream fos = new FileOutputStream(worldTar);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         } catch (IOException e)
         {
@@ -207,50 +209,20 @@ public class GameAdaptator implements Listener
             e.printStackTrace();
         }
 
-        return this.extractWorld(worldZip, worldDir);
+        return this.extractWorld(worldTar, worldDir);
     }
 
-    private boolean extractWorld(File worldZip, File worldDir)
+    private boolean extractWorld(File worldTar, File worldDir)
     {
-        if (worldDir.exists() && !worldDir.delete())
-        {
-            plugin.getLogger().severe("World cannot be removed! This is a critical error!");
-        }
-
+        Archiver archiver = ArchiverFactory.createArchiver("tar", "gz");
         try
         {
-            ZipFile zipFile = new ZipFile(worldZip);
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements())
-            {
-                ZipEntry entry = entries.nextElement();
-                File entryDestination = new File(worldDir.getParent(), entry.getName());
-                if (entry.isDirectory())
-                {
-                    if (!entryDestination.mkdirs())
-                    {
-                        plugin.getLogger().warning("Cannot create directory " + entryDestination);
-                    }
-                } else
-                {
-                    if (!entryDestination.getParentFile().mkdirs())
-                    {
-                        plugin.getLogger().warning("Cannot create directory for file " + entryDestination);
-                    }
-                    InputStream in = zipFile.getInputStream(entry);
-                    OutputStream out = new FileOutputStream(entryDestination);
-                    IOUtils.copy(in, out);
-                    IOUtils.closeQuietly(in);
-                    out.close();
-                }
-            }
-            zipFile.close();
+            archiver.extract(worldTar, worldDir);
+            return true;
         } catch (IOException e)
         {
-            e.printStackTrace();
             return false;
         }
-        return true;
     }
 
 }

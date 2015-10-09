@@ -1,6 +1,7 @@
 package net.samagames.uhcrun;
 
 import com.google.gson.Gson;
+import de.schlichtherle.io.archive.tar.TarGZipDriver;
 import net.samagames.uhcrun.compatibility.GameAdaptator;
 import net.samagames.uhcrun.compatibility.GameProperties;
 import net.samagames.uhcrun.generator.FortressPopulator;

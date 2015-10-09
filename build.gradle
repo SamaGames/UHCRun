@@ -45,9 +45,23 @@ repositories {
     maven { url "http://maven.sk89q.com/repo/" }
 }
 
+configurations {
+    bundle {
+
+    }
+    compile {
+        extendsFrom bundle
+    }
+}
+
 configurations.all {
     // check for updates every build
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+jar {
+    from { configurations.bundle.collect { it.isDirectory() ? it : zipTree(it) } }
+    include '**'
 }
 
 dependencies {
@@ -60,4 +74,5 @@ dependencies {
         exclude module: 'bukkit-classloader-check'
     }
     compile group: 'net.samagames', name: 'PermissionsAPI', version: '2.0.0-SNAPSHOT', changing: true
+    bundle 'org.rauschig:jarchivelib:0.7.1'
 }
