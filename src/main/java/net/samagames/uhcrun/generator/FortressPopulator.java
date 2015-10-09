@@ -48,6 +48,7 @@ public class FortressPopulator extends BlockPopulator
     private CuboidClipboard netherHouse, netherFortress;
     private Random random;
     private EditSession es;
+    private boolean isFortess;
 
     public FortressPopulator(UHCRun plugin, List<Map<String, Object>> netherChestLoots)
     {
@@ -90,9 +91,9 @@ public class FortressPopulator extends BlockPopulator
         {
             return;
         }
-        int i = MathHelper.nextInt(random, 0, 1);
-        CuboidClipboard clipboard = i == 0 ? netherHouse : netherFortress;
-        generateCuboid(clipboard, world, x, z);
+        
+        this.isFortess = !isFortess;
+        generateCuboid(isFortess ? netherFortress : netherFortress, world, x, z);
 
     }
 
