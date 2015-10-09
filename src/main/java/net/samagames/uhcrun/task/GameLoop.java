@@ -175,7 +175,7 @@ public class GameLoop implements Runnable
                 }
                 if (this.nextEvent != null)
                 {
-                    ActionBarAPI.sendMessage(player, ChatColor.BOLD + this.nextEvent.string + this.nextEvent.color + " dans " + this.toString(this.nextEvent.seconds == 0 ? this.nextEvent.minutes - 1 : this.nextEvent.minutes, this.nextEvent.seconds == 0 ? 59 : this.nextEvent.seconds - 1));
+                    ActionBarAPI.sendMessage(player, this.nextEvent.string + ChatColor.BOLD + this.nextEvent.color + " dans " + this.toString(this.nextEvent.seconds == 0 ? this.nextEvent.minutes - 1 : this.nextEvent.minutes, this.nextEvent.seconds == 0 ? 59 : this.nextEvent.seconds - 1));
                 }
 
                 UHCPlayer uhcPlayer = this.game.getPlayer(player);
@@ -187,7 +187,10 @@ public class GameLoop implements Runnable
                     lastLine += 2;
                 }
 
-                objective.setLine(lastLine + 1, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.toString(this.minutes, this.seconds));
+                objective.setLine(lastLine + 1, ChatColor.GRAY + "Bordure :");
+                objective.setLine(lastLine + 2, ChatColor.WHITE + "-" + (int) world.getWorldBorder().getSize() / 2 + " +" + (int) world.getWorldBorder().getSize() / 2);
+                objective.setLine(lastLine + 3, ChatColor.RED + " ");
+                objective.setLine(lastLine + 4, ChatColor.GRAY + "Temps : " + ChatColor.WHITE + this.toString(this.minutes, this.seconds));
                 objective.updateLines();
                 server.getScheduler().runTaskAsynchronously(plugin, objective::updateLines);
             }
