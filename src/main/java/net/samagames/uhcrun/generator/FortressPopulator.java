@@ -93,7 +93,7 @@ public class FortressPopulator extends BlockPopulator
         }
         
         this.isFortess = !isFortess;
-        generateCuboid(isFortess ? netherFortress : netherFortress, world, x, z);
+        generateCuboid(isFortess ? netherFortress : netherHouse, world, x, z);
 
     }
 

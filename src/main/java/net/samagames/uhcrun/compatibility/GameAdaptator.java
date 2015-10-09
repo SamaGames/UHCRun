@@ -12,7 +12,6 @@ import net.samagames.uhcrun.game.SoloGame;
 import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.listener.*;
-import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -28,9 +27,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Created by Thog9 on 25/08/2015.
