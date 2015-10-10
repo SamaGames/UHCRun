@@ -213,7 +213,7 @@ public class GameAdaptator implements Listener
         Archiver archiver = ArchiverFactory.createArchiver("tar", "gz");
         try
         {
-            archiver.extract(worldTar, worldDir);
+            archiver.extract(worldTar, worldDir.getParentFile());
             return true;
         } catch (IOException e)
         {
