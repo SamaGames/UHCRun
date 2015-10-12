@@ -162,7 +162,7 @@ public class GameAdaptator implements Listener
                 boolean result = this.extractWorld(worldTar, worldDir);
                 try
                 {
-                    worldStorageURL = new URL(worldStorage + "clean.php?name=" + mapID);
+                    worldStorageURL = new URL(worldStorage.getAsString() + "clean.php?name=" + mapID);
                     URLConnection connection = worldStorageURL.openConnection();
                     connection.connect();
                 } catch (IOException e)
@@ -185,7 +185,7 @@ public class GameAdaptator implements Listener
 
         try
         {
-            worldStorageURL = new URL(worldStorage + "download.php?name=" + mapID);
+            worldStorageURL = new URL(worldStorage.getAsString() + "download.php?name=" + mapID);
             ReadableByteChannel rbc = Channels.newChannel(worldStorageURL.openStream());
             FileOutputStream fos = new FileOutputStream(worldTar);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
@@ -197,7 +197,7 @@ public class GameAdaptator implements Listener
 
         try
         {
-            worldStorageURL = new URL(worldStorage + "clean.php?name=" + mapID);
+            worldStorageURL = new URL(worldStorage.getAsString() + "clean.php?name=" + mapID);
             URLConnection connection = worldStorageURL.openConnection();
             connection.connect();
         } catch (IOException e)
