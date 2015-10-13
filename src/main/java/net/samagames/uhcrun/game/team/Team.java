@@ -1,6 +1,6 @@
 package net.samagames.uhcrun.game.team;
 
-import net.samagames.tools.chat.FancyMessage;
+import net.samagames.tools.chat.fanciful.FancyMessage;
 import net.samagames.uhcrun.game.TeamGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

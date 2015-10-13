@@ -2,7 +2,7 @@ package net.samagames.uhcrun.gui;
 
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.TileEntitySign;
-import net.samagames.tools.chat.FancyMessage;
+import net.samagames.tools.chat.fanciful.FancyMessage;
 import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.game.team.Team;

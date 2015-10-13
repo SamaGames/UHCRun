@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -125,7 +126,7 @@ public class TeamSelector implements Listener
         gui.display(player);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event)
     {
 
@@ -136,11 +137,17 @@ public class TeamSelector implements Listener
 
         if (event.getMessage().startsWith("!"))
         {
+            event.setCancelled(true);
             String message = event.getMessage().substring(1);
             Team team = game.getPlayerTeam(event.getPlayer().getUniqueId());
             if (team != null)
             {
-                event.setFormat(team.getChatColor() + "[" + team.getTeamName() + "] " + event.getPlayer().getName() + " : " + ChatColor.WHITE + message);
+                event.setCancelled(true);
+                Collection<? extends Player> players = game.getPlugin().getServer().getOnlinePlayers();
+                for (Player player : players)
+                {
+                    player.sendMessage(team.getChatColor() + "[" + team.getTeamName() + "] " + event.getPlayer().getName() + " : " + ChatColor.WHITE + message);
+                }
             }
         } else
         {
