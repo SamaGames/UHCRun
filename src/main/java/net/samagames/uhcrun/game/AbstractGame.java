@@ -222,13 +222,13 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
 
             this.checkStump(player);
 
-            player.setGameMode(GameMode.SPECTATOR);
-            player.setHealth(20.0D);
             if (!logout)
             {
                 this.increaseStat(player.getUniqueId(), "deaths", 1);
                 Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
                 removeFromGame(player.getUniqueId());
+                player.setGameMode(GameMode.SPECTATOR);
+                player.setHealth(20.0D);
             }
         }
     }

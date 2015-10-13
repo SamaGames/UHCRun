@@ -87,7 +87,7 @@ public class SpectatorListener implements Listener
         {
             event.setCancelled(true);
             event.getPlayer().teleport(game.getPlugin().getSpawnLocation());
-            event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Mais où vous allez comme ça ?!");
+            event.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Mais où allez vous comme ça ?!");
         }
     }
 
