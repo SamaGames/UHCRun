@@ -42,6 +42,9 @@ public class UHCPlayer extends GamePlayer
         {
             player.setGameMode(GameMode.ADVENTURE);
             player.teleport(game.getPlugin().getSpawnLocation());
+            player.getInventory().setItem(8, this.getLeaveDoor());
+            player.getInventory().setHeldItemSlot(0);
+            player.updateInventory();
             if (game instanceof TeamGame)
             {
                 ItemStack star = new ItemStack(Material.NETHER_STAR);
@@ -49,12 +52,22 @@ public class UHCPlayer extends GamePlayer
                 starMeta.setDisplayName(ChatColor.GOLD + "Sélectionner une équipe");
                 star.setItemMeta(starMeta);
                 player.getInventory().setItem(4, star);
+                player.getInventory().setHeldItemSlot(4);
             }
         } else
         {
             game.rejoin(player, false);
         }
 
+    }
+
+    public ItemStack getLeaveDoor()
+    {
+        ItemStack leveldoor = new ItemStack(Material.WOOD_DOOR, 1);
+        ItemMeta levelMeta = leveldoor.getItemMeta();
+        levelMeta.setDisplayName(org.bukkit.ChatColor.GOLD + "Quitter le jeu " + org.bukkit.ChatColor.GRAY + "(Clique-Droit)");
+        leveldoor.setItemMeta(levelMeta);
+        return leveldoor;
     }
 
     @Override

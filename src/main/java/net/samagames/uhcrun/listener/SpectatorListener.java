@@ -1,12 +1,15 @@
 package net.samagames.uhcrun.listener;
 
 import net.md_5.bungee.api.ChatColor;
+import net.samagames.api.SamaGamesAPI;
 import net.samagames.api.games.Status;
 import net.samagames.uhcrun.game.AbstractGame;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -109,6 +112,15 @@ public class SpectatorListener implements Listener
         if (e.getEntity() instanceof Player)
         {
             e.setCancelled(cancel((Player) e.getEntity()));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerInteract(PlayerInteractEvent event)
+    {
+        if (game.getStatus() != Status.IN_GAME && event.getMaterial().equals(Material.WOOD_DOOR) && (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_AIR)))
+        {
+            SamaGamesAPI.get().getGameManager().kickPlayer(event.getPlayer(), "");
         }
     }
 

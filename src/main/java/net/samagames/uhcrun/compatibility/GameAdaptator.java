@@ -13,6 +13,7 @@ import net.samagames.uhcrun.game.TeamGame;
 import net.samagames.uhcrun.generator.LobbyPopulator;
 import net.samagames.uhcrun.listener.*;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -96,6 +97,7 @@ public class GameAdaptator implements Listener
     {
         if (game == null || game.getStatus() == Status.WAITING_FOR_PLAYERS)
         {
+            event.getPlayer().setGameMode(GameMode.ADVENTURE);
             event.getPlayer().teleport(plugin.getSpawnLocation());
         }
     }
