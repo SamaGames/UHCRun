@@ -143,7 +143,7 @@ public class BlockListener implements Listener
                 blocksOwner.remove(event.getBlock().getLocation());
             } else if (!game.isPvpEnabled())
             {
-                event.getPlayer().sendMessage(ChatColor.RED + "Ce block appartient à " + blocksOwner.get(event.getBlock().getLocation())  + ". Vous ne pouvez pas le casser durant la préparation !");
+                event.getPlayer().sendMessage(ChatColor.RED + "Ce block appartient à " + Bukkit.getOfflinePlayer(blocksOwner.get(event.getBlock().getLocation())).getName()  + ". Vous ne pouvez pas le casser durant la préparation !");
                 event.setCancelled(true);
             }
         }

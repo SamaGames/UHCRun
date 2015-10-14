@@ -53,7 +53,7 @@ public class ChunkListener implements Runnable, Listener
         for (Map.Entry<Chunk, Long> entry : lastChunkCleanUp.entrySet())
         {
             Chunk chunk = entry.getKey();
-            if (!chunk.isLoaded() || (currentTime - entry.getValue() <= 40000))
+            if (!chunk.isLoaded() || (currentTime - entry.getValue() <= 60000))
             {
                 continue;
             }
