@@ -33,7 +33,7 @@ public class ChunkListener implements Runnable, Listener
         Bukkit.getScheduler().runTaskTimer(plugin, this, 20, 200);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChunkUnload(final ChunkUnloadEvent event)
     {
         if (!lastChunkCleanUp.containsKey(event.getChunk()))
