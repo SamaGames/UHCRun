@@ -378,12 +378,7 @@ public class GameListener implements Listener
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event)
     {
-
-        int x = event.getBlockPlaced().getX();
-        int y = event.getBlockPlaced().getY();
-        int z = event.getBlockPlaced().getZ();
-
-        if (x > -50 && x < 50 && z > -50 && z < 50 && y > WorldLoader.getHighestNaturalBlockAt(x, z) + 17)
+        if (event.getBlockPlaced().getY() > WorldLoader.getHighestNaturalBlockAt(event.getBlockPlaced().getX(), event.getBlockPlaced().getZ()) + 15)
         {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + "Towers" + ChatColor.DARK_RED + "] " + ChatColor.RED + "Les Towers sont interdites en UHCRun.");

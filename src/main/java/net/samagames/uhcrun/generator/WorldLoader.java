@@ -3,11 +3,10 @@ package net.samagames.uhcrun.generator;
 import net.samagames.uhcrun.UHCRun;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This file is a part of the SamaGames Project CodeBase
@@ -18,7 +17,6 @@ import java.util.Map;
  */
 public class WorldLoader
 {
-    private static Map<int[], Integer> highestBlocks = new HashMap<>();
     private BukkitTask task;
     private int lastShow = -1;
     private int numberChunk;
@@ -31,14 +29,7 @@ public class WorldLoader
 
     public static Integer getHighestNaturalBlockAt(int x, int z)
     {
-        final int[] loc = new int[]{x, z};
-
-        if (highestBlocks.containsKey(loc))
-        {
-            return highestBlocks.get(loc);
-        }
-
-        return 255;
+        return Pos.getY(x, z);
     }
 
     public void begin(final World world)
@@ -88,17 +79,64 @@ public class WorldLoader
 
     public void computeTop(World world)
     {
-        int x = -50;
-        while (x < 50)
+        int x = -500;
+        while (x < 500)
         {
-            int z = -50;
-            while (z < 50)
+            int z = -500;
+            while (z < 500)
             {
-                Block block = world.getHighestBlockAt(x, z);
-                highestBlocks.put(new int[]{x, z}, block.getY());
+                Pos.registerY(x, world.getHighestBlockYAt(x, z), z);
                 z++;
             }
             x++;
+        }
+    }
+
+
+    private static final class Pos
+    {
+        private static List<Pos> highestBlocks = new ArrayList<>();
+        int x, y, z;
+
+        Pos(int x, int y, int z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+
+        public int getX()
+        {
+            return x;
+        }
+
+        public int getY()
+        {
+            return y;
+        }
+
+        public int getZ()
+        {
+            return z;
+        }
+
+        public static int getY(int x, int z)
+        {
+            for (Pos pos : highestBlocks)
+            {
+                if (pos.getX() == x && pos.getZ() == z)
+                {
+                    return pos.getY();
+                }
+            }
+
+            return 255;
+        }
+
+        public static void registerY(int x, int y, int z)
+        {
+            highestBlocks.add(new Pos(x, y, z));
         }
     }
 }

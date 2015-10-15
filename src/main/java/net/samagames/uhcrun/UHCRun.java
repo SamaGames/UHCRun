@@ -220,7 +220,10 @@ public class UHCRun extends JavaPlugin implements Listener
         logger.info("Ready in " + time + "ms");
         if (adaptator != null)
         {
+            long lastTime = System.currentTimeMillis();
+            logger.info("Computing world top for tower detection...");
             worldLoader.computeTop(world);
+            logger.info("Compute done in " + (System.currentTimeMillis() - lastTime) + " ms");
             adaptator.loadEnd();
         } else
         {
