@@ -1,6 +1,7 @@
 package net.samagames.uhcrun.game;
 
 import com.google.gson.JsonPrimitive;
+import net.minecraft.server.v1_8_R3.MathHelper;
 import net.samagames.api.games.IGameProperties;
 import net.samagames.api.games.Status;
 import net.samagames.api.games.themachine.ICoherenceMachine;
@@ -26,6 +27,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -40,7 +42,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     protected final UHCRun plugin;
     protected final GameAdaptator adaptator;
     protected final Server server;
-    protected final Random rand;
+    protected final SecureRandom rand;
     protected final List<Location> spawnPoints;
     protected final TreeMap<UUID, UHCPlayer> prevInGame;
     private final int maxSpawnLocations;
@@ -62,7 +64,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
         this.plugin = plugin;
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
-        this.rand = new Random();
+        this.rand = new SecureRandom();
         this.maxSpawnLocations = properties.getMaxSlots();
         this.spawnPoints = new ArrayList<>();
         this.prevInGame = new TreeMap<>();
@@ -86,7 +88,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     {
         for (int i = 0; i < maxSpawnLocations; i++)
         {
-            final Location randomLocation = new Location(world, -500 + rand.nextInt(500 - (-500) + 1), 150, -500 + rand.nextInt(500 - (-500) + 1));
+            final Location randomLocation = new Location(world, MathHelper.nextInt(rand, -450, 450), 150, MathHelper.nextInt(rand, -450, 450));
             for (int y = 0; y < 16; y++)
             {
                 world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
