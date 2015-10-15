@@ -21,6 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -397,6 +398,20 @@ public class GameListener implements Listener
             // Force client update to avoid sync problems when cancelled
             event.getPlayer().getItemInHand().setType(Material.LAVA_BUCKET);
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onSignChange(SignChangeEvent e)
+    {
+        for (int i = 0; i < 4; i++) {
+            if (e.getLine(i).matches("^[a-zA-Z0-9ÀÁÂÄÇÈÉÊËÌÍÎÏÒÓÔÖÙÚÛÜàáâäçèéêëîïôöûü &]*$"))
+            {
+                if (e.getLine(i).length() > 20)
+                {
+                    e.setCancelled(true);
+                }
+            }
         }
     }
 }

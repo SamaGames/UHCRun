@@ -156,6 +156,7 @@ public class UHCRun extends JavaPlugin implements Listener
 
     private void setupNormalWorld(World world)
     {
+        getServer().setSpawnRadius(0); // Disable Spawn Protection
         try
         {
             NMSPatcher patcher = new NMSPatcher(properties);
