@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -25,7 +26,7 @@ public class Team
 {
 
     private int maxSize = -1;
-    private final ArrayList<UUID> players;
+    private final CopyOnWriteArrayList<UUID> players;
     private final TeamGame game;
     private final ItemStack icon;
     private final DyeColor color;
@@ -39,7 +40,7 @@ public class Team
     {
         this.game = game;
         this.teamName = name;
-        this.players = new ArrayList<>();
+        this.players = new CopyOnWriteArrayList<>();
         this.color = color;
         this.chatColor = chatColor;
         this.icon = new ItemStack(Material.WOOL, 1, color.getData());
@@ -111,7 +112,7 @@ public class Team
         return players.contains(player);
     }
 
-    public ArrayList<UUID> getPlayersUUID()
+    public CopyOnWriteArrayList<UUID> getPlayersUUID()
     {
         return players;
     }
