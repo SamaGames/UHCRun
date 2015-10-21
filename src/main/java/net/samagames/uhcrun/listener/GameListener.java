@@ -82,9 +82,9 @@ public class GameListener implements Listener
             } else if (damager instanceof Projectile)
             {
                 Projectile arrow = (Projectile) damager;
-                Entity shooter = (Entity) arrow.getShooter();
-                if (shooter instanceof Player)
+                if (arrow.getShooter() instanceof Player)
                 {
+                    Player shooter = (Player) arrow.getShooter();
                     if (!game.isPvpEnabled() || (game instanceof TeamGame && ((TeamGame) game).getPlayerTeam(shooter.getUniqueId()).hasPlayer(damaged.getUniqueId())))
                     {
                         event.setCancelled(true);
