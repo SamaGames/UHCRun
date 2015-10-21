@@ -36,7 +36,7 @@ public class TeamGame extends AbstractGame
     public TeamGame(UHCRun plugin, int nbByTeam)
     {
         super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties());
-
+        this.beginObj.setTimeStart(60);
         this.personsPerTeam = nbByTeam;
         try
         {
