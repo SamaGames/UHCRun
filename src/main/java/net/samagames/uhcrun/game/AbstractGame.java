@@ -111,7 +111,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     protected void removeFromGame(UUID uuid)
     {
         UHCPlayer player = this.gamePlayers.get(uuid);
-        if (player != null && player.getPlayerIfOnline() != null)
+        if (player != null)
         {
             player.setSpectator();
         }
@@ -219,12 +219,11 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
             }
 
             this.checkStump(player);
-
+            removeFromGame(player.getUniqueId());
             if (!logout)
             {
                 this.increaseStat(player.getUniqueId(), "deaths", 1);
                 Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
-                removeFromGame(player.getUniqueId());
                 player.setGameMode(GameMode.SPECTATOR);
                 player.setHealth(20.0D);
             }
