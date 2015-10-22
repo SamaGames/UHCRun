@@ -1,6 +1,8 @@
 package net.samagames.uhcrun;
 
 import com.google.gson.Gson;
+import com.sk89q.bukkit.util.DynamicPluginCommand;
+import net.samagames.tools.Reflection;
 import net.samagames.uhcrun.compatibility.GameAdaptator;
 import net.samagames.uhcrun.compatibility.GameProperties;
 import net.samagames.uhcrun.generator.FortressPopulator;
@@ -11,6 +13,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.command.Command;
+import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 /**
@@ -54,6 +60,14 @@ public class UHCRun extends JavaPlugin implements Listener
     public static UHCRun getInstance()
     {
         return (UHCRun) Bukkit.getServer().getPluginManager().getPlugin("UHCRun");
+    }
+
+    private void removeCommand(String str) throws NoSuchFieldException, IllegalAccessException
+    {
+        SimpleCommandMap scm = ((CraftServer) this.getServer()).getCommandMap();
+        Map knownCommands = (Map) Reflection.getValue(scm, true, "knownCommands");
+        System.out.println(knownCommands);
+        knownCommands.remove(str);
     }
 
     @Override
@@ -152,6 +166,36 @@ public class UHCRun extends JavaPlugin implements Listener
         worldLoader = new WorldLoader(this);
         worldLoader.begin(world);
 
+        try
+        {
+            removeWorldEditCommand();
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeWorldEditCommand() throws NoSuchFieldException, IllegalAccessException
+    {
+        SimpleCommandMap scm = ((CraftServer) Bukkit.getServer()).getCommandMap();
+        Map<String, Command> knownCommands = (Map) net.samagames.tools.Reflection.getValue(scm, true, "knownCommands");
+        List<String> toRemove = new ArrayList<>();
+
+        for (Map.Entry<String, Command> entry : knownCommands.entrySet())
+        {
+            if (entry.getValue() instanceof DynamicPluginCommand)
+            {
+                toRemove.add(entry.getKey());
+            }
+        }
+
+        for (String remove : toRemove)
+        {
+            knownCommands.remove(remove);
+        }
     }
 
     private void setupNormalWorld(World world)
