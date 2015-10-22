@@ -401,7 +401,6 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     @Override
     public void handleReconnectTimeOut(Player player)
     {
-        this.setSpectator(player);
         this.stumpPlayer(player, true);
     }
 
