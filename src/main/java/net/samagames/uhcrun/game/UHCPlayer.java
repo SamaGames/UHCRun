@@ -96,9 +96,6 @@ public class UHCPlayer extends GamePlayer
                         w.dropItemNaturally(time, stack);
                     }
                 }
-            } else
-            {
-                game.getCoherenceMachine().getMessageManager().writePlayerQuited(player);
             }
         }
     }

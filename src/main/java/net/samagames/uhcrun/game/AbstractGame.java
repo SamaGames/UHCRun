@@ -182,10 +182,6 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
                 ObjectiveSign sign = new ObjectiveSign("sggameloop", ChatColor.GOLD + "" + ChatColor.ITALIC + ChatColor.BOLD + "= UHCRun =");
                 sign.addReceiver(thePlayer);
                 this.gameLoop.addPlayer(thePlayer.getUniqueId(), sign);
-                if (!isModerator)
-                {
-                    messageManager.writePlayerReconnected(thePlayer);
-                }
             }, 10L);
 
         }
@@ -213,7 +209,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
 
             if (logout)
             {
-                messageManager.writePlayerQuited(player);
+                messageManager.writePlayerReconnectTimeOut(player);
             } else if (killer != null)
             {
                 server.broadcastMessage(this.coherenceMachine.getGameTag() + " " + player.getDisplayName() + ChatColor.GOLD + " a été tué par " + killer.getDisplayName());
@@ -400,6 +396,13 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     {
         this.interrupt();
         super.handleGameEnd();
+    }
+
+    @Override
+    public void handleReconnectTimeOut(Player player)
+    {
+        this.setSpectator(player);
+        this.stumpPlayer(player, true);
     }
 
     public void interrupt()
