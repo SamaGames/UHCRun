@@ -83,6 +83,7 @@ public class GameLoop implements Runnable
             public void run()
             {
                 game.disableDamages();
+                game.getAdaptator().getAPI().getGameManager().setMaxReconnectTime(-1); // HACK: Does that is needed?!
                 game.teleportDeathMatch();
                 int size = game.getDeathMatchSize();
                 int border = size / 2;
