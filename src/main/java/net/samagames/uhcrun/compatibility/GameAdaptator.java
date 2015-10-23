@@ -60,7 +60,7 @@ public class GameAdaptator implements Listener
         }
 
         samaGamesAPI.getGameManager().registerGame(game);
-        samaGamesAPI.getGameManager().setMaxReconnectTime(game.getReductionTime());
+        samaGamesAPI.getGameManager().setMaxReconnectTime(game.getPreparingTime() + 1);
         pluginManager.registerEvents(new SpectatorListener(game), plugin);
         pluginManager.registerEvents(new GameListener(game), plugin);
         pluginManager.registerEvents(new CompassTargeter(this), plugin);

@@ -33,9 +33,7 @@ public class SoloGame extends AbstractGame
         if (getInGamePlayers().size() == 3)
         {
             playerData.addCoins(20, "Troisième au classement !");
-        }
-
-        if (getInGamePlayers().size() == 2)
+        } else if (getInGamePlayers().size() == 2)
         {
             playerData.addCoins(50, "Second au classement !");
             playerData.addStars(1, "Second au classement !");
