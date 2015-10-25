@@ -268,6 +268,8 @@ public class UHCRun extends JavaPlugin implements Listener
             logger.info("Computing world top for tower detection...");
             worldLoader.computeTop(world);
             logger.info("Compute done in " + (System.currentTimeMillis() - lastTime) + " ms");
+            logger.info("Force apply annimals spawning in world...");
+            logger.info("Done!");
             adaptator.loadEnd();
         } else
         {

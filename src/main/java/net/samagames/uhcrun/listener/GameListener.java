@@ -282,9 +282,10 @@ public class GameListener implements Listener
     public void onDeath(EntityDeathEvent event)
     {
         LivingEntity entity = event.getEntity();
+        List<ItemStack> newDrops = null;
         if (entity instanceof Cow || entity instanceof Horse)
         {
-            List<ItemStack> newDrops = new ArrayList<>();
+            newDrops = new ArrayList<>();
             for (ItemStack stack : event.getDrops())
             {
                 if (stack.getType() == Material.RAW_BEEF)
@@ -295,11 +296,9 @@ public class GameListener implements Listener
                     newDrops.add(new ItemStack(Material.LEATHER, stack.getAmount() * 2));
                 }
             }
-            event.getDrops().clear();
-            event.getDrops().addAll(newDrops);
         } else if (entity instanceof Sheep)
         {
-            List<ItemStack> newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.MUTTON).map(stack -> new ItemStack(Material.COOKED_MUTTON, stack.getAmount() * 2)).collect(Collectors.toList());
+            newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.MUTTON).map(stack -> new ItemStack(Material.COOKED_MUTTON, stack.getAmount() * 2)).collect(Collectors.toList());
             if (random.nextInt(32) >= 16)
             {
                 newDrops.add(new ItemStack(Material.LEATHER, random.nextInt(5) + 1));
@@ -308,25 +307,19 @@ public class GameListener implements Listener
             {
                 newDrops.add(new ItemStack(Material.STRING, random.nextInt(2) + 1));
             }
-            event.getDrops().clear();
-            event.getDrops().addAll(newDrops);
         } else if (entity instanceof Pig)
         {
-            List<ItemStack> newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.PORK).map(stack -> new ItemStack(Material.GRILLED_PORK, stack.getAmount() * 2)).collect(Collectors.toList());
+            newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.PORK).map(stack -> new ItemStack(Material.GRILLED_PORK, stack.getAmount() * 2)).collect(Collectors.toList());
             if (random.nextInt(32) >= 16)
             {
                 newDrops.add(new ItemStack(Material.LEATHER, random.nextInt(5) + 1));
             }
-            event.getDrops().clear();
-            event.getDrops().addAll(newDrops);
         } else if (entity instanceof Rabbit)
         {
-            List<ItemStack> newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.RABBIT).map(stack -> new ItemStack(Material.COOKED_RABBIT, stack.getAmount() * 2)).collect(Collectors.toList());
-            event.getDrops().clear();
-            event.getDrops().addAll(newDrops);
+            newDrops = event.getDrops().stream().filter(stack -> stack.getType() == Material.RABBIT).map(stack -> new ItemStack(Material.COOKED_RABBIT, stack.getAmount() * 2)).collect(Collectors.toList());
         } else if (entity instanceof Chicken)
         {
-            List<ItemStack> newDrops = new ArrayList<>();
+            newDrops = new ArrayList<>();
             for (ItemStack stack : event.getDrops())
             {
                 if (stack.getType() == Material.RAW_CHICKEN)
@@ -337,20 +330,13 @@ public class GameListener implements Listener
                     newDrops.add(new ItemStack(Material.ARROW, stack.getAmount()));
                 }
             }
-            event.getDrops().clear();
-            event.getDrops().addAll(newDrops);
         } else if (entity instanceof Squid)
         {
-            List<ItemStack> newDrops = new ArrayList<>();
-            if (random.nextInt(32) >= 8)
-            {
-                newDrops.add(new ItemStack(Material.COOKED_FISH, random.nextInt(5) + 1));
-            }
-            event.getDrops().clear();
-            event.getDrops().addAll(newDrops);
+            newDrops = new ArrayList<>();
+            newDrops.add(new ItemStack(Material.COOKED_FISH, random.nextInt(5) + 1));
         } else if (entity instanceof Skeleton)
         {
-            List<ItemStack> newDrops = new ArrayList<>();
+            newDrops = new ArrayList<>();
             for (ItemStack stack : event.getDrops())
             {
                 if (stack.getType() == Material.ARROW)
@@ -363,10 +349,13 @@ public class GameListener implements Listener
                     newDrops.add(stack);
                 }
             }
+
+        }
+        if (newDrops != null)
+        {
             event.getDrops().clear();
             event.getDrops().addAll(newDrops);
         }
-
         event.setDroppedExp(event.getDroppedExp() * 2);
     }
 

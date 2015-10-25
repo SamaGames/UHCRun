@@ -1,6 +1,8 @@
 package net.samagames.uhcrun.game;
 
 import com.google.gson.JsonPrimitive;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.SpawnerCreature;
 import net.samagames.api.games.IGameProperties;
 import net.samagames.api.games.Status;
 import net.samagames.api.games.themachine.ICoherenceMachine;
@@ -108,6 +110,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
         spawnPoints.add(new Location(world, -400, 150, 400));
         spawnPoints.add(new Location(world, 400, 150, -400));
         spawnPoints.add(new Location(world, 200, 150, -200));
+        Collections.shuffle(spawnPoints);
     }
 
     @Override
@@ -172,7 +175,13 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
             sign.addReceiver(player);
             gameLoop.addPlayer(player.getUniqueId(), sign);
         }
+
         server.getPluginManager().registerEvents(new ChunkListener(plugin), plugin);
+        SpawnerCreature spawner = new SpawnerCreature();
+        for (int i = 0; i < 3; i++)
+        {
+            spawner.a(MinecraftServer.getServer().getWorldServer(0), false, true, true); // Force spawning of passive annimals
+        }
     }
 
     @Override

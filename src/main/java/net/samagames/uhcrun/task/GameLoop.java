@@ -38,7 +38,7 @@ public class GameLoop implements Runnable
         this.plugin = plugin;
         this.server = server;
         this.world = server.getWorld("world");
-        this.nextEvent = new GameLoop.TimedEvent(1, 0, ChatColor.GOLD + "Dégats actifs", ChatColor.GOLD)
+        this.nextEvent = new GameLoop.TimedEvent(1, 0, "Dégats actifs", ChatColor.GOLD)
         {
             @Override
             public void run()
@@ -77,7 +77,7 @@ public class GameLoop implements Runnable
 
     private void createReductionEvent()
     {
-        this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, ChatColor.RED + "Téléportation", ChatColor.RED)
+        this.nextEvent = new GameLoop.TimedEvent(this.game.getPreparingTime() - 1, 0, "Téléportation", ChatColor.RED)
         {
             @Override
             public void run()
@@ -107,7 +107,7 @@ public class GameLoop implements Runnable
                 server.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite en " + size + " * " + size);
                 server.broadcastMessage(ChatColor.GOLD + "Les bordures sont en coordonnées " + ChatColor.RED + "-" + border + " +" + border);
                 server.broadcastMessage(ChatColor.GOLD + "Les dégats et le PVP seront activés dans 30 secondes !");
-                nextEvent = new GameLoop.TimedEvent(0, 30, ChatColor.RED + "PVP Activé", ChatColor.RED)
+                nextEvent = new GameLoop.TimedEvent(0, 30, "PVP Activé", ChatColor.RED)
                 {
                     @Override
                     public void run()
@@ -122,7 +122,7 @@ public class GameLoop implements Runnable
                             public void run()
                             {
                                 server.broadcastMessage(ChatColor.GOLD + "La map est désormais réduite. Fin de partie forcée dans 2 minutes.");
-                                nextEvent = new GameLoop.TimedEvent(2, 0, ChatColor.RED + "Fin de partie", ChatColor.RED)
+                                nextEvent = new GameLoop.TimedEvent(2, 0, "Fin de partie", ChatColor.RED)
                                 {
                                     @Override
                                     public void run()
@@ -176,7 +176,7 @@ public class GameLoop implements Runnable
                 }
                 if (this.nextEvent != null)
                 {
-                    ActionBarAPI.sendMessage(player, this.nextEvent.string + ChatColor.BOLD + this.nextEvent.color + " dans " + this.toString(this.nextEvent.seconds == 0 ? this.nextEvent.minutes - 1 : this.nextEvent.minutes, this.nextEvent.seconds == 0 ? 59 : this.nextEvent.seconds - 1));
+                    ActionBarAPI.sendMessage(player, this.nextEvent.color.toString() +  this.nextEvent.string + " dans " + this.toString(this.nextEvent.seconds == 0 ? this.nextEvent.minutes - 1 : this.nextEvent.minutes, this.nextEvent.seconds == 0 ? 59 : this.nextEvent.seconds - 1));
                 }
 
                 UHCPlayer uhcPlayer = this.game.getPlayer(player);
