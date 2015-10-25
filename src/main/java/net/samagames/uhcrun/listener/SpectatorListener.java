@@ -83,7 +83,7 @@ public class SpectatorListener implements Listener
         e.setCancelled(cancel(e.getPlayer()));
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event)
     {
         if ((game.getStatus() == Status.STARTING || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125)

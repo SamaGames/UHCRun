@@ -23,7 +23,7 @@ public class SoloGame extends AbstractGame
 
     public SoloGame(UHCRun plugin)
     {
-        super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties());
+        super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties(), plugin.getAdaptator().getAPI().getGameManager().getGameProperties().getMaxSlots());
     }
 
     @Override

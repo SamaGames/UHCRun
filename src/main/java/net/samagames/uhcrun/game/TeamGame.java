@@ -6,16 +6,10 @@ import net.samagames.uhcrun.UHCRun;
 import net.samagames.uhcrun.game.team.Team;
 import net.samagames.uhcrun.game.team.TeamList;
 import net.samagames.uhcrun.game.team.TeamSelector;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -35,7 +29,7 @@ public class TeamGame extends AbstractGame
 
     public TeamGame(UHCRun plugin, int nbByTeam)
     {
-        super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties());
+        super(plugin, plugin.getAdaptator().getAPI().getGameManager().getGameProperties(), 12);
         this.personsPerTeam = nbByTeam;
         try
         {

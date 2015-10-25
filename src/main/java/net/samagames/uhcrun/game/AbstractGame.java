@@ -1,7 +1,6 @@
 package net.samagames.uhcrun.game;
 
 import com.google.gson.JsonPrimitive;
-import net.minecraft.server.v1_8_R3.MathHelper;
 import net.samagames.api.games.IGameProperties;
 import net.samagames.api.games.Status;
 import net.samagames.api.games.themachine.ICoherenceMachine;
@@ -45,7 +44,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     protected final SecureRandom rand;
     protected final List<Location> spawnPoints;
     protected final TreeMap<UUID, UHCPlayer> prevInGame;
-    private final int maxSpawnLocations;
+    private final int maxLocations;
     private final int minPlayers;
     private GameLoop gameLoop;
     private IMessageManager messageManager;
@@ -57,7 +56,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
     private final int deathMatchSize;
     private final int reductionTime;
 
-    public AbstractGame(UHCRun plugin , IGameProperties properties)
+    public AbstractGame(UHCRun plugin , IGameProperties properties, int maxPoint)
     {
         super("UHCRun", "UHCRun", "Vous jouez en " + properties.getMapName().replaceAll("_", " "), UHCPlayer.class);
         this.status = Status.STARTING;
@@ -65,7 +64,7 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
         this.adaptator = plugin.getAdaptator();
         this.server = plugin.getServer();
         this.rand = new SecureRandom();
-        this.maxSpawnLocations = properties.getMaxSlots();
+        this.maxLocations = maxPoint;
         this.spawnPoints = new ArrayList<>();
         this.prevInGame = new TreeMap<>();
         UHCPlayer.setGame(this);
@@ -81,24 +80,34 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
         this.scoreboard = server.getScoreboardManager().getMainScoreboard();
         this.gameLoop = new GameLoop(this, plugin, server);
         this.disableDamages();
-        this.computeSpawnLocations(world);
+        this.computeLocations(world);
     }
 
-    private void computeSpawnLocations(World world)
+    private void computeLocations(World world)
     {
-        for (int i = 0; i < maxSpawnLocations; i++)
-        {
-            final Location randomLocation = new Location(world, MathHelper.nextInt(rand, -450, 450), 150, MathHelper.nextInt(rand, -450, 450));
-            for (int y = 0; y < 16; y++)
-            {
-                world.getChunkAt(world.getBlockAt(randomLocation.getBlockX(), y * 16, randomLocation.getBlockZ())).load(true);
-            }
-
-            spawnPoints.add(randomLocation);
-        }
-
-        // Shuffle locations
-        Collections.shuffle(this.spawnPoints);
+        spawnPoints.add(new Location(world, 0, 150, 200));
+        spawnPoints.add(new Location(world, 0, 150, 400));
+        spawnPoints.add(new Location(world, 200, 150, 0));
+        spawnPoints.add(new Location(world, 400, 150, 0));
+        spawnPoints.add(new Location(world, 400, 150, 200));
+        spawnPoints.add(new Location(world, 200, 150, 400));
+        spawnPoints.add(new Location(world, 400, 150, 400));
+        spawnPoints.add(new Location(world, 200, 150, 200));
+        spawnPoints.add(new Location(world, 0, 150, -200));
+        spawnPoints.add(new Location(world, 0, 150, -400));
+        spawnPoints.add(new Location(world, -200, 150, 0));
+        spawnPoints.add(new Location(world, -400, 150, 0));
+        spawnPoints.add(new Location(world, -400, 150, -200));
+        spawnPoints.add(new Location(world, -200, 150, -400));
+        spawnPoints.add(new Location(world, -400, 150, -400));
+        spawnPoints.add(new Location(world, -200, 150, -200));
+        spawnPoints.add(new Location(world, 400, 150, -200));
+        spawnPoints.add(new Location(world, -400, 150, 200));
+        spawnPoints.add(new Location(world, 200, 150, -400));
+        spawnPoints.add(new Location(world, -200, 150, 400));
+        spawnPoints.add(new Location(world, -400, 150, 400));
+        spawnPoints.add(new Location(world, 400, 150, -400));
+        spawnPoints.add(new Location(world, 200, 150, -200));
     }
 
     @Override
