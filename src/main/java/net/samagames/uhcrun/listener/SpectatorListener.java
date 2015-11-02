@@ -86,7 +86,7 @@ public class SpectatorListener implements Listener
     @EventHandler (ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event)
     {
-        if ((game.getStatus() == Status.STARTING || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125)
+        if ((game.getStatus() == Status.READY_TO_START || game.getStatus() == Status.WAITING_FOR_PLAYERS) && event.getTo().getY() < 125)
         {
             event.setCancelled(true);
             event.getPlayer().teleport(game.getPlugin().getSpawnLocation());
