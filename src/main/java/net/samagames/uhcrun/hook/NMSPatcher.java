@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Field;
+import java.sql.Ref;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -35,9 +37,20 @@ public class NMSPatcher
         BiomeBase[] biomes = BiomeBase.getBiomes();
         Map<String, BiomeBase> biomesMap = BiomeBase.o;
         BiomeBase defaultBiome = BiomeBase.FOREST;
+        ArrayList<BiomeBase.BiomeMeta> mobs = new ArrayList<>();
+
+        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 15, 4, 4));
+        mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 15, 3, 5));
+        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 20, 10, 15));
+        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 21, 10, 15));
+        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 20, 10, 15));
+        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 6, 5, 30));
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
+        Field defaultMobField = BiomeBase.class.getDeclaredField("au");
+
         Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
+        Reflection.setFinalStatic(defaultMobField, mobs);
 
         if (properties.getOptions().containsKey("blacklistedBiomes"))
         {
