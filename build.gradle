@@ -68,10 +68,7 @@ dependencies {
     compile(group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT', changing: true) {
         transitive = false
     }
-    compile (group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version: '6.1.1-SNAPSHOT', changing: true) {
-        exclude module: 'bukkit'
-        exclude module: 'bukkit-classloader-check'
-    }
+    compile(group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version: '6.1.1-20151103.211728-1')
     compile group: 'net.samagames', name: 'PermissionsAPI', version: '2.0.0-SNAPSHOT', changing: true
     bundle 'org.rauschig:jarchivelib:0.7.1'
 }
