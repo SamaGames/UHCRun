@@ -78,16 +78,6 @@ public class UHCRun extends JavaPlugin implements Listener
         // World Loader
         pluginManager.registerEvents(this, this);
 
-        try
-        {
-            NMSPatcher patcher = new NMSPatcher(properties);
-            patcher.patchBiomes();
-            patcher.patchPotions();
-        } catch (ReflectiveOperationException e)
-        {
-            e.printStackTrace();
-        }
-
         // Copy schematics
         this.saveResource("lobby.schematic", true);
         this.saveResource("nether_1.schematic", true);
@@ -130,6 +120,16 @@ public class UHCRun extends JavaPlugin implements Listener
         } else
         {
             logger.severe("game.json does not exist! THIS SHOULD BE IMPOSSIBLE!");
+        }
+
+        try
+        {
+            NMSPatcher patcher = new NMSPatcher(properties);
+            patcher.patchBiomes();
+            patcher.patchPotions();
+        } catch (ReflectiveOperationException e)
+        {
+            e.printStackTrace();
         }
 
         if (this.adaptator != null)
