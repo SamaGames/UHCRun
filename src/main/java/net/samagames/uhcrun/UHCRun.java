@@ -78,6 +78,15 @@ public class UHCRun extends JavaPlugin implements Listener
         // World Loader
         pluginManager.registerEvents(this, this);
 
+        try
+        {
+            NMSPatcher patcher = new NMSPatcher(properties);
+            patcher.patchBiomes();
+            patcher.patchPotions();
+        } catch (ReflectiveOperationException e)
+        {
+            e.printStackTrace();
+        }
 
         // Copy schematics
         this.saveResource("lobby.schematic", true);
@@ -200,15 +209,6 @@ public class UHCRun extends JavaPlugin implements Listener
     private void setupNormalWorld(World world)
     {
         getServer().setSpawnRadius(0); // Disable Spawn Protection
-        try
-        {
-            NMSPatcher patcher = new NMSPatcher(properties);
-            patcher.patchBiomes();
-            patcher.patchPotions();
-        } catch (ReflectiveOperationException e)
-        {
-            e.printStackTrace();
-        }
 
         // Init custom ore populator
         populator = new OrePopulator();
