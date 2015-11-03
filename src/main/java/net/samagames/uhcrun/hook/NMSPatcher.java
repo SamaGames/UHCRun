@@ -47,9 +47,10 @@ public class NMSPatcher
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
         Field defaultMobField = BiomeBase.class.getDeclaredField("au");
+        defaultMobField.setAccessible(true);
 
         Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
-        Reflection.setFinalStatic(defaultMobField, mobs);
+        defaultMobField.set(defaultBiome, mobs);
 
         if (properties.getOptions().containsKey("blacklistedBiomes"))
         {
