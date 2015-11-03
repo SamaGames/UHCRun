@@ -37,15 +37,7 @@ public class NMSPatcher
         Map<String, BiomeBase> biomesMap = BiomeBase.o;
         BiomeBase defaultBiome = BiomeBase.FOREST;
 
-        addAnimalsSpawn("FOREST", BiomeBase.FOREST);
-        addAnimalsSpawn("JUNGLE", BiomeBase.JUNGLE);
-        addAnimalsSpawn("TAIGA", BiomeBase.TAIGA);
-        addAnimalsSpawn("TAIGA_HILLS", BiomeBase.TAIGA_HILLS);
-        addAnimalsSpawn("RIVER", BiomeBase.RIVER);
-        addAnimalsSpawn("BIRCH_FOREST", BiomeBase.BIRCH_FOREST);
-        addAnimalsSpawn("BIRCH_FOREST_HILLS", BiomeBase.BIRCH_FOREST_HILLS);
-        addAnimalsSpawn("DESERT", BiomeBase.DESERT);
-        addAnimalsSpawn("DESERT_HILLS", BiomeBase.DESERT_HILLS);
+        fixAnimals();
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
 
@@ -67,6 +59,7 @@ public class NMSPatcher
                 {
                     biomes[i] = defaultBiome;
                 }
+                biomes[i] = addAnimals(biomes[i]);
                 setReedsPerChunk(biomes[i], (int) Reflection.getValue(biomes[i].as, BiomeDecorator.class, true, "F") * (Integer) (properties.getOptions().getOrDefault("reedsMultiplier", 2)));
             }
         }
@@ -77,6 +70,46 @@ public class NMSPatcher
     private void setReedsPerChunk(BiomeBase biome, int value) throws NoSuchFieldException, IllegalAccessException
     {
         Reflection.setValue(biome.as, BiomeDecorator.class, true, "F", value);
+    }
+
+    public void fixAnimals() throws ReflectiveOperationException {
+        addAnimalsSpawn("PLAINS", BiomeBase.PLAINS);
+        addAnimalsSpawn("DESERT", BiomeBase.DESERT);
+        addAnimalsSpawn("EXTREME_HILLS", BiomeBase.EXTREME_HILLS);
+        addAnimalsSpawn("FOREST", BiomeBase.FOREST);
+        addAnimalsSpawn("TAIGA", BiomeBase.TAIGA);
+        addAnimalsSpawn("SWAMPLAND", BiomeBase.SWAMPLAND);
+        addAnimalsSpawn("RIVER", BiomeBase.RIVER);
+        addAnimalsSpawn("FROZEN_OCEAN", BiomeBase.FROZEN_OCEAN);
+        addAnimalsSpawn("FROZEN_RIVER", BiomeBase.FROZEN_RIVER);
+        addAnimalsSpawn("MUSHROOM_ISLAND", BiomeBase.MUSHROOM_ISLAND);
+        addAnimalsSpawn("MUSHROOM_SHORE", BiomeBase.MUSHROOM_SHORE);
+        addAnimalsSpawn("BEACH", BiomeBase.BEACH);
+        addAnimalsSpawn("DESERT_HILLS", BiomeBase.DESERT_HILLS);
+        addAnimalsSpawn("FOREST_HILLS", BiomeBase.FOREST_HILLS);
+        addAnimalsSpawn("TAIGA_HILLS", BiomeBase.TAIGA_HILLS);
+        addAnimalsSpawn("SMALL_MOUNTAINS", BiomeBase.SMALL_MOUNTAINS);
+        addAnimalsSpawn("JUNGLE", BiomeBase.JUNGLE);
+        addAnimalsSpawn("JUNGLE_HILLS", BiomeBase.JUNGLE_HILLS);
+        addAnimalsSpawn("JUNGLE_EDGE", BiomeBase.JUNGLE_EDGE);
+        addAnimalsSpawn("STONE_BEACH", BiomeBase.STONE_BEACH);
+        addAnimalsSpawn("COLD_BEACH", BiomeBase.COLD_BEACH);
+        addAnimalsSpawn("BIRCH_FOREST", BiomeBase.BIRCH_FOREST);
+        addAnimalsSpawn("BIRCH_FOREST_HILLS", BiomeBase.BIRCH_FOREST_HILLS);
+        addAnimalsSpawn("ROOFED_FOREST", BiomeBase.ROOFED_FOREST);
+        addAnimalsSpawn("COLD_TAIGA", BiomeBase.COLD_TAIGA);
+        addAnimalsSpawn("COLD_TAIGA_HILLS", BiomeBase.COLD_TAIGA_HILLS);
+        addAnimalsSpawn("MEGA_TAIGA", BiomeBase.MEGA_TAIGA);
+        addAnimalsSpawn("MEGA_TAIGA_HILLS", BiomeBase.MEGA_TAIGA_HILLS);
+        addAnimalsSpawn("EXTREME_HILLS_PLUS", BiomeBase.EXTREME_HILLS_PLUS);
+        addAnimalsSpawn("SAVANNA", BiomeBase.SAVANNA);
+        addAnimalsSpawn("SAVANNA_PLATEAU", BiomeBase.SAVANNA_PLATEAU);
+        addAnimalsSpawn("MESA", BiomeBase.MESA);
+        addAnimalsSpawn("MESA_PLATEAU_F", BiomeBase.MESA_PLATEAU_F);
+        addAnimalsSpawn("MESA_PLATEAU", BiomeBase.MESA_PLATEAU);
+        addAnimalsSpawn("FOREST", BiomeBase.FOREST);
+        addAnimalsSpawn("FOREST", BiomeBase.FOREST);
+        addAnimalsSpawn("FOREST", BiomeBase.FOREST);
     }
 
     public void addAnimalsSpawn(String name, BiomeBase biomeBase) throws ReflectiveOperationException {
@@ -96,6 +129,23 @@ public class NMSPatcher
 
         defaultMobField.set(biomeBase, mobs);
         Reflection.setFinalStatic(biome, biomeBase);
+    }
+
+    public BiomeBase addAnimals(BiomeBase biomeBase) throws NoSuchFieldException, IllegalAccessException {
+        Field defaultMobField = BiomeBase.class.getDeclaredField("au");
+        defaultMobField.setAccessible(true);
+
+        ArrayList<BiomeBase.BiomeMeta> mobs = new ArrayList<>();
+
+        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 15, 10, 10));
+        mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 4, 3, 5));
+        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 15, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 20, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 15, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 5, 5, 30));
+
+        defaultMobField.set(biomeBase, mobs);
+        return biomeBase;
     }
 
     public void patchPotions() throws ReflectiveOperationException
