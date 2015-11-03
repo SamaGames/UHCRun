@@ -36,21 +36,20 @@ public class NMSPatcher
         BiomeBase[] biomes = BiomeBase.getBiomes();
         Map<String, BiomeBase> biomesMap = BiomeBase.o;
         BiomeBase defaultBiome = BiomeBase.FOREST;
-        ArrayList<BiomeBase.BiomeMeta> mobs = new ArrayList<>();
 
-        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 15, 10, 10));
-        mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 4, 3, 5));
-        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 15, 20, 40));
-        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 20, 20, 40));
-        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 15, 20, 40));
-        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 5, 5, 30));
+        addAnimalsSpawn("FOREST", BiomeBase.FOREST);
+        addAnimalsSpawn("JUNGLE", BiomeBase.JUNGLE);
+        addAnimalsSpawn("TAIGA", BiomeBase.TAIGA);
+        addAnimalsSpawn("TAIGA_HILLS", BiomeBase.TAIGA_HILLS);
+        addAnimalsSpawn("RIVER", BiomeBase.RIVER);
+        addAnimalsSpawn("BIRCH_FOREST", BiomeBase.BIRCH_FOREST);
+        addAnimalsSpawn("BIRCH_FOREST_HILLS", BiomeBase.BIRCH_FOREST_HILLS);
+        addAnimalsSpawn("DESERT", BiomeBase.DESERT);
+        addAnimalsSpawn("DESERT_HILLS", BiomeBase.DESERT_HILLS);
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
-        Field defaultMobField = BiomeBase.class.getDeclaredField("au");
-        defaultMobField.setAccessible(true);
 
         Reflection.setFinalStatic(defaultBiomeField, defaultBiome);
-        defaultMobField.set(defaultBiome, mobs);
 
         if (properties.getOptions().containsKey("blacklistedBiomes"))
         {
@@ -68,7 +67,6 @@ public class NMSPatcher
                 {
                     biomes[i] = defaultBiome;
                 }
-                defaultMobField.set(biomes[i], mobs);
                 setReedsPerChunk(biomes[i], (int) Reflection.getValue(biomes[i].as, BiomeDecorator.class, true, "F") * (Integer) (properties.getOptions().getOrDefault("reedsMultiplier", 2)));
             }
         }
@@ -79,6 +77,25 @@ public class NMSPatcher
     private void setReedsPerChunk(BiomeBase biome, int value) throws NoSuchFieldException, IllegalAccessException
     {
         Reflection.setValue(biome.as, BiomeDecorator.class, true, "F", value);
+    }
+
+    public void addAnimalsSpawn(String name, BiomeBase biomeBase) throws ReflectiveOperationException {
+
+        Field biome = BiomeBase.class.getDeclaredField(name);
+        Field defaultMobField = BiomeBase.class.getDeclaredField("au");
+        defaultMobField.setAccessible(true);
+
+        ArrayList<BiomeBase.BiomeMeta> mobs = new ArrayList<>();
+
+        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 15, 10, 10));
+        mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 4, 3, 5));
+        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 15, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 20, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 15, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 5, 5, 30));
+
+        defaultMobField.set(biomeBase, mobs);
+        Reflection.setFinalStatic(biome, biomeBase);
     }
 
     public void patchPotions() throws ReflectiveOperationException
