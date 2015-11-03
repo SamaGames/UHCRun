@@ -38,12 +38,12 @@ public class NMSPatcher
         BiomeBase defaultBiome = BiomeBase.FOREST;
         ArrayList<BiomeBase.BiomeMeta> mobs = new ArrayList<>();
 
-        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 15, 4, 4));
+        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 30, 4, 4));
         mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 15, 3, 5));
-        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 20, 10, 15));
-        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 21, 10, 15));
-        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 20, 10, 15));
-        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 6, 5, 30));
+        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 30, 10, 15));
+        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 25, 10, 15));
+        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 30, 10, 15));
+        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 10, 5, 30));
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
         Field defaultMobField = BiomeBase.class.getDeclaredField("au");
@@ -68,6 +68,7 @@ public class NMSPatcher
                 {
                     biomes[i] = defaultBiome;
                 }
+                defaultMobField.set(biomes[i], mobs);
                 setReedsPerChunk(biomes[i], (int) Reflection.getValue(biomes[i].as, BiomeDecorator.class, true, "F") * (Integer) (properties.getOptions().getOrDefault("reedsMultiplier", 2)));
             }
         }
