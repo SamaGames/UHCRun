@@ -42,7 +42,6 @@ repositories {
             password sgpass
         }
     }
-    maven { url "http://maven.sk89q.com/repo/" }
 }
 
 configurations {
