@@ -38,12 +38,12 @@ public class NMSPatcher
         BiomeBase defaultBiome = BiomeBase.FOREST;
         ArrayList<BiomeBase.BiomeMeta> mobs = new ArrayList<>();
 
-        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 30, 4, 4));
-        mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 15, 3, 5));
-        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 30, 10, 15));
-        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 25, 10, 15));
-        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 30, 10, 15));
-        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 10, 5, 30));
+        mobs.add(new BiomeBase.BiomeMeta(EntitySheep.class, 15, 10, 10));
+        mobs.add(new BiomeBase.BiomeMeta(EntityRabbit.class, 4, 3, 5));
+        mobs.add(new BiomeBase.BiomeMeta(EntityPig.class, 15, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityChicken.class, 20, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityCow.class, 15, 20, 40));
+        mobs.add(new BiomeBase.BiomeMeta(EntityWolf.class, 5, 5, 30));
 
         Field defaultBiomeField = BiomeBase.class.getDeclaredField("ad");
         Field defaultMobField = BiomeBase.class.getDeclaredField("au");
