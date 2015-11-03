@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Field;
-import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
