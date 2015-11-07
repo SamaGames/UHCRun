@@ -195,9 +195,9 @@ public class TeamGame extends AbstractGame
         Team team = teams.getTeam(killerID);
         if (team != null)
         {
-            for(UUID otherPlayer : team.getPlayersUUID())
+            for (UUID otherPlayer : team.getPlayersUUID())
             {
-                if(!otherPlayer.equals(killerID) && getPlayer(otherPlayer) != null)
+                if (!otherPlayer.equals(killerID) && getPlayer(otherPlayer) != null)
                 {
                     getPlayer(otherPlayer).addCoins(10, "Votre équipe fait un kill !");
                 }
