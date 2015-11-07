@@ -29,36 +29,37 @@ public class SoloGame extends AbstractGame
     @Override
     public void checkStump(Player player)
     {
-        UHCPlayer playerData = getPlayer(player.getUniqueId());
-        if (getInGamePlayers().size() == 3)
-        {
-            playerData.addCoins(20, "Troisième au classement !");
-        } else if (getInGamePlayers().size() == 2)
-        {
-            playerData.addCoins(50, "Second au classement !");
-            playerData.addStars(1, "Second au classement !");
-
-            // HACK
-            this.gamePlayers.remove(playerData.getUUID());
-            UUID winnerId = getInGamePlayers().keySet().iterator().next();
-            this.gamePlayers.put(playerData.getUUID(), playerData);
-
-            Player winner = server.getPlayer(winnerId);
-            if (winner == null)
+        server.getScheduler().runTaskLater(plugin, () -> {
+            UHCPlayer playerData = getPlayer(player.getUniqueId());
+            if (getInGamePlayers().size() == 3)
             {
-                this.handleGameEnd();
+                playerData.addCoins(20, "Troisième au classement !");
+            } else if (getInGamePlayers().size() == 2)
+            {
+                playerData.addCoins(50, "Second au classement !");
+                playerData.addStars(1, "Second au classement !");
+
+                // HACK
+                gamePlayers.remove(playerData.getUUID());
+                UUID winnerId = getInGamePlayers().keySet().iterator().next();
+                gamePlayers.put(playerData.getUUID(), playerData);
+
+                Player winner = server.getPlayer(winnerId);
+                if (winner == null)
+                {
+                    handleGameEnd();
+                } else
+                {
+                    win(winner);
+                }
+            } else if (getInGamePlayers().size() == 1)
+            {
+                handleGameEnd();
             } else
             {
-                this.win(winner);
+                server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + (getInGamePlayers().size() - 1) + ChatColor.YELLOW + " joueur(s) en vie.");
             }
-        } else if (getInGamePlayers().size() == 1)
-        {
-            this.handleGameEnd();
-        } else
-        {
-            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + (getInGamePlayers().size() - 1) + ChatColor.YELLOW + " joueur(s) en vie.");
-        }
-
+        }, 2L);
     }
 
     public void win(final Player player)

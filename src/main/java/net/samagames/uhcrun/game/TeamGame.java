@@ -195,71 +195,63 @@ public class TeamGame extends AbstractGame
         Team team = teams.getTeam(killerID);
         if (team != null)
         {
-            team.getPlayersUUID().stream().filter(otherPlayer -> !otherPlayer.equals(killerID)).forEach(otherPlayer -> getPlayer(otherPlayer).addCoins(10, "Votre équipe fait un kill !"));
+            for(UUID otherPlayer : team.getPlayersUUID())
+            {
+                if(!otherPlayer.equals(killerID) && getPlayer(otherPlayer) != null)
+                {
+                    getPlayer(otherPlayer).addCoins(10, "Votre équipe fait un kill !");
+                }
+            }
         }
     }
 
     @Override
-    public void checkStump(final Player player)
-    {
+    public void checkStump(final Player player) {
         server.getScheduler().runTaskLater(plugin, () -> {
             List<Team> toRemvove = new ArrayList<>();
             Team team = teams.getTeam(player.getUniqueId());
-            if (team == null)
-            {
+            if (team == null) {
                 return;
             }
 
             int left = team.removePlayer(player.getUniqueId());
-            if (left == 0)
-            {
+            if (left == 0) {
                 server.broadcastMessage(ChatColor.GOLD + "L'équipe " + team.getChatColor() + team.getTeamName() + ChatColor.GOLD + " a été éliminée !");
                 teams.remove(team);
 
                 left = teams.size();
-                if (left == 1)
-                {
+                if (left == 1) {
                     win(teams.get(0));
                     return;
-                } else if (left < 1)
-                {
+                } else if (left < 1) {
                     handleGameEnd();
                     return;
-                } else
-                {
+                } else {
                     server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + teams.size() + ChatColor.YELLOW + " équipes en jeu.");
                 }
             }
 
             // Security check
-            for (Team t : teams)
-            {
+            for (Team t : teams) {
                 int players1 = 0;
-                if (!t.isEmpty())
-                {
-                    for (UUID id : t.getPlayersUUID())
-                    {
-                        if (server.getPlayer(id) != null)
-                        {
+                if (!t.isEmpty()) {
+                    for (UUID id : t.getPlayersUUID()) {
+                        if (server.getPlayer(id) != null) {
                             players1++;
                         }
                     }
                 }
 
-                if (players1 == 0)
-                {
+                if (players1 == 0) {
                     server.broadcastMessage(ChatColor.GOLD + "L'équipe " + t.getChatColor() + t.getTeamName() + ChatColor.GOLD + " a été éliminée !");
                     toRemvove.add(t);
 
                     left = teams.size();
-                    if (left == 2)
-                    {
+                    if (left == 2) {
                         win(teams.get(0));
-                    } else if (left < 2)
-                    {
+                    } else if (left < 2) {
                         handleGameEnd();
-                    } else
-                    {
+                    } else {
                         server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + teams.size() + ChatColor.YELLOW + " équipes en jeu.");
                     }
                 }

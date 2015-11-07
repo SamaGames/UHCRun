@@ -216,8 +216,11 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
                 killer = (Player) lastDamager;
                 if (killer.isOnline() && this.isInGame(killer.getUniqueId()))
                 {
-                    this.creditKillCoins(getPlayer(killer.getUniqueId()).addKill());
-                    this.increaseStat(killer.getUniqueId(), "kills", 1);
+                    final Player finalKiller = killer;
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        creditKillCoins(getPlayer(finalKiller.getUniqueId()).addKill());
+                        increaseStat(finalKiller.getUniqueId(), "kills", 1);
+                    });
                     killer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 400, 1));
                 } else
                 {
@@ -240,7 +243,8 @@ public abstract class AbstractGame extends net.samagames.api.games.Game<UHCPlaye
             removeFromGame(player.getUniqueId());
             if (!logout)
             {
-                this.increaseStat(player.getUniqueId(), "deaths", 1);
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> increaseStat(player.getUniqueId(), "deaths", 1));
+
                 Titles.sendTitle(player, 5, 70, 5, ChatColor.RED + "Vous êtes mort !", ChatColor.GOLD + "Vous êtes maintenant spectateur.");
                 player.setGameMode(GameMode.SPECTATOR);
                 player.setHealth(20.0D);
