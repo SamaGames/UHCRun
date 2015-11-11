@@ -2,13 +2,12 @@ package net.samagames.uhcrun.game;
 
 import net.samagames.tools.Titles;
 import net.samagames.uhcrun.UHCRun;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -29,60 +28,64 @@ public class SoloGame extends AbstractGame
     @Override
     public void checkStump(Player player)
     {
-        server.getScheduler().runTaskLater(plugin, () -> {
-            UHCPlayer playerData = getPlayer(player.getUniqueId());
-            if (getInGamePlayers().size() == 3)
-            {
-                playerData.addCoins(20, "Troisième au classement !");
-            } else if (getInGamePlayers().size() == 2)
-            {
-                playerData.addCoins(50, "Second au classement !");
-                playerData.addStars(1, "Second au classement !");
+        UHCPlayer playerData = getPlayer(player.getUniqueId());
+        if (getInGamePlayers().size() == 3)
+        {
+            playerData.addCoins(20, "Troisième au classement !");
+        } else if (getInGamePlayers().size() == 2)
+        {
+            playerData.addCoins(50, "Second au classement !");
+            playerData.addStars(1, "Second au classement !");
 
-                // HACK
-                gamePlayers.remove(playerData.getUUID());
-                UUID winnerId = getInGamePlayers().keySet().iterator().next();
-                gamePlayers.put(playerData.getUUID(), playerData);
+            // HACK
+            gamePlayers.remove(playerData.getUUID());
+            UUID winnerId = getInGamePlayers().keySet().iterator().next();
+            gamePlayers.put(playerData.getUUID(), playerData);
 
-                Player winner = server.getPlayer(winnerId);
-                if (winner == null)
-                {
-                    handleGameEnd();
-                } else
-                {
-                    win(winner);
-                }
-            } else if (getInGamePlayers().size() == 1)
+            Player winner = server.getPlayer(winnerId);
+            if (winner == null)
             {
                 handleGameEnd();
             } else
             {
-                server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + (getInGamePlayers().size() - 1) + ChatColor.YELLOW + " joueur(s) en vie.");
+                win(winner);
             }
-        }, 2L);
+        } else if (getInGamePlayers().size() == 1)
+        {
+            handleGameEnd();
+        } else
+        {
+            server.broadcastMessage(ChatColor.YELLOW + "Il reste encore " + ChatColor.AQUA + (getInGamePlayers().size() - 1) + ChatColor.YELLOW + " joueur(s) en vie.");
+        }
     }
 
     public void win(final Player player)
     {
         final UHCPlayer playerData = this.getPlayer(player.getUniqueId());
-        playerData.addStars(2, "Victoire !");
-        playerData.addCoins(100, "Victoire ! ");
+        if(playerData != null)
+        {
+            playerData.addStars(2, "Victoire !");
+            playerData.addCoins(100, "Victoire ! ");
 
-        try
-        {
-            this.increaseStat(player.getUniqueId(), "wins", 1);
-        } catch (Exception ex)
-        {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                try {
+                    this.increaseStat(player.getUniqueId(), "wins", 1);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            server.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
+
+            List<Player> players = new ArrayList<>();
+            players.addAll(server.getOnlinePlayers());
+            for (Player user : players)
+            {
+                Titles.sendTitle(user, 5, 70, 5, ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
+            }
+
+            this.effectsOnWinner(player);
         }
-
-        server.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Victoire de " + player.getDisplayName() + ChatColor.GOLD + "" + ChatColor.BOLD + " !");
-
-        for (Player user : server.getOnlinePlayers())
-        {
-            Titles.sendTitle(user, 5, 70, 5, ChatColor.GOLD + "Victoire de " + player.getDisplayName(), "");
-        }
-
-        this.effectsOnWinner(player);
         this.handleGameEnd();
     }
 
