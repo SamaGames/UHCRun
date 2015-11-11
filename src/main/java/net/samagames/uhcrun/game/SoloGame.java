@@ -62,7 +62,7 @@ public class SoloGame extends AbstractGame
     public void win(final Player player)
     {
         final UHCPlayer playerData = this.getPlayer(player.getUniqueId());
-        if(playerData != null)
+        if (playerData != null)
         {
             playerData.addStars(2, "Victoire !");
             playerData.addCoins(100, "Victoire ! ");
