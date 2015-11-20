@@ -1,26 +1,19 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 apply plugin: 'idea'
-apply plugin: 'eclipse'
-apply plugin: 'checkstyle'
 
-group = 'net.samagames'
-version = '2.0.0-SNAPSHOT'
-archivesBaseName = 'uhcrun'
+group = 'fr.blueslime'
+version = '3.0.0'
+archivesBaseName = 'UHCRun'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-//force UTF-8 to the compileJava task
-compileJava.options.encoding = 'UTF-8'
-
-checkstyle {
-    toolVersion = "6.7"
-    configFile = file('guidelines/uhcrun.checkstyle')
-}
-
 repositories {
     mavenCentral()
+
+    maven { url "http://maven.samagames.net/public/" }
+    maven { url "http://maven.sk89q.com/repo/" }
+
     maven {
         url "http://maven.samagames.net/developpers/"
         credentials {
@@ -28,47 +21,13 @@ repositories {
             password sgpass
         }
     }
-    maven {
-        url "http://maven.samagames.net/public/"
-        credentials {
-            username sguser
-            password sgpass
-        }
-    }
-    maven {
-        url "http://maven.samagames.net/network/"
-        credentials {
-            username sguser
-            password sgpass
-        }
-    }
-}
-
-configurations {
-    bundle {
-
-    }
-    compile {
-        extendsFrom bundle
-    }
-}
-
-configurations.all {
-    // check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-jar {
-    from { configurations.bundle.collect { it.isDirectory() ? it : zipTree(it) } }
-    include '**'
 }
 
 dependencies {
     compile group: 'net.samagames', name: 'SamaGamesAPI', version: '1.0.0-SNAPSHOT', changing: true
+    compile group: 'net.samagames', name: 'SurvivalAPI', version: '1.0.0-SNAPSHOT', changing: true
+
     compile(group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT', changing: true) {
         transitive = false
     }
-    compile(group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version: '6.1.1-SNAPSHOT', changing: true)
-    compile group: 'net.samagames', name: 'PermissionsAPI', version: '2.0.0-SNAPSHOT', changing: true
-    bundle 'org.rauschig:jarchivelib:0.7.1'
 }
