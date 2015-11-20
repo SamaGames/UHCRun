@@ -3,9 +3,13 @@ package net.samagames.uhcrun;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.game.SurvivalGameLoop;
+import net.samagames.survivalapi.game.SurvivalPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.Set;
 
 public class UHCRunGameLoop extends SurvivalGameLoop
 {
@@ -34,6 +38,12 @@ public class UHCRunGameLoop extends SurvivalGameLoop
             SamaGamesAPI.get().getGameManager().setMaxReconnectTime(-1);
 
             this.game.disableDamages();
+
+            for (SurvivalPlayer player : (Set<SurvivalPlayer>) this.game.getInGamePlayers().values())
+            {
+                player.getPlayerIfOnline().removePotionEffect(PotionEffectType.SPEED);
+                player.getPlayerIfOnline().removePotionEffect(PotionEffectType.FAST_DIGGING);
+            }
 
             this.game.getWorldBorder().setSize(400.0D);
             this.game.getWorldBorder().setSize(10.0D, 10L * 60L);
