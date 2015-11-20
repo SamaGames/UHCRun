@@ -6,14 +6,15 @@ import net.samagames.survivalapi.SurvivalAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.modules.block.RapidOresModule;
 import net.samagames.survivalapi.modules.block.AutomaticTNTModule;
+import net.samagames.survivalapi.modules.block.WorldDropModule;
 import net.samagames.survivalapi.modules.combat.DropMyEffectsModule;
 import net.samagames.survivalapi.modules.craft.*;
 import net.samagames.survivalapi.modules.entity.RapidUsefullModule;
-import net.samagames.survivalapi.modules.gameplay.ConstantPotionModule;
-import net.samagames.survivalapi.modules.gameplay.RapidFoodModule;
-import net.samagames.survivalapi.modules.gameplay.RapidStackingModule;
+import net.samagames.survivalapi.modules.gameplay.*;
 import net.samagames.uhcrun.types.UHCRunSurvivalSoloGame;
 import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -40,12 +41,19 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(AutomaticTNTModule.class, null);
         SurvivalAPI.get().loadModule(WaterMovingBootsModule.class, null);
         SurvivalAPI.get().loadModule(DropMyEffectsModule.class, null);
+        SurvivalAPI.get().loadModule(FastTreeModule.class, null);
+        SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 255, 2));
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 255, 1));
 
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
+
+        WorldDropModule.ConfigurationBuilder worldDropConfiguration = new WorldDropModule.ConfigurationBuilder();
+        worldDropConfiguration.addCustomDrop(Material.SAND, new ItemStack(Material.GLASS, 1));
+
+        SurvivalAPI.get().loadModule(WorldDropModule.class, worldDropConfiguration.build());
 
         if (nb > 1)
             game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 20 minutes", "=", nb);
