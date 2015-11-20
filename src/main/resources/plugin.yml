@@ -1,12 +1,8 @@
 name: UHCRun
 main: net.samagames.uhcrun.UHCRun
-version: 2.0
-depend: [WorldEdit]
-softdepend: [SamaGamesAPI]
-load: STARTUP
-commands:
-   nextevent:
-      description: Execute le prochain evenement de force
-      usage: /<command>
-      permission: sg.op
-      permission-message: Permission non accordée
+version: 3.0
+
+depend: [SamaGamesAPI, SurvivalAPI]
+
+author: BlueSlime
+website: http://samagames.net/
