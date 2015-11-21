@@ -9,7 +9,7 @@ import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Set;
+import java.util.Collection;
 
 public class UHCRunGameLoop extends SurvivalGameLoop
 {
@@ -39,7 +39,7 @@ public class UHCRunGameLoop extends SurvivalGameLoop
 
             this.game.disableDamages();
 
-            for (SurvivalPlayer player : (Set<SurvivalPlayer>) this.game.getInGamePlayers().values())
+            for (SurvivalPlayer player : (Collection<SurvivalPlayer>) this.game.getInGamePlayers().values())
             {
                 player.getPlayerIfOnline().removePotionEffect(PotionEffectType.SPEED);
                 player.getPlayerIfOnline().removePotionEffect(PotionEffectType.FAST_DIGGING);
