@@ -4,6 +4,7 @@ import net.samagames.api.SamaGamesAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.game.SurvivalGameLoop;
 import net.samagames.survivalapi.game.SurvivalPlayer;
+import net.samagames.uhcrun.types.UHCRunSurvivalGame;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +39,7 @@ public class UHCRunGameLoop extends SurvivalGameLoop
             SamaGamesAPI.get().getGameManager().setMaxReconnectTime(-1);
 
             this.game.disableDamages();
+            ((UHCRunSurvivalGame) this.game).teleportDeathMatch();
 
             for (SurvivalPlayer player : (Collection<SurvivalPlayer>) this.game.getInGamePlayers().values())
             {
