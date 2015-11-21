@@ -10,7 +10,7 @@ import net.samagames.survivalapi.modules.block.TorchThanCoalModule;
 import net.samagames.survivalapi.modules.block.WorldDropModule;
 import net.samagames.survivalapi.modules.combat.DropMyEffectsModule;
 import net.samagames.survivalapi.modules.craft.*;
-import net.samagames.survivalapi.modules.entity.RapidUsefullModule;
+import net.samagames.survivalapi.modules.gameplay.RapidUsefullModule;
 import net.samagames.survivalapi.modules.gameplay.*;
 import net.samagames.uhcrun.types.UHCRunSurvivalSoloGame;
 import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
@@ -48,8 +48,9 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(TorchThanCoalModule.class, new TorchThanCoalModule.ConfigurationBuilder().build());
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 255, 2));
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 255, 1));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 200, 0));
 
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
 

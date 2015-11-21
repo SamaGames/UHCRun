@@ -10,7 +10,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
-import java.util.Set;
 
 public class UHCRunGameLoop extends SurvivalGameLoop
 {
