@@ -6,6 +6,7 @@ import net.samagames.survivalapi.SurvivalAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.modules.block.RapidOresModule;
 import net.samagames.survivalapi.modules.block.AutomaticTNTModule;
+import net.samagames.survivalapi.modules.block.TorchThanCoalModule;
 import net.samagames.survivalapi.modules.block.WorldDropModule;
 import net.samagames.survivalapi.modules.combat.DropMyEffectsModule;
 import net.samagames.survivalapi.modules.craft.*;
@@ -43,6 +44,7 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(DropMyEffectsModule.class, null);
         SurvivalAPI.get().loadModule(FastTreeModule.class, null);
         SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
+        SurvivalAPI.get().loadModule(TorchThanCoalModule.class, null);
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 255, 2));
