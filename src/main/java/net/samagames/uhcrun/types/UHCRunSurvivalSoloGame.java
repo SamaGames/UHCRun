@@ -43,6 +43,8 @@ public class UHCRunSurvivalSoloGame extends SurvivalSoloGame<UHCRunGameLoop> imp
                 continue;
             }
 
+            this.removeEffects(player);
+
             Location location = locationIterator.next();
             player.teleport(new Location(location.getWorld(), location.getX() * 4 / 10, 150.0, location.getZ() * 4 / 10));
         }

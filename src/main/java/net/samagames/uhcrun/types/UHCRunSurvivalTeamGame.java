@@ -51,9 +51,14 @@ public class UHCRunSurvivalTeamGame extends SurvivalTeamGame<UHCRunGameLoop> imp
                 Player player = this.server.getPlayer(playerUUID);
 
                 if (player == null)
+                {
                     this.gamePlayers.remove(playerUUID);
+                }
                 else
+                {
+                    this.removeEffects(player);
                     player.teleport(new Location(location.getWorld(), location.getX() * 4 / 10, 150.0, location.getZ() * 4 / 10));
+                }
             }
         }
 

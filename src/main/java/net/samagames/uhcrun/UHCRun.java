@@ -46,16 +46,11 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(TorchThanCoalModule.class, new TorchThanCoalModule.ConfigurationBuilder().build());
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1));
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0));
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 200, 0));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, 0));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 0));
 
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
-
-        WorldDropModule.ConfigurationBuilder worldDropConfiguration = new WorldDropModule.ConfigurationBuilder();
-        worldDropConfiguration.addCustomDrop(Material.SAND, new ItemStack(Material.GLASS, 1));
-
-        SurvivalAPI.get().loadModule(WorldDropModule.class, worldDropConfiguration.build());
 
         if (nb > 1)
             game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 20 minutes", "=", nb);
