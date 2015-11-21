@@ -10,7 +10,6 @@ import net.samagames.survivalapi.modules.block.TorchThanCoalModule;
 import net.samagames.survivalapi.modules.block.WorldDropModule;
 import net.samagames.survivalapi.modules.combat.DropMyEffectsModule;
 import net.samagames.survivalapi.modules.craft.*;
-import net.samagames.survivalapi.modules.gameplay.RapidUsefullModule;
 import net.samagames.survivalapi.modules.gameplay.*;
 import net.samagames.uhcrun.types.UHCRunSurvivalSoloGame;
 import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
@@ -36,7 +35,7 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(RapidToolsModule.class, null);
         SurvivalAPI.get().loadModule(RapidFoodModule.class, null);
         SurvivalAPI.get().loadModule(RapidStackingModule.class, null);
-        SurvivalAPI.get().loadModule(RapidUsefullModule.class, null);
+        //SurvivalAPI.get().loadModule(RapidUsefullModule.class, null);
         SurvivalAPI.get().loadModule(RapidOresModule.class, new RapidOresModule.ConfigurationBuilder().build());
 
         SurvivalAPI.get().loadModule(AutomaticTNTModule.class, null);
