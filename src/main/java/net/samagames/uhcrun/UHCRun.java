@@ -21,8 +21,6 @@ public class UHCRun extends JavaPlugin
     @Override
     public void onEnable()
     {
-        System.out.print("starting uhcrun");
-
         SurvivalGame game;
 
         int nb = SamaGamesAPI.get().getGameManager().getGameProperties().getOption("playersPerTeam", new JsonPrimitive(1)).getAsInt();
@@ -51,17 +49,11 @@ public class UHCRun extends JavaPlugin
 
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
 
-        System.out.print("finished modules");
-
         if (nb > 1)
             game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 20 minutes", "=", nb);
         else
             game = new UHCRunSurvivalSoloGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 20 minutes", "=");
 
-        System.out.print("finished game instance");
-
         SamaGamesAPI.get().getGameManager().registerGame(game);
-
-        System.out.print("finished uhcrun");
     }
 }
