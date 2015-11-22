@@ -7,14 +7,11 @@ import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.modules.block.RapidOresModule;
 import net.samagames.survivalapi.modules.block.AutomaticTNTModule;
 import net.samagames.survivalapi.modules.block.TorchThanCoalModule;
-import net.samagames.survivalapi.modules.block.WorldDropModule;
 import net.samagames.survivalapi.modules.combat.DropMyEffectsModule;
 import net.samagames.survivalapi.modules.craft.*;
 import net.samagames.survivalapi.modules.gameplay.*;
 import net.samagames.uhcrun.types.UHCRunSurvivalSoloGame;
 import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -46,7 +43,7 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(TorchThanCoalModule.class, new TorchThanCoalModule.ConfigurationBuilder().build());
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, 0));
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 0));
 
