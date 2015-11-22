@@ -35,7 +35,6 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(RapidUsefullModule.class, null);
         SurvivalAPI.get().loadModule(RapidOresModule.class, new RapidOresModule.ConfigurationBuilder().build());
 
-        SurvivalAPI.get().loadModule(AutomaticTNTModule.class, null);
         SurvivalAPI.get().loadModule(DropMyEffectsModule.class, null);
         SurvivalAPI.get().loadModule(FastTreeModule.class, null);
         SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
@@ -45,14 +44,13 @@ public class UHCRun extends JavaPlugin
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
         constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, 0));
-        constantPotionConfiguration.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 0));
 
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
 
         if (nb > 1)
-            game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 20 minutes", "=", nb);
+            game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", nb);
         else
-            game = new UHCRunSurvivalSoloGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 20 minutes", "=");
+            game = new UHCRunSurvivalSoloGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=");
 
         SamaGamesAPI.get().getGameManager().registerGame(game);
     }
