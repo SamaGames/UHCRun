@@ -65,7 +65,7 @@ public class UHCRunGameLoop extends SurvivalGameLoop
             this.game.enablePVP();
 
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Les dégats et le PvP sont maintenant activés. Bonne chance !", true);
-            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("La map est maintenant en réduction constance pendant les 10 prochaines minutes.", true);
+            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("La map est maintenant en réduction constante pendant les 10 prochaines minutes.", true);
 
             this.createReducingEvent();
         });
