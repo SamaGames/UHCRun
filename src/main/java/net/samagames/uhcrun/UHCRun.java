@@ -4,6 +4,7 @@ import com.google.gson.JsonPrimitive;
 import net.samagames.api.SamaGamesAPI;
 import net.samagames.survivalapi.SurvivalAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
+import net.samagames.survivalapi.modules.block.RandomChestModule;
 import net.samagames.survivalapi.modules.block.RapidOresModule;
 import net.samagames.survivalapi.modules.combat.AutomaticTNTModule;
 import net.samagames.survivalapi.modules.block.TorchThanCoalModule;
@@ -12,6 +13,8 @@ import net.samagames.survivalapi.modules.craft.*;
 import net.samagames.survivalapi.modules.gameplay.*;
 import net.samagames.uhcrun.types.UHCRunSurvivalSoloGame;
 import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -47,6 +50,14 @@ public class UHCRun extends JavaPlugin
         constantPotionConfiguration.addPotionEffect(PotionEffectType.FAST_DIGGING, 0);
 
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
+
+        RandomChestModule.ConfigurationBuilder randomChestConfiguration = new RandomChestModule.ConfigurationBuilder();
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.DIAMOND, 2), 30);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.REDSTONE, 4), 60);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.NETHER_STALK, 3), 50);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.GOLD_INGOT, 2), 40);
+
+        SurvivalAPI.get().loadModule(RandomChestModule.class, randomChestConfiguration.build());
 
         if (nb > 1)
             game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", nb);
