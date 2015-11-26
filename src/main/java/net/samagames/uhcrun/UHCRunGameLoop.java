@@ -17,6 +17,8 @@ public class UHCRunGameLoop extends SurvivalGameLoop
     public UHCRunGameLoop(JavaPlugin plugin, Server server, SurvivalGame game)
     {
         super(plugin, server, game);
+
+        this.episodeEnabled = false;
     }
 
     @Override
