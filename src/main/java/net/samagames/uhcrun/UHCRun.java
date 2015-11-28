@@ -16,7 +16,6 @@ import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class UHCRun extends JavaPlugin
@@ -43,7 +42,7 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
         //SurvivalAPI.get().loadModule(LoveMachineModule.class, null);
         SurvivalAPI.get().loadModule(TorchThanCoalModule.class, new TorchThanCoalModule.ConfigurationBuilder().build());
-        SurvivalAPI.get().loadModule(RemoveItemOnUse.class, null);
+        SurvivalAPI.get().loadModule(RemoveItemOnUseModule.class, null);
 
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
