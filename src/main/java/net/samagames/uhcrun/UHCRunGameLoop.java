@@ -25,7 +25,7 @@ public class UHCRunGameLoop extends SurvivalGameLoop
         this.nextEvent = new TimedEvent(1, 0, "Dégats actifs", ChatColor.GREEN, () ->
         {
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Les dégats sont désormais actifs.", true);
-            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Le map sera réduire dans 19 minutes. Le PvP sera activé à ce moment là.", true);
+            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Le map sera réduite dans 19 minutes. Le PvP sera activé à ce moment là.", true);
             this.game.enableDamages();
 
             this.createTeleportationEvent();
@@ -50,7 +50,7 @@ public class UHCRunGameLoop extends SurvivalGameLoop
             this.game.getWorldBorder().setSize(400.0D);
             this.game.getWorldBorder().setSize(10.0D, 10L * 60L);
 
-            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("La map est désormais réduire. Les bordures sont en coordonnées " + ChatColor.RED + "-" + (this.game.getWorldBorder().getSize() / 2) + " +" + (this.game.getWorldBorder().getSize() / 2) + ChatColor.RESET + ".", true);
+            this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("La map est désormais réduite. Les bordures sont en coordonnées " + ChatColor.RED + "-" + (this.game.getWorldBorder().getSize() / 2) + " +" + (this.game.getWorldBorder().getSize() / 2) + ChatColor.RESET + ".", true);
             this.game.getCoherenceMachine().getMessageManager().writeCustomMessage("Les dégats et le PvP seront activés dans 30 secondes !", true);
 
             this.createDeathmatchEvent();
