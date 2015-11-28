@@ -42,7 +42,7 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(DropMyEffectsModule.class, null);
         SurvivalAPI.get().loadModule(FastTreeModule.class, null);
         SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
-        SurvivalAPI.get().loadModule(LoveMachineModule.class, null);
+        //SurvivalAPI.get().loadModule(LoveMachineModule.class, null);
         SurvivalAPI.get().loadModule(TorchThanCoalModule.class, new TorchThanCoalModule.ConfigurationBuilder().build());
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
