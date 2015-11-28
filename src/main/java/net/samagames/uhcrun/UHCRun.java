@@ -41,8 +41,10 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(AutomaticTNTModule.class, null);
         SurvivalAPI.get().loadModule(FastTreeModule.class, null);
         SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
-        SurvivalAPI.get().loadModule(LoveMachineModule.class, null);
+        //SurvivalAPI.get().loadModule(LoveMachineModule.class, null);
         SurvivalAPI.get().loadModule(TorchThanCoalModule.class, new TorchThanCoalModule.ConfigurationBuilder().build());
+        SurvivalAPI.get().loadModule(RemoveItemOnUse.class, null);
+
 
         ConstantPotionModule.ConfigurationBuilder constantPotionConfiguration = new ConstantPotionModule.ConfigurationBuilder();
         constantPotionConfiguration.addPotionEffect(PotionEffectType.SPEED, 0);
@@ -51,10 +53,10 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
 
         RandomChestModule.ConfigurationBuilder randomChestConfiguration = new RandomChestModule.ConfigurationBuilder();
-        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.DIAMOND, 2), 30);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.DIAMOND, 2), 40);
         randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.REDSTONE, 4), 60);
-        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.NETHER_STALK, 3), 50);
-        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.GOLD_INGOT, 2), 40);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.NETHER_STALK, 3), 55);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.GOLD_INGOT, 2), 50);
 
         SurvivalAPI.get().loadModule(RandomChestModule.class, randomChestConfiguration.build());
 

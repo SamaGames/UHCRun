@@ -21,6 +21,14 @@ repositories {
             password sgpass
         }
     }
+    
+    maven {
+        url "http://maven.samagames.net/network/"
+        credentials {
+            username sguser
+            password sgpass
+        }
+    }
 }
 
 dependencies {
