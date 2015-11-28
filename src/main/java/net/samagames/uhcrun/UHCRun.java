@@ -52,10 +52,10 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(ConstantPotionModule.class, constantPotionConfiguration.build());
 
         RandomChestModule.ConfigurationBuilder randomChestConfiguration = new RandomChestModule.ConfigurationBuilder();
-        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.DIAMOND, 2), 30);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.DIAMOND, 2), 40);
         randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.REDSTONE, 4), 60);
-        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.NETHER_STALK, 3), 50);
-        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.GOLD_INGOT, 2), 40);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.NETHER_STALK, 3), 55);
+        randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.GOLD_INGOT, 2), 50);
 
         SurvivalAPI.get().loadModule(RandomChestModule.class, randomChestConfiguration.build());
 
