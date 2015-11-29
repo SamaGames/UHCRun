@@ -16,7 +16,6 @@ import net.samagames.uhcrun.types.UHCRunSurvivalTeamGame;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class UHCRun extends JavaPlugin
@@ -39,7 +38,6 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(RapidOresModule.class, new RapidOresModule.ConfigurationBuilder().build());
 
         SurvivalAPI.get().loadModule(AutomaticTNTModule.class, null);
-        SurvivalAPI.get().loadModule(DropMyEffectsModule.class, null);
         SurvivalAPI.get().loadModule(FastTreeModule.class, null);
         SurvivalAPI.get().loadModule(PersonalBlocksModule.class, null);
         //SurvivalAPI.get().loadModule(LoveMachineModule.class, null);
@@ -60,6 +58,12 @@ public class UHCRun extends JavaPlugin
         randomChestConfiguration.addItemWithPercentage(new ItemStack(Material.GOLD_INGOT, 2), 50);
 
         SurvivalAPI.get().loadModule(RandomChestModule.class, randomChestConfiguration.build());
+
+        DropMyEffectsModule.ConfigurationBuilder dropMyEffectsConfiguration = new DropMyEffectsModule.ConfigurationBuilder();
+        dropMyEffectsConfiguration.blacklistPotionEffect(PotionEffectType.SPEED);
+        dropMyEffectsConfiguration.blacklistPotionEffect(PotionEffectType.FAST_DIGGING);
+
+        SurvivalAPI.get().loadModule(DropMyEffectsModule.class, dropMyEffectsConfiguration.build());
 
         if (nb > 1)
             game = new UHCRunSurvivalTeamGame(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", nb);
