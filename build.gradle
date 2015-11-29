@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 apply plugin: 'idea'
 
 group = 'fr.blueslime'
@@ -21,7 +22,7 @@ repositories {
             password sgpass
         }
     }
-    
+
     maven {
         url "http://maven.samagames.net/network/"
         credentials {
