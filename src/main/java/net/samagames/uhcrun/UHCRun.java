@@ -30,7 +30,7 @@ public class UHCRun extends JavaPlugin
         SurvivalAPI.get().loadModule(DisableLevelTwoPotionModule.class, null);
         SurvivalAPI.get().loadModule(DisableNotchAppleModule.class, null);
         SurvivalAPI.get().loadModule(DisableSpeckedMelonModule.class, null);
-        SurvivalAPI.get().loadModule(StackableItemModule.class, null);
+        //SurvivalAPI.get().loadModule(StackableItemModule.class, null); //WIP
 
         SurvivalAPI.get().loadModule(RapidOresModule.class, new RapidOresModule.ConfigurationBuilder().build());
         SurvivalAPI.get().loadModule(RapidToolsModule.class, null);
