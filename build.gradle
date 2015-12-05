@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 
-group = 'fr.blueslime'
+group = 'net.samagames'
 version = '3.0.0'
 archivesBaseName = 'UHCRun'
 
