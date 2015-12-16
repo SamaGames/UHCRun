@@ -18,9 +18,9 @@ public class UHCRun extends JavaPlugin
         int nb = SamaGamesAPI.get().getGameManager().getGameProperties().getOption("playersPerTeam", new JsonPrimitive(1)).getAsInt();
 
         if (nb > 1)
-            game = new RunBasedTeamGame<RunBasedGameLoop>(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", RunBasedGameLoop.class, nb);
+            game = new RunBasedTeamGame<>(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", RunBasedGameLoop.class, nb);
         else
-            game = new RunBasedSoloGame<RunBasedGameLoop>(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", RunBasedGameLoop.class);
+            game = new RunBasedSoloGame<>(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", RunBasedGameLoop.class);
 
         SamaGamesAPI.get().getGameManager().setMaxReconnectTime(20);
         SamaGamesAPI.get().getGameManager().registerGame(game);
