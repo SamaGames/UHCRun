@@ -1,6 +1,6 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 apply plugin: 'idea'
+apply plugin: 'sonar-runner'
 
 group = 'net.samagames'
 version = '3.0.0'
@@ -8,6 +8,8 @@ archivesBaseName = 'UHCRun'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
@@ -29,6 +31,16 @@ repositories {
             username sguser
             password sgpass
         }
+    }
+}
+
+sonarRunner {
+    sonarProperties {
+        property "sonar.projectKey", group + "." + archivesBaseName.toString().toLowerCase()
+        property "sonar.projectName", archivesBaseName
+
+        property "sonar.login", sonaruser
+        property "sonar.password", sonarpass
     }
 }
 
