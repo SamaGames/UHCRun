@@ -36,7 +36,7 @@ repositories {
 
 sonarRunner {
     sonarProperties {
-        property "sonar.projectKey", group + "." + archivesBaseName.toString().toLowerCase()
+        property "sonar.projectKey", group + "." + archivesBaseName
         property "sonar.projectName", archivesBaseName
 
         property "sonar.login", sonaruser
