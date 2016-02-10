@@ -36,6 +36,7 @@ repositories {
 
 sonarRunner {
     sonarProperties {
+        property "sonar.host.url", "http://blackmesa.samagames.net:9494/"
         property "sonar.projectKey", group + "." + archivesBaseName
         property "sonar.projectName", archivesBaseName
 
