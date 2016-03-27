@@ -4,5 +4,7 @@ version: 3.0
 
 depend: [SamaGamesAPI, SurvivalAPI]
 
+load: STARTUP
+
 author: BlueSlime
 website: http://samagames.net/
