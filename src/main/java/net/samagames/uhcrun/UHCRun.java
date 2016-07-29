@@ -26,6 +26,7 @@ public class UHCRun extends JavaPlugin
             game = new RunBasedSoloGame<>(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", RunBasedGameLoop.class);
 
         SamaGamesAPI.get().getGameManager().setMaxReconnectTime(20);
+        SamaGamesAPI.get().getGameManager().setGameStatisticsHelper(new UHCRunStatisticsHelper());
         SamaGamesAPI.get().getGameManager().registerGame(game);
     }
 }
