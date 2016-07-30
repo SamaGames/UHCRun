@@ -2,6 +2,7 @@ package net.samagames.uhcrun;
 
 import com.google.gson.JsonPrimitive;
 import net.samagames.api.SamaGamesAPI;
+import net.samagames.api.games.GamesNames;
 import net.samagames.survivalapi.SurvivalAPI;
 import net.samagames.survivalapi.game.SurvivalGame;
 import net.samagames.survivalapi.game.types.run.RunBasedGameLoop;
@@ -26,6 +27,8 @@ public class UHCRun extends JavaPlugin
             game = new RunBasedSoloGame<>(this, "uhcrun", "UHCRun", "L’expérience d’un UHC en 30 minutes", "=", RunBasedGameLoop.class);
 
         SamaGamesAPI.get().getGameManager().setMaxReconnectTime(20);
+        SamaGamesAPI.get().getStatsManager().setStatsToLoad(GamesNames.UHCRUN, true);
+        SamaGamesAPI.get().getShopsManager().setShopToLoad(GamesNames.UHCRUN, true);
         SamaGamesAPI.get().getGameManager().setGameStatisticsHelper(new UHCRunStatisticsHelper());
         SamaGamesAPI.get().getGameManager().registerGame(game);
     }
